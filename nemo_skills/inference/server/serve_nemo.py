@@ -112,6 +112,7 @@ def main(cfg) -> None:
         pretrained_cfg.precision = trainer.precision
         pretrained_cfg.tensor_model_parallel_size = cfg.tensor_model_parallel_size
         pretrained_cfg.pipeline_model_parallel_size = cfg.pipeline_model_parallel_size
+        pretrained_cfg.use_flash_attention = cfg.get("use_flash_attention", False)
         if trainer.precision == "16":
             pretrained_cfg.megatron_amp_O2 = False
         elif trainer.precision in ['bf16', 'bf16-mixed'] and cfg.get('megatron_amp_O2', False):
