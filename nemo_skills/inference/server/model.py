@@ -281,7 +281,7 @@ class NemoModel(BaseModel):
             "top_p": top_p,
             "random_seed": random_seed,
             "repetition_penalty": repetition_penalty,
-            "end_strings": ["<|endoftext|>"] + stop_phrases,
+            "end_strings": ["<|endoftext|>", '<extra_id_1>'] + stop_phrases,
         }
         outputs = self._send_request(request)
         outputs = outputs['sentences']
