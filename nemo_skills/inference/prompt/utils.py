@@ -40,6 +40,7 @@ datasets = [
 class PromptConfig:
     delimiter: str = MISSING
     prefix: str = MISSING
+    suffix: str = ""
     template: str = MISSING
     context_type: str = "empty"
     examples_type: Optional[str] = None
@@ -72,8 +73,13 @@ def get_prompt(prompt_config: PromptConfig, input_dict: dict):
     filled_examples = []
     for example_dict in examples:
         filled_examples.append(prompt_config.template.format(context=context.format(**example_dict), **example_dict))
-    filled_examples.append(
-        prompt_config.template.format(context=context.format(**input_dict), **input_dict, generated_solution="")
-    )
+    if prompt_config.suffix:
+        filled_examples.append(
+            prompt_config.suffix.format(context=context.format(**input_dict), **input_dict, generated_solution="")
+        )
+    else:
+        filled_examples.append(
+            prompt_config.template.format(context=context.format(**input_dict), **input_dict, generated_solution="")
+        )
 
     return prompt_config.prefix + prompt_config.delimiter.join(filled_examples)
