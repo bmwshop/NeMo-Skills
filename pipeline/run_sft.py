@@ -31,19 +31,18 @@ export WANDB_API_KEY={WANDB_API_KEY} \
 && export HYDRA_FULL_ERROR=1 \
 && echo "Starting training" \
 && export PYTHONPATH=$PYTHONPATH:/code \
-&& NVTE_APPLY_QK_LAYER_SCALING=1 python /code/nemo_skills/finetuning/start_sft.py \
+&& NVTE_APPLY_QK_LAYER_SCALING=1 python /code/nemo_skills/finetuning/start_dpo.py \
     --config-name={config_name} --config-path={config_path} \
-    model.tensor_model_parallel_size={num_gpus} \
-    trainer.devices={num_gpus} \
-    trainer.num_nodes={num_nodes} \
-    model.restore_from_path=/nemo_model \
-    model.data.validation_ds.file_path=/code/datasets/{validation_dataset}/validation-sft.jsonl \
-    {logging_params} \
-    exp_manager.name={expname} \
-    exp_manager.explicit_log_dir=/results \
-    exp_manager.exp_dir=/results \
-    ++exp_manager.max_time_per_run={timeout} \
-    {extra_arguments}
+   pretrained_checkpoint.restore_from_path=/nemo_model \
+   ++model.tensor_model_parallel_size={num_gpus} \
+   trainer.devices={num_gpus} \
+   trainer.num_nodes={num_nodes} \
+   {logging_params} \
+   exp_manager.name={expname} \
+   exp_manager.explicit_log_dir=/results \
+   exp_manager.exp_dir=/results \
+   ++exp_manager.max_time_per_run={timeout} \
+   {extra_arguments}
 """
 MOUNTS = "{NEMO_SKILLS_CODE}:/code,{checkpoints_folder}:/results,{NEMO_SKILLS_DATA}:/data,{nemo_model}:/nemo_model"
 JOB_NAME = "sft-{expname}"
@@ -57,7 +56,7 @@ if __name__ == "__main__":
     parser.add_argument("--checkpoints_folder", required=True)
     parser.add_argument("--nemo_model", required=True)
     # have to be handled explicitly since hydra requires these to be first arguments
-    parser.add_argument("--config-name", "-cn", default='sft_config')
+    parser.add_argument("--config-name", "-cn", default='dpo_config')
     parser.add_argument("--config-path", "-cp", default='/code/nemo_skills/finetuning/')
     parser.add_argument(
         "--validation_dataset",
