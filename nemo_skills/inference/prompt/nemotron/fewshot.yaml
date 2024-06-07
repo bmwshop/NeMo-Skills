@@ -12,12 +12,13 @@ user: |-
 
     {context}
 
+    Don't forget that your final answer should be inside \boxed{{}}!
+
 prompt_template: |-
   <extra_id_0>System
   {system}
   <extra_id_1>User
   {user}<extra_id_1>Assistant
-  My solution:
   {generation}
 
 stop_phrases: ["\n\n\n\n\n\n", "<extra_id_1>"]
