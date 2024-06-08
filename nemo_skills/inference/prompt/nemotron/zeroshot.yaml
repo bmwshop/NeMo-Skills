@@ -21,3 +21,4 @@ prompt_template: |-
   {generation}
 
 stop_phrases: ["<extra_id_1>"]
+
