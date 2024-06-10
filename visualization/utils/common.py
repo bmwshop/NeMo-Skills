@@ -20,6 +20,7 @@ import os
 import re
 import subprocess
 from collections import defaultdict
+from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Optional, Set, Tuple, Union
 
 from dash import html
@@ -30,6 +31,7 @@ from settings.constants import (
     ERROR_MESSAGE_TEMPLATE,
     OUTPUT,
     PARAMETERS_FILE_NAME,
+    PARAMS_TO_REMOVE,
     QUESTION_FIELD,
     SEPARATOR_DISPLAY,
     STATS_KEYS,
@@ -172,6 +174,9 @@ def get_values_from_input_group(children: Iterable) -> Dict:
                 type_function = str
                 value = input_group_child["props"]["value"]
 
+                if value is None or value == UNDEFINED:
+                    values[input_group_child["props"]["id"]] = None
+                    continue
                 if str(value).isdigit() or str(value).replace("-", "", 1).isdigit():
                     type_function = int
                 elif str(value).replace(".", "", 1).replace("-", "", 1).isdigit():
@@ -194,7 +199,9 @@ def extract_query_params(query_params_ids: List[Dict], query_params: List[Dict])
 def get_utils_from_config_helper(cfg: Dict, display_path: bool = True) -> Dict:
     config = {}
     for key, value in sorted(cfg.items()):
-        if isinstance(value, Dict):
+        if key in PARAMS_TO_REMOVE:
+            continue
+        elif isinstance(value, Dict):
             config = {
                 **config,
                 **{
@@ -231,7 +238,11 @@ def get_stats(all_files_data: List[Dict]) -> Tuple[float, float, float]:
             wrong += 1
 
     if len(all_files_data):
-        return correct / len(all_files_data), wrong / len(all_files_data), no_response / len(all_files_data)
+        return (
+            correct / len(all_files_data),
+            wrong / len(all_files_data),
+            no_response / len(all_files_data),
+        )
     return -1, -1, -1
 
 
@@ -451,3 +462,27 @@ def run_subprocess(command: str) -> Tuple[str, bool]:
         success = False
 
     return result.stdout.strip(), result.stderr.strip(), success
+
+
+def get_prompt_types():
+    path_to_prompts = Path.joinpath(
+        Path(__file__).parents[2].absolute(),
+        "nemo_skills/inference/prompt",
+    )
+
+    def get_prompts(current_path):
+        prompt_types = []
+        contents = [folder for folder in os.listdir(current_path)]
+        for content in contents:
+            if os.path.isdir(Path.joinpath(current_path, content)):
+                prompt_types.extend(get_prompts(Path.joinpath(current_path, content)))
+            elif os.path.splitext(content)[1] == '.yaml':
+                prompt_types.append(str(Path.joinpath(current_path, os.path.splitext(content)[0])))
+        return prompt_types
+
+    return list(
+        map(
+            lambda path: path[len(str(path_to_prompts)) + 1 :],
+            get_prompts(path_to_prompts),
+        )
+    )
