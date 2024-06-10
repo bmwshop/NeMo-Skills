@@ -34,6 +34,25 @@ def process_bad_solutions(
             continue
         if should_trim:
             sample['generation'] = trim_output(sample['generation'])
+
+        # try:
+        #     num_answer = float(sample['expected_answer'])
+        #     if num_answer == int(num_answer) and 0 <= num_answer < 6:
+        #         print("!", sample['expected_answer'])
+        #         continue
+        # except:
+        #     pass
+
+        # if sample['expected_answer'] in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] or \
+        #     sample['expected_answer'] in ['A)', 'B)', 'C)', 'D)', 'E)', 'F)', 'G)', 'H)'] or \
+        #     sample['expected_answer'] in ['(A)', '(B)', '(C)', '(D)', '(E)', '(F)', '(G)', '(H)']:
+        #     print("@", sample['expected_answer'])
+        #     continue
+
+        # if '[asy]' in sample['generation']:
+        #     print("#")
+        #     continue
+
         if CODE_SEPARATORS[0] in sample['generation']:
             code_solns.append(sample)
         else:
