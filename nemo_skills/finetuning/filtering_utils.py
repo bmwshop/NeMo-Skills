@@ -35,6 +35,9 @@ def process_bad_solutions(
         if should_trim:
             sample['generation'] = trim_output(sample['generation'])
 
+        # if len(sample['generation']) < int(len(sample['reference_solution'])):
+        #     continue
+
         # try:
         #     num_answer = float(sample['expected_answer'])
         #     if num_answer == int(num_answer) and 0 <= num_answer < 6:
