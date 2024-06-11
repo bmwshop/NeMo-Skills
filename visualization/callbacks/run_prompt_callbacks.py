@@ -46,6 +46,7 @@ from nemo_skills.inference.prompt.utils import (
     PromptConfig,
     context_templates,
     get_prompt_config,
+    prompt_types,
 )
 
 
@@ -264,7 +265,16 @@ def update_examples(
     prevent_initial_call=True,
 )
 def update_prompt_type(prompt_type: str, js_trigger: str) -> Union[NoUpdate, dbc.AccordionItem]:
-    prompt_types = get_prompt_types()
+    prompt_types = [
+        os.path.splitext(file)[0]
+        for file in os.listdir(
+            Path.joinpath(
+                Path(__file__).parents[2].absolute(),
+                "nemo_skills/inference/prompt",
+            )
+        )
+        if os.path.splitext(file)[1] == '.yaml'
+    ]
     if prompt_type not in prompt_types:
         output_len = len(get_utils_from_config(asdict(PromptConfig(few_shot_examples=FewShotExamplesConfig()))).keys())
         return [no_update] * (output_len + 2)
