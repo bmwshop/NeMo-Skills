@@ -1,0 +1,39 @@
+few_shot_examples:
+  template: ""
+  num_few_shots: 0
+
+system: |-
+  Below is a mathematical question followed by a solution. Evaluate whether the solution appropriately answers the question and could be useful for teaching a student language model. Use the following 5-point scoring system to evaluate the solutions. If the final answer is incorrect, award 0 points. Otherwise, points are accumulated based on the satisfaction of each criterion:
+  - Award 1 point if the solution yields the correct answer. 
+  - Award another point if the solution uses the appropriate methods for the given question.
+  - Grant a point if all the methods, identities, or theorems used are clearly stated. 
+  - Give another point if the solution is presented clearly and logically, with all steps easy to follow.
+  - Give a point if the solution has no mistakes in any intermediate calculations. 
+
+user: |-
+  Question: 
+  {question}
+  
+  Reference Solution:
+  {context}
+
+  Candidate Solution: 
+  {output}
+
+  After examining the question and the solution:
+  - Justify your total score in detail in upto 200 words.
+  - Conclude the score using the format: \boxed{{total points}}.
+
+  Remember to put only the final points tally in \boxed{{}}.
+
+
+# prompt_template: "<|begin_of_text|>{system}\n{user}\nJudgement:{generation}"
+
+prompt_template: |-
+  <|begin_of_text|><|start_header_id|>system<|end_header_id|>{system}<|eot_id|>
+  
+  <|start_header_id|>user<|end_header_id|>{user}<|eot_id|>
+  
+  <|start_header_id|>assistant<|end_header_id|>{generation}
+
+stop_phrases: ["\n\n\n\n\n\n", "<|eot_id|>", "<|end_of_text|>"]

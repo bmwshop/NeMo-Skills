@@ -399,7 +399,8 @@ class VLLMModel(BaseModel):
                 output = choice.text
                 # adding back stop words
                 if choice.finish_reason == "stop":
-                    output += choice.stop_reason
+                    if choice.stop_reason is not None:
+                        output += choice.stop_reason
                 responses.append(output)
         return responses
 

@@ -117,11 +117,15 @@ class PromptConfig:
 
     def __post_init__(self):
         """Initialize context_template if not provided."""
-        if self.context_template is None:
-            self.context_template = context_templates[self.context_type]
+        # if self.context_type is "empty":
+        if self.context_type is not None:
+            self.context_template = context_templates.get(self.context_type, "")
         else:
-            if self.context_type != "empty":
-                raise ValueError("context_template should not be provided if context_type is not empty")
+            self.context_template = ""
+
+        # else:
+        #     if self.context_type != "empty":
+        #         raise ValueError("context_template should not be provided if context_type is not empty")
 
 
 class Prompt:

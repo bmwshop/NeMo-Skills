@@ -20,7 +20,7 @@ from pathlib import Path
 # adding nemo_skills to python path to avoid requiring installation
 sys.path.append(str(Path(__file__).absolute().parents[1]))
 
-from launcher import CLUSTER_CONFIG, NEMO_SKILLS_CODE, get_server_command, launch_job
+from launcher import CLUSTER_CONFIG, NEMO_SKILLS_CODE, get_server_command, launch_job, fill_env_vars
 
 from nemo_skills.utils import setup_logging
 
@@ -40,10 +40,8 @@ if [ $SLURM_PROCID -eq 0 ]; then \
         inference.temperature={temperature} \
         inference.top_k=0 \
         inference.top_p=0.95 \
-        output_file=/results/output-rs{random_seed}.jsonl \
+        output_file=/results/output.jsonl \
         {extra_arguments} && \
-    python nemo_skills/evaluation/evaluate_results.py \
-        prediction_jsonl_files=/results/output-rs{random_seed}.jsonl {extra_eval_args} && \
     pkill -f nemo_skills/inference/server; \
 else \
     {server_start_cmd}; \
@@ -54,7 +52,7 @@ fi \
 # TODO: when parameters are incorrect, the error is displayed in a bizarre way
 
 
-MOUNTS = "{NEMO_SKILLS_CODE}:/code,{model_path}:/model,{output_dir}:/results"
+MOUNTS = "{NEMO_SKILLS_CODE}:/code,{model_path}:/model,{output_dir}:/results,{NEMO_SKILLS_DATA}:/data"
 LOGS = "{output_dir}/slurm_logs-rs{random_seed}.txt"
 JOB_NAME = "labelling-{model_name}-rs{random_seed}"
 
@@ -77,7 +75,7 @@ def run_script(format_dict, seed, extra_arguments, partition=None, dependency=No
         container=CLUSTER_CONFIG["containers"][format_dict["server_type"]],
         mounts=MOUNTS.format(**format_dict),
         partition=partition,
-        with_sandbox=format_dict.get("use_sandbox", True),
+        with_sandbox=False,
         extra_sbatch_args=extra_sbatch_args,
     )
     # going to return a previous job id
@@ -89,9 +87,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--model_path", required=True)
     parser.add_argument("--server_type", choices=('nemo', 'tensorrt_llm', 'vllm'), default='tensorrt_llm')
-    parser.add_argument("--temperature", default=1.0, type=float, help="Temperature for generation")
-    parser.add_argument("--no_sandbox", dest="use_sandbox", default=True, action="store_false", type=bool, 
-                        help="Whether to use sandbox")
+    parser.add_argument("--temperature", default=0.0, type=float, help="Temperature for generation")
     
     parser.add_argument("--output_dir", required=True)
     parser.add_argument("--num_runs", type=int, default=1)
@@ -144,9 +140,11 @@ if __name__ == "__main__":
         "server_type": args.server_type,
         "extra_eval_args": args.extra_eval_args,
         "NEMO_SKILLS_CODE": NEMO_SKILLS_CODE,
+        # "NEMO_SKILLS_DATA": NEMO_SKILLS_DATA,
         "HF_TOKEN": os.getenv("HF_TOKEN", ""),  # needed for some of the models, so making an option to pass it in
         "server_wait_string": server_wait_string,
     }
+    fill_env_vars(format_dict, ["NEMO_SKILLS_DATA"])
 
     Path(args.output_dir).mkdir(exist_ok=True, parents=True)
 
