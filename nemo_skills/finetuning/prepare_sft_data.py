@@ -192,7 +192,7 @@ def prepare_sft_data(cfg: PrepareSFTDataConfig):
                 elem['type'] = None
             else:
                 elem["input"] = prompt.build_string(input_dict={"question": question})
-                elem["output"] = elem.pop("generation")
+                elem["output"] = elem.pop("generation") + '<|eot_id|>'
             elem.update(cfg.metadata)
             prepared_data.append(elem)
 
