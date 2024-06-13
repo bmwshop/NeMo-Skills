@@ -29,6 +29,8 @@ def process_bad_solutions(
     filtered_predictions = []
     code_solns = []
     text_solns = []
+    # Solution set to ensure uniqueness of solutions filtered through
+    solution_set = set()
     for sample in samples:
         if should_remove(sample['generation'], solution_filters):
             continue
@@ -56,10 +58,17 @@ def process_bad_solutions(
         #     print("#")
         #     continue
 
+        if sample['generation'] in solution_set:
+            # Generation has already been covered
+            continue
+        else:
+            solution_set.add(sample['generation'])
+
         if CODE_SEPARATORS[0] in sample['generation']:
             code_solns.append(sample)
         else:
             text_solns.append(sample)
+
     if text_filter_type is None:
         filtered_predictions.extend(code_solns)
         filtered_predictions.extend(text_solns)
