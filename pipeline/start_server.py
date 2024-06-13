@@ -29,6 +29,7 @@ from nemo_skills.utils import setup_logging
 
 SLURM_CMD = """
 nvidia-smi && \
+cd /code && \
 export PYTHONPATH=/code && \
 export HF_TOKEN={HF_TOKEN} && \
 if [ $SLURM_PROCID -eq 0 ]; then \
@@ -132,7 +133,7 @@ if __name__ == "__main__":
             for line in fin:
                 if "running on node" in line:
                     server_host = line.split()[-1].strip()
-                if "Running on all addresses" in line:
+                if server_wait_string in line:
                     server_started = True
         if server_started:
             print(f"Server has started at {server_host}")
