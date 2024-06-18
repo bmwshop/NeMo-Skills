@@ -247,7 +247,6 @@ def from_dir(
         free_gpu_memory_fraction=free_gpu_memory_fraction,
         max_attention_window=max_attention_window_size,
         sink_token_length=sink_token_length,
-        # TODO: enable when it's supported
         enable_block_reuse=True,
     )
 
