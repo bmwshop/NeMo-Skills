@@ -132,17 +132,15 @@ def main(cfg) -> None:
     except AttributeError:
         pass
 
-    inference_strategy = CodeExecutionStrategy(sandbox_cfg=cfg.sandbox, model=model, **cfg.get('code_execution', {}))
-
     if parallel_state.is_pipeline_first_stage() and parallel_state.get_tensor_model_parallel_rank() == 0:
-        server = MegatronServer(model.cuda(), inference_strategy=inference_strategy)
+        server = MegatronServer(model.cuda())
         server.run("0.0.0.0", port=cfg.port)
 
     while True:
         choice = torch.cuda.LongTensor(1)
         torch.distributed.broadcast(choice, 0)
         if choice[0].item() == 0:
-            generate(model.cuda(), strategy=inference_strategy)
+            generate(model.cuda())
 
 
 if __name__ == '__main__':
