@@ -231,10 +231,10 @@ def server_params():
 def get_code_execution_model(server_type, code_execution=None, sandbox=None, **kwargs):
     """A helper function to make it easier to set server through cmd."""
     model = get_model(server_type=server_type, **kwargs)
-    if isinstance(model, NemoModel):  # nemo handles code execution directly
-        if code_execution is not None:
-            raise ValueError("Extra code execution parameters are not supported for Nemo model.")
-        return model
+    # if isinstance(model, NemoModel):  # nemo handles code execution directly
+    #     if code_execution is not None:
+    #         raise ValueError("Extra code execution parameters are not supported for Nemo model.")
+    #     return model
     if code_execution is None:
         code_execution = {}
     code_execution_config = CodeExecutionConfig(**code_execution)
