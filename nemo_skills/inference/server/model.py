@@ -198,12 +198,22 @@ class NemoModel(BaseModel):
         outputs = [None] * len(generations['sentences'])
         begin_idx = 0
         for idx, generation in enumerate(generations['sentences']):
+<<<<<<< HEAD
             # outputs[idx] = {'generation': generation[len(prompts[idx]) :]}
             # when the prompt starts from special tokens like bos, nemo will remove them,
             # so we need this hack to find where to start the cut
             while begin_idx < len(prompts[idx]) and not prompts[idx][begin_idx].startswith(generation[:20]):
                 begin_idx += 1
             outputs[idx] = {'generation': generation[(len(prompts[idx]) - begin_idx) :]}
+=======
+            # when the prompt starts from special tokens like bos, nemo will remove them,
+            # so we need this hack to find where to start the cut
+            begin_idx = 0
+            while begin_idx < len(prompts[idx]) and not prompts[idx][begin_idx:].startswith(generation[:20]):
+                begin_idx += 1
+            outputs[idx] = {'generation': generation[(len(prompts[idx]) - begin_idx) :]}
+
+>>>>>>> main
         if remove_stop_phrases:
             postprocess_output(outputs, stop_phrases)
         return outputs
@@ -312,7 +322,7 @@ class VLLMModel(BaseModel):
         tokens_to_generate: int = 512,
         temperature: float = 0.0,
         top_p: float = 0.95,
-        top_k: int = 0,
+        top_k: int = -1,
         repetition_penalty: float = 1.0,
         random_seed: int = 0,
         stop_phrases: list[str] | None = None,
@@ -348,7 +358,7 @@ class VLLMModel(BaseModel):
         max_tokens: int,
         temperature: float,
         top_p: float,
-        top_k: int = 1,
+        top_k: int = -1,
         num_generations: int = 1,
         stop=None,
         echo: bool = False,
@@ -366,7 +376,7 @@ class VLLMModel(BaseModel):
         # Process top_k
         extra_body = {
             "extra_body": {
-                "top_k": 1,
+                "top_k": top_k,
                 "repetition_penalty": repetition_penalty,
                 "spaces_between_special_tokens": False,
             }
@@ -403,10 +413,16 @@ class VLLMModel(BaseModel):
         for resp in response:
             for choice in resp.choices:
                 output = choice.text
+<<<<<<< HEAD
                 # adding back stop words
                 if choice.finish_reason == "stop":
                     if choice.stop_reason is not None:
                         output += choice.stop_reason
+=======
+                # adding back stop words - somehow sometimes it returns token ids, so we do not handle those for now
+                if choice.finish_reason == "stop" and isinstance(choice.stop_reason, str):
+                    output += choice.stop_reason
+>>>>>>> main
                 responses.append(output)
         return responses
 

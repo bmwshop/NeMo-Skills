@@ -112,20 +112,12 @@ class PromptConfig:
     user: str = MISSING
     system: str = MISSING
     context_type: str = "empty"
-    context_template: Optional[str] = None
+    _context_template: Optional[str] = None  # cannot be set directly for now!
     stop_phrases: List[str] = field(default_factory=list)
 
     def __post_init__(self):
         """Initialize context_template if not provided."""
-        # if self.context_type is "empty":
-        if self.context_type is not None:
-            self.context_template = context_templates.get(self.context_type, "")
-        else:
-            self.context_template = ""
-
-        # else:
-        #     if self.context_type != "empty":
-        #         raise ValueError("context_template should not be provided if context_type is not empty")
+        self._context_template = context_templates[self.context_type]
 
 
 class Prompt:
@@ -136,7 +128,7 @@ class Prompt:
 
     def build_context(self, example_dict: Dict[str, Any]) -> str:
         """Builds the context string based on the example dictionary."""
-        context = self.config.context_template.format(**example_dict)
+        context = self.config._context_template.format(**example_dict)
         return context
 
     def build_filled_example(self, example_dict: Dict[str, Any]) -> str:
@@ -214,8 +206,27 @@ class Prompt:
 
 
 def get_prompt_config(prompt_type: str) -> PromptConfig:
+    """
+    Reads the prompt config from the yaml file.
+
+    Args:
+        prompt_type: The name of the prompt config file. Can be the path to a yaml file or one of the available configs.
+
+    Returns:
+        The prompt config object.
+    """
     # reading prompt format from the yaml file, if not running through hydra
-    config_path = Path(__file__).parent / f"{prompt_type}.yaml"
+    internal_config_path = Path(__file__).parent / f"{prompt_type}.yaml"
+    if internal_config_path.exists():
+        config_path = internal_config_path
+
+    elif ".yaml" in prompt_type:
+        # Assume prompt type is a str to a filepath
+        config_path = Path(prompt_type).absolute()
+
+    else:
+        raise ValueError(f"Prompt config not found for {prompt_type}")
+
     with open(config_path, "rt", encoding="utf-8") as fin:
         prompt_config = PromptConfig(_init_nested=True, **yaml.safe_load(fin))
         return prompt_config
