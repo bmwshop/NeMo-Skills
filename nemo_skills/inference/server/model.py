@@ -198,14 +198,6 @@ class NemoModel(BaseModel):
         outputs = [None] * len(generations['sentences'])
         begin_idx = 0
         for idx, generation in enumerate(generations['sentences']):
-<<<<<<< HEAD
-            # outputs[idx] = {'generation': generation[len(prompts[idx]) :]}
-            # when the prompt starts from special tokens like bos, nemo will remove them,
-            # so we need this hack to find where to start the cut
-            while begin_idx < len(prompts[idx]) and not prompts[idx][begin_idx].startswith(generation[:20]):
-                begin_idx += 1
-            outputs[idx] = {'generation': generation[(len(prompts[idx]) - begin_idx) :]}
-=======
             # when the prompt starts from special tokens like bos, nemo will remove them,
             # so we need this hack to find where to start the cut
             begin_idx = 0
@@ -213,7 +205,6 @@ class NemoModel(BaseModel):
                 begin_idx += 1
             outputs[idx] = {'generation': generation[(len(prompts[idx]) - begin_idx) :]}
 
->>>>>>> main
         if remove_stop_phrases:
             postprocess_output(outputs, stop_phrases)
         return outputs
@@ -413,16 +404,9 @@ class VLLMModel(BaseModel):
         for resp in response:
             for choice in resp.choices:
                 output = choice.text
-<<<<<<< HEAD
-                # adding back stop words
-                if choice.finish_reason == "stop":
-                    if choice.stop_reason is not None:
-                        output += choice.stop_reason
-=======
                 # adding back stop words - somehow sometimes it returns token ids, so we do not handle those for now
                 if choice.finish_reason == "stop" and isinstance(choice.stop_reason, str):
                     output += choice.stop_reason
->>>>>>> main
                 responses.append(output)
         return responses
 
