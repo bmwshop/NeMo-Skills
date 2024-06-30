@@ -13,14 +13,18 @@
 # limitations under the License.
 
 import hydra
+import sys
 from sdp.run_processors import run_processors
 
 from nemo_skills.utils import setup_logging
 
 
-@hydra.main(version_base=None, config_path="data_preparation_utils/", config_name="prepare_sft_data.yaml")
+@hydra.main(version_base=None, config_path="data_preparation_utils/", config_name="prepare_code_sft.yaml")
 def main(cfg):
-    run_processors(cfg)
+    print(cfg.config_name)
+    sys.exit()
+    # run_processors(cfg)
+    
 
 
 if __name__ == "__main__":

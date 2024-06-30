@@ -35,6 +35,8 @@ class ReadData(BaseProcessor):
         self,
         prediction_jsonl_files: Optional[str] = None,
         preprocessed_dataset_files: Optional[str] = None,
+        question_key="question",
+        solution_key="generation",
         skip_first: int = 0,
         add_correct: bool = True,
         add_incorrect: bool = False,
@@ -43,6 +45,9 @@ class ReadData(BaseProcessor):
         super().__init__(**kwargs)
         self.prediction_jsonl_files = prediction_jsonl_files
         self.preprocessed_dataset_files = preprocessed_dataset_files
+        self.question_key = question_key
+        self.solution_key = solution_key
+        print(self.solution_key)
         self.skip_first = skip_first
         self.add_correct = add_correct
         self.add_incorrect = add_incorrect
@@ -64,10 +69,10 @@ class ReadData(BaseProcessor):
         questions = set()
         for line in tqdm.tqdm(file_handle):
             sample = json.loads(line)
-            questions.add(sample["question"])
+            questions.add(sample[self.question_key])
             # for backward compatibility
-            if "generation" not in sample and "generated_solution" in sample:
-                sample["generation"] = sample.pop("generated_solution")
+            if self.solution_key not in sample and "generated_solution" in sample:
+                sample[self.solution_key] = sample.pop("generated_solution")
             samples.append(sample)
 
         return samples
@@ -104,8 +109,8 @@ class ReadData(BaseProcessor):
                 continue
 
             # for backward compatibility
-            if "generation" not in line_dict and "generated_solution" in line_dict:
-                line_dict["generation"] = line_dict.pop("generated_solution")
+            if self.solution_key not in line_dict and "generated_solution" in line_dict:
+                line_dict[self.solution_key] = line_dict.pop("generated_solution")
 
             line_dict['filename'] = file_handle.name
             samples.append(line_dict)
@@ -115,11 +120,11 @@ class ReadData(BaseProcessor):
     def _unique_iterator(self, samples):
         seen_predictions = defaultdict(set)
         for sample in samples:
-            question = sample["question"]
-            if sample['generation'] in seen_predictions[question]:
+            question = sample[self.question_key]
+            if sample[self.solution_key] in seen_predictions[question]:
                 continue
 
-            seen_predictions[question].add(sample['generation'])
+            seen_predictions[question].add(sample[self.solution_key])
             yield sample
 
     def process(self):
@@ -142,7 +147,7 @@ class ReadData(BaseProcessor):
 
 
 class GroupSamples(BaseProcessor):
-    def __init__(self, group_key='question', **kwargs):
+    def __init__(self, group_key="question", **kwargs):
         super().__init__(**kwargs)
         self.group_key = group_key
 
@@ -229,10 +234,19 @@ class ShuffleAndDownsampleData(BaseProcessor):
 
 
 class WriteFinalSftManifest(BaseProcessor):
-    def __init__(self, prompt_type: str, chat_format: bool = False, metadata: Optional[Dict] = None, **kwargs):
+    def __init__(
+            self, 
+            prompt_type: str, 
+            chat_format: bool = False,
+            question_key: str = "question", 
+            solution_key: str = "generation",  
+            metadata: Optional[Dict] = None, 
+            **kwargs):
         super().__init__(**kwargs)
         self.prompt_type = prompt_type
         self.chat_format = chat_format
+        self.question_key = question_key
+        self.solution_key = solution_key
         self.metadata = metadata
         if not self.metadata:
             self.metadata = {}
@@ -250,23 +264,23 @@ class WriteFinalSftManifest(BaseProcessor):
             for line in fin:
                 elem = json.loads(line)
 
-                question = elem["question"]
+                question = elem[self.question_key]
                 # deduplication
-                if elem['generation'] in seen_predictions[question]:
+                if elem[self.solution_key] in seen_predictions[question]:
                     continue
-                seen_predictions[question].add(elem['generation'])
+                seen_predictions[question].add(elem[self.solution_key])
 
                 if self.chat_format:
                     elem['conversations'] = [
-                        {'value': elem['question'], 'from': 'User', 'canonical_form': ''},
-                        {'value': elem.pop("generation"), 'from': 'Assistant', 'canonical_form': ''},
+                        {'value': elem[self.question_key], 'from': 'User', 'canonical_form': ''},
+                        {'value': elem.pop(self.solution_key), 'from': 'Assistant', 'canonical_form': ''},
                     ]
                     elem['system'] = prompt_config.system
                     elem['mask'] = 'User'
                     elem['type'] = None
                 else:
-                    elem["input"] = prompt.build_string(input_dict={"question": elem['question']})
-                    elem["output"] = elem.pop("generation")
+                    elem["input"] = prompt.build_string(input_dict={self.question_key: elem[self.question_key]})
+                    elem["output"] = elem.pop(self.solution_key)
                 elem.update(self.metadata)
                 fout.write(json.dumps(elem) + "\n")
                 samples_count += 1

@@ -62,6 +62,10 @@ class DropMultiBoxed(BaseFilter):
 
     def __init__(self, solution_key: str = "generation", **kwargs):
         super().__init__(**kwargs)
+        print("##" * 80)
+        print(self.solution_key)
+        print("##" * 80)
+        
         self.solution_key = solution_key
 
     def process_dataset_entry(self, data_entry) -> List:

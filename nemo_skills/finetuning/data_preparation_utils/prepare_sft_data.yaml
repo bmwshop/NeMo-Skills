@@ -19,7 +19,7 @@ chat_format: false  # whether to use NeMo's chat format
 
 filters:
   solution_key: generation  # key to filter solutions by
-  group_key: question  # key to group samples by before code_text_filter
+  question_key: question  # key to group samples by before code_text_filter
 
   drop_multi_boxed: true
   drop_useless_code: false
@@ -34,6 +34,8 @@ processors:
   - _target_: nemo_skills.finetuning.data_preparation_utils.preprocessing.ReadData
     preprocessed_dataset_files: ${preprocessed_dataset_files}
     prediction_jsonl_files: ${prediction_jsonl_files}
+    question_key: ${filters.question_key}
+    solution_key: ${filters.solution_key}
     skip_first: ${skip_first}
     add_correct: ${add_correct}
     add_incorrect: ${add_incorrect}
@@ -76,7 +78,7 @@ processors:
       - {input: {generation: "3 * (1 + 7) / 4 = 6"}, output: {generation: "3 * (1 + 7) / 4 = 3 * 8 / 4 = 24 / 4 = 6"}}
 
   - _target_: nemo_skills.finetuning.data_preparation_utils.preprocessing.GroupSamples
-    group_key: ${filters.group_key}
+    group_key: ${filters.question_key}
 
   - _target_: nemo_skills.finetuning.data_preparation_utils.filters.CodeTextFilter
     filter_type: ${filters.code_text_filter}
@@ -92,4 +94,6 @@ processors:
     output_manifest_file: ${output_path}
     prompt_type: ${prompt_type}
     chat_format: ${chat_format}
+    question_key: ${filters.question_key}
+    solution_key: ${filters.solution_key}
     metadata: ${metadata}
