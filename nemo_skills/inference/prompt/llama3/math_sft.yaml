@@ -2,9 +2,9 @@ system: ""
 
 user: |-
   You're an expert mathematician. Help the user to solve the given problem.
-  Make sure to put the answer (and only answer) inside \boxed{}.
+  Make sure to put the answer (and only answer) inside \boxed{{}}.
 
-  """{question}{context}"""
+  {question}{context}
 
 prompt_template: |-
   <|begin_of_text|><|start_header_id|>system<|end_header_id|>

@@ -279,6 +279,7 @@ class WriteFinalSftManifest(BaseProcessor):
                     elem['mask'] = 'User'
                     elem['type'] = None
                 else:
+                    print(prompt)
                     elem["input"] = prompt.build_string(input_dict={"question": elem[self.question_key]})
                     elem["output"] = elem.pop(self.solution_key)
                 elem.update(self.metadata)
