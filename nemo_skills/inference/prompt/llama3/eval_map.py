@@ -28,8 +28,8 @@ EVAL_MAP = {
     },
     'instruct-nemo': {  # llama3-instruct finetuned with nemo_skills
         'default': 'llama3/instruct',
-        'human-eval': 'llama3/codegen',
-        'mbpp': 'llama3/codegen',
+        'human-eval': 'llama3/codegen_sft',
+        'mbpp': 'llama3/codegen_sft',
         'mmlu': 'llama3/mmlu',
     },
 }
