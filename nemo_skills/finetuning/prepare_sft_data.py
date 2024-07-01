@@ -21,9 +21,9 @@ from nemo_skills.utils import setup_logging
 
 @hydra.main(version_base=None, config_path="data_preparation_utils/", config_name="prepare_code_sft.yaml")
 def main(cfg):
+    # sys.exit()
     print(cfg.config_name)
-    sys.exit()
-    # run_processors(cfg)
+    run_processors(cfg)
     
 
 

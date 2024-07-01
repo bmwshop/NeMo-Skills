@@ -279,7 +279,7 @@ class WriteFinalSftManifest(BaseProcessor):
                     elem['mask'] = 'User'
                     elem['type'] = None
                 else:
-                    elem["input"] = prompt.build_string(input_dict={self.question_key: elem[self.question_key]})
+                    elem["input"] = prompt.build_string(input_dict={"question": elem[self.question_key]})
                     elem["output"] = elem.pop(self.solution_key)
                 elem.update(self.metadata)
                 fout.write(json.dumps(elem) + "\n")
