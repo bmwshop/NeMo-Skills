@@ -17,6 +17,9 @@ num_output_samples: null
 prompt_type: llama3/codegen_sft
 chat_format: false  # whether to use NeMo's chat format
 
+add_eos: false
+eos_token: <|eot_id|>
+
 filters:
   question_key: input  # key to group samples by before code_text_filter
   solution_key: output  # key to filter solutions by
@@ -40,6 +43,13 @@ processors:
       - {input: {output: "Solution ```python\ndef hello()``` Second code ```python\n"}, output: null}
       - {input: {output: "Solution ```python\ndef hello()```"}, output: {output: "Solution ```python\ndef hello()```"}}
       - {input: {output: "She had python\ndef hello()```"}, output: null}
+
+  - _target_: nemo_skills.finetuning.data_preparation_utils.filters.AddEosToken
+    should_run: ${add_eos}
+    solution_key: ${filters.solution_key}
+    eos_token: ${eos_token}
+    test_cases:
+      - {input: {output: "Solution: ```python\ndef hello()```"}, output: {output: "Solution: ```python\ndef hello()```<|eot_id|>"}}
 
   - _target_: nemo_skills.finetuning.data_preparation_utils.preprocessing.WriteFinalSftManifest
     output_manifest_file: ${output_path}

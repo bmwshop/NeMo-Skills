@@ -19,10 +19,10 @@ from sdp.run_processors import run_processors
 from nemo_skills.utils import setup_logging
 
 
-@hydra.main(version_base=None, config_path="data_preparation_utils/", config_name="prepare_code_sft.yaml")
+@hydra.main(version_base=None, config_path="data_preparation_utils/", config_name="prepare_math_sft.yaml")
 def main(cfg):
     # sys.exit()
-    print(cfg.config_name)
+    # print(cfg.config_name)
     run_processors(cfg)
     
 

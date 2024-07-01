@@ -60,15 +60,15 @@ class BaseFilter(BaseParallelProcessor):
             LOG.info("Number of modified entries: %d", num_modified_entries)
 
 
-class DropMultiBoxed(BaseFilter):
-    def __init__(self, solution_key: str = "generation", **kwargs):
+class AddEosToken(BaseFilter):
+    def __init__(self, solution_key: str = "generation", eos_token="<|eot_id|>", **kwargs):
         super().__init__(**kwargs)
         self.solution_key = solution_key
+        self.eos_token = eos_token
 
     def process_dataset_entry(self, data_entry) -> List:
-        if len(PATTERN_ANS.findall(data_entry[self.solution_key])) > 1:
-            return [DataEntry(data=None, metrics=dict(num_removed=1))]
-        return [DataEntry(data=data_entry, metrics=dict(num_removed=0))]
+        data_entry[self.solution_key] = data_entry[self.solution_key] + self.eos_token
+        return [DataEntry(data=data_entry, metrics=dict(num_modified=1))]
 
 
 class DropIncorrectCodeBlocks(BaseFilter):
@@ -78,6 +78,17 @@ class DropIncorrectCodeBlocks(BaseFilter):
 
     def process_dataset_entry(self, data_entry) -> List:
         if len(PATTERN_PYTHON_CODE.findall(data_entry[self.solution_key])) != 1:
+            return [DataEntry(data=None, metrics=dict(num_removed=1))]
+        return [DataEntry(data=data_entry, metrics=dict(num_removed=0))]
+
+
+class DropMultiBoxed(BaseFilter):
+    def __init__(self, solution_key: str = "generation", **kwargs):
+        super().__init__(**kwargs)
+        self.solution_key = solution_key
+
+    def process_dataset_entry(self, data_entry) -> List:
+        if len(PATTERN_ANS.findall(data_entry[self.solution_key])) > 1:
             return [DataEntry(data=None, metrics=dict(num_removed=1))]
         return [DataEntry(data=data_entry, metrics=dict(num_removed=0))]
 
