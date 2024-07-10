@@ -17,7 +17,7 @@ num_output_samples: null
 prompt_type: llama3/codegen_sft
 chat_format: false  # whether to use NeMo's chat format
 
-add_eos: false
+add_eos: true
 eos_token: <|eot_id|>
 
 filters:
