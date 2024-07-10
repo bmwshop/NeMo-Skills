@@ -26,9 +26,6 @@ user: |-
 
   Remember to put only the final points tally in \boxed{{}}.
 
-
-# prompt_template: "<|begin_of_text|>{system}\n{user}\nJudgement:{generation}"
-
 prompt_template: |-
   <|begin_of_text|><|start_header_id|>system<|end_header_id|>{system}<|eot_id|>
   
