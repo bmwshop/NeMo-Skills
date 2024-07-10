@@ -341,6 +341,13 @@ def normalize(answer) -> str:
     if isinstance(answer, str) and bool(re.match(r'\$\d+(\.\d+)?', answer)):
         return answer[1:]
 
+
+    if isinstance(answer, str) and bool(re.match(r'\\\d+(\.\d+)?', answer)):
+        return answer[1:]
+
+    if isinstance(answer, str) and bool(re.match(r'\$\\\d+(\.\d+)?', answer)):
+        return answer[2:]
+
     # checking if answer is <number>% or <number>\\% and removing %
     if isinstance(answer, str) and (
         bool(re.match(r'^\d+(\.\d+)?%$', answer)) or bool(re.match(r'^\d+(\.\d+)?\\%$', answer))
@@ -522,13 +529,28 @@ def symbolic_equal(a, b, tolerance, timeout=10.0):
     return False
 
 
+def get_fallback_answer(string):
+    """Fallback strategy to produce the answer if the model doesn't adhere to the format."""
+
+    # 1 - Search for the last number
+    def extract_last_number(string):
+        numbers = re.findall(r'\d+\.\d+|\d+', string)
+        if numbers:
+            return float(numbers[-1]) if '.' in numbers[-1] else int(numbers[-1])
+        return None
+
+    last_number = extract_last_number(string)
+    return last_number
+
+
 def extract_answer(string):
     """Extract Answer String from \\boxed expression."""
     idx = string.rfind("\\boxed")
     if idx < 0:
         idx = string.rfind("\\fbox")
         if idx < 0:
-            return None
+            return get_fallback_answer(string)
+            # return None
 
     i = idx
     right_brace_idx = None
