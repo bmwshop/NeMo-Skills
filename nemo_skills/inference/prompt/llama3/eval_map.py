@@ -32,4 +32,7 @@ EVAL_MAP = {
         'mbpp': 'llama3/codegen_sft',
         'mmlu': 'llama3/mmlu',
     },
+    'simple-instruct': {
+        'default': 'llama3/simple_instruct',
+    }
 }
