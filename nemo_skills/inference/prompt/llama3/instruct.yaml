@@ -21,4 +21,4 @@ prompt_template: |-
 
   {generation}
 
-stop_phrases: ["<|eot_id|>"]
+stop_phrases: ["\n\n\n\n\n\n", "<|eot_id|>"]
