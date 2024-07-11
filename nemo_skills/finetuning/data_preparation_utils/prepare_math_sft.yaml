@@ -17,6 +17,11 @@ num_output_samples: null
 prompt_type: openmathinstruct/sft
 chat_format: false  # whether to use NeMo's chat format
 
+add_eos: true
+eos_token: <|eot_id|>
+
+has_code: false
+
 filters:
   solution_key: generation  # key to filter solutions by
   question_key: question  # key to group samples by before code_text_filter
@@ -77,10 +82,16 @@ processors:
       - {input: {generation: "1 + 7 * 19 = 134"}, output: {generation: "1 + 7 * 19 = 1 + 133 = 134"}}
       - {input: {generation: "3 * (1 + 7) / 4 = 6"}, output: {generation: "3 * (1 + 7) / 4 = 3 * 8 / 4 = 24 / 4 = 6"}}
 
+  - _target_: nemo_skills.finetuning.data_preparation_utils.filters.AddEosToken
+    should_run: ${add_eos}
+    solution_key: ${filters.solution_key}
+    eos_token: ${eos_token}
+
   - _target_: nemo_skills.finetuning.data_preparation_utils.preprocessing.GroupSamples
     group_key: ${filters.question_key}
 
   - _target_: nemo_skills.finetuning.data_preparation_utils.filters.CodeTextFilter
+    should_run: ${has_code}
     filter_type: ${filters.code_text_filter}
     solution_key: ${filters.solution_key}
 
@@ -89,7 +100,7 @@ processors:
     sampling_method: ${downsampling_method}
     random_seed: ${random_seed}
     do_shuffle: ${do_shuffle}
-
+  
   - _target_: nemo_skills.finetuning.data_preparation_utils.preprocessing.WriteFinalSftManifest
     output_manifest_file: ${output_path}
     prompt_type: ${prompt_type}

@@ -227,7 +227,7 @@ class ShuffleAndDownsampleData(BaseProcessor):
                 soln_counter += 1
             if self.do_shuffle:
                 random.shuffle(output_instances)
-
+        print(len(output_instances))
         with open(self.output_manifest_file, "wt", encoding="utf-8") as fout:
             for instance in output_instances:
                 fout.write(json.dumps(instance) + "\n")
