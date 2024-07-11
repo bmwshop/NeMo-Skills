@@ -36,5 +36,8 @@ EVAL_MAP = {
     },
     'simple-instruct': {
         'default': 'llama3/simple_instruct',
+    },
+    'sft': {
+        'default': 'llama3/sft',
     }
 }
