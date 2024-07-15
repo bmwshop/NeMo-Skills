@@ -30,6 +30,8 @@ EVAL_MAP = {
         'default': 'llama3/instruct',
         'human-eval': 'llama3/codegen_sft',
         'mbpp': 'llama3/codegen_sft',
+        'gsm8k': 'llama3/math_sft',
+        'math': 'llama3/math_sft',
         'mmlu': 'llama3/mmlu',
     },
 }
