@@ -1,0 +1,17 @@
+system: ""
+
+user: |-
+  As a proficient math solver, solve the problem and ensure the answer is in \boxed{{}}.
+
+  {question}{context}
+
+prompt_template: |-
+  <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+  {system}<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+  {user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+  {generation}
+
+stop_phrases: ["<|eot_id|>"]

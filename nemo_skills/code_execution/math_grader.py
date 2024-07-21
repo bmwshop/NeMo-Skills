@@ -539,8 +539,11 @@ def get_fallback_answer(string):
             return float(numbers[-1]) if '.' in numbers[-1] else int(numbers[-1])
         return None
 
-    last_number = extract_last_number(string)
-    return last_number
+    try:
+        last_number = extract_last_number(string)
+        return last_number
+    except ValueError:
+        return None
 
 
 def extract_answer(string):
@@ -550,7 +553,6 @@ def extract_answer(string):
         idx = string.rfind("\\fbox")
         if idx < 0:
             return get_fallback_answer(string)
-            # return None
 
     i = idx
     right_brace_idx = None
