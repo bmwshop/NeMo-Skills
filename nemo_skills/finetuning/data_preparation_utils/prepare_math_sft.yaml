@@ -16,6 +16,7 @@ num_output_samples: null
 
 prompt_type: openmathinstruct/sft
 chat_format: false  # whether to use NeMo's chat format
+generation_suffix: ""  # suffix to add to the end of expected response (e.g. <|eot_id|>)
 
 add_eos: true
 eos_token: <|eot_id|>
@@ -105,6 +106,5 @@ processors:
     output_manifest_file: ${output_path}
     prompt_type: ${prompt_type}
     chat_format: ${chat_format}
-    question_key: ${filters.question_key}
-    solution_key: ${filters.solution_key}
+    generation_suffix: ${generation_suffix}
     metadata: ${metadata}

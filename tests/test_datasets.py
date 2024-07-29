@@ -26,6 +26,7 @@ def test_data_scripts():
         'algebra222/test.jsonl',
         'asdiv/test.jsonl',
         'gsm-hard/test.jsonl',
+        'gsm-hard/test_rounded.jsonl',
         'mawps/test.jsonl',
         'svamp/test.jsonl',
         'tabmwp/train.jsonl',
@@ -38,6 +39,7 @@ def test_data_scripts():
         'gsm8k/validation-sft-chat.jsonl',
         'gsm8k/test.jsonl',
         'gsm-plus/test.jsonl',
+        'gsm-plus/test_rounded.jsonl',
         'gsm-ic-2step/test.jsonl',
         'gsm-ic-mstep/test.jsonl',
         'functional/test.jsonl',
@@ -62,6 +64,9 @@ def test_data_scripts():
         'mmlu/test.jsonl',
         'mmlu/dev.jsonl',
         'mmlu/val.jsonl',
+        'ifeval/test.jsonl',
+        'math-odyssey/test.jsonl',
+        'aime-2024/test.jsonl',
     ]
     for file in expected_files:
         assert (Path(__file__).absolute().parents[1] / "datasets" / file).exists()

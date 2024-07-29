@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cluster: local
+# need to contain an EVAL_MAP dictionary mapping model version name to prompts for different benchmarks
+# can have a default key that will be used if benchmark name is not in dict
 
-containers:
-  tensorrt_llm: igitman/nemo-skills-trtllm:0.3.0
-  vllm: igitman/nemo-skills-vllm:0.3.0
-  nemo: igitman/nemo-skills-sft:0.3.0
-  # sandbox is always re-built locally
-
-# change this to "sudo docker" if non-root user access is not set up
-# to set up non-root access, follow https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user
-docker_cmd: "docker"
+EVAL_MAP = {
+    'base': { 
+        'default': 'nemotron/fewshot',
+    },
+    'instruct': {  # nemotron-instruct
+        'default': 'nemotron/zeroshot',
+    },
+}

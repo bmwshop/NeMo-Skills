@@ -235,19 +235,20 @@ class ShuffleAndDownsampleData(BaseProcessor):
 
 class WriteFinalSftManifest(BaseProcessor):
     def __init__(
-            self, 
-            prompt_type: str, 
-            chat_format: bool = False,
-            question_key: str = "question", 
-            solution_key: str = "generation",  
-            metadata: Optional[Dict] = None, 
-            **kwargs):
+        self,
+        prompt_type: str,
+        chat_format: bool = False,
+        generation_suffix: str = "",
+        metadata: Optional[Dict] = None,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.prompt_type = prompt_type
         self.chat_format = chat_format
-        self.question_key = question_key
-        self.solution_key = solution_key
         self.metadata = metadata
+        self.generation_suffix = generation_suffix
+        if self.generation_suffix and self.chat_format:
+            raise ValueError("generation_suffix can only be used with chat_format=False")
         if not self.metadata:
             self.metadata = {}
 
@@ -279,8 +280,8 @@ class WriteFinalSftManifest(BaseProcessor):
                     elem['mask'] = 'User'
                     elem['type'] = None
                 else:
-                    elem["input"] = prompt.build_string(input_dict={"question": elem[self.question_key]})
-                    elem["output"] = elem.pop(self.solution_key)
+                    elem["input"] = prompt.build_string(input_dict={"question": elem['question']})
+                    elem["output"] = elem.pop("generation") + self.generation_suffix
                 elem.update(self.metadata)
                 fout.write(json.dumps(elem) + "\n")
                 samples_count += 1
