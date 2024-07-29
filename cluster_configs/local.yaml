@@ -12,4 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__version__ = '0.3.1'
+cluster: local
+
+containers:
+  tensorrt_llm: igitman/nemo-skills-trtllm:0.3.1
+  vllm: igitman/nemo-skills-vllm:0.3.1
+  nemo: igitman/nemo-skills-sft:0.3.0
+  # sandbox is always re-built locally
+
+# change this to "sudo docker" if non-root user access is not set up
+# to set up non-root access, follow https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user
+docker_cmd: "docker"

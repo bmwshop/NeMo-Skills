@@ -529,28 +529,19 @@ def symbolic_equal(a, b, tolerance, timeout=10.0):
     return False
 
 
-def get_fallback_answer(string):
-    """Fallback strategy to produce the answer if the model doesn't adhere to the format."""
-
-    # 1 - Search for the last number
-    def extract_last_number(string):
-        numbers = re.findall(r'\d+\.\d+|\d+', string)
-        if numbers:
-            return float(numbers[-1]) if '.' in numbers[-1] else int(numbers[-1])
+def extract_answer(string: str, extract_from_boxed: bool = True, extract_regex: str = r"The final answer is (.+)$"):
+    """Extract Answer String from \\boxed expression or based on regex"""
+    if not extract_from_boxed:
+        match = re.search(extract_regex, string)
+        if match:
+            return match.group(1)
         return None
 
-    last_number = extract_last_number(string)
-    return last_number
-
-
-def extract_answer(string):
-    """Extract Answer String from \\boxed expression."""
     idx = string.rfind("\\boxed")
     if idx < 0:
         idx = string.rfind("\\fbox")
         if idx < 0:
-            return get_fallback_answer(string)
-            # return None
+            return None
 
     i = idx
     right_brace_idx = None
