@@ -30,5 +30,6 @@ generate(
     # num_chunks=10,
     server_gpus=4,
     server_nodes=4,
-    server_args="--async-scheduling"
 )
+
+# server_args="--async-scheduling"
