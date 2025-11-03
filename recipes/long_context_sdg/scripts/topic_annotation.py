@@ -1,7 +1,8 @@
 from nemo_skills.pipeline.cli import generate, wrap_arguments
 
 cluster = "hsg"
-input_file = "/nemo_run/code/recipes/long_context_sdg/src/test.jsonl"
+# input_file = "/nemo_run/code/recipes/long_context_sdg/src/test.jsonl"
+input_file = "/workspace/DATA/LONG_CONTEXT/ANNOTATED_TOPIC_TEST/lcr.jsonl"
 output_dir = "/workspace/DATA/LONG_CONTEXT/ANNOTATED_TOPIC_TEST"
 prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/annotate_document_topic.yaml"
 
