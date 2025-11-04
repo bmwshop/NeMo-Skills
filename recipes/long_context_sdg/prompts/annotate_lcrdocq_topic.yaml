@@ -1,0 +1,25 @@
+user: |-
+  Given the following documents and question, perform these steps:
+    1. Identify the main domain or topic area of the question-documents pair (e.g., eferfre etc.).
+    2. List the top {num_subtopics} subtopics discussed or implied. Each subtopic should represent a distinct theme, process, or concept related to the main domain.
+    3. Analyze and understand the question and its solution in the context of the documents. Identify all the reasoning steps (e.g., Step 1, Step 2, Step 3) and summarize the knowledge points at each step.
+    4. Provide the solution to the question in the context of the documents.
+    5. Output your response strictly in the following JSON format:
+       {{
+         "domain": "<main domain>",
+         "subtopics": ["<subtopic_1>", "<subtopic_2>", ..., "<subtopic_N>"],
+         "reasoning_steps": ["<reasoning_step_1>", "<reasoning_step_2>", ..., "<reasoning_step_N>"],
+         "knowledge_points": ["<knowledge_point_1>", "<knowledge_point_2>", ..., "<knowledge_point_N>"],
+         "solution": "<solution>"
+       }}
+
+
+  Given Documents:
+  
+  {docs}
+
+  Given Question:
+  
+  {original_question}
+
+ 
