@@ -26,7 +26,7 @@ user: |-
   Return **one valid JSON object only**, matching this schema exactly:
 
   ```json
-  {
+  {{
     "goal": "One concise sentence describing what understanding or skill the annotator was testing.",
     "instruction_to_annotator": "A general, reusable instruction another annotator could follow on new documents to create a similar QA pair.",
     "reasoning_type": "factual_retrieval | comparative | causal | synthesis | evaluation | predictive",
@@ -34,7 +34,7 @@ user: |-
     "expected_answer_style": "short factual phrase | comparative paragraph | multi-step reasoning | synthesis essay | other",
     "constraints": "Optional limits on length, tone, or number of documents referenced.",
     "estimated_difficulty": "easy | medium | hard"
-  }
+  }}
   ```
 
   Below is the full benchmark example.
