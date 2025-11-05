@@ -3,7 +3,6 @@ system: |
   You create new benchmark examples that test analytical reasoning across multiple documents.
   Follow the provided abstract instruction faithfully.
   Ground all content in the supplied documents.
-  Do not copy text verbatim or use named entities from the input.
   The goal is to emulate the *style* and *difficulty* of long-context reasoning tasks.
 
   STYLE GUIDELINES:
@@ -18,11 +17,13 @@ user: |-
   Follow the meta-instruction and documents below to create one new QA pair.
 
   META-INSTRUCTION:
-  {{ instruction_to_annotator }}
+  {{ instruction }}
 
-
+  ATTRIBUTES:
+  Difficulty: {{ difficulty }}
   Reasoning type: {{ reasoning_type }}
-  Estimated difficulty: {{ estimated_difficulty }}
+  Reasoning depth: {{ reasoning_depth }}
+  Formatting constraints: {{ formatting_constraints }}
 
   REQUIREMENTS
   - Use at least TWO distinct documents meaningfully.
