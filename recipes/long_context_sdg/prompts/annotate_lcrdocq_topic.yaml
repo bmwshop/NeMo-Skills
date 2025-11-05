@@ -23,6 +23,12 @@ user: |-
   - Focus on abstract task design, reasoning type, and answer expectations.
   - Write at the level of general instruction a human annotator could follow on unseen documents.
 
+  **About constraints**
+  - Constraints are optional but orthogonal to reasoning type.
+  - Include them if the example specifies how the answer should be formatted, ranked, or bounded.
+  - Examples: “Rank by revenue”, “Exclude 2024 data”, “Round to two decimals”, “List top three entities”, “Do not use abbreviations”, "Answer must be in thousands", "Comma-separate the outputs".
+
+
   Return **one valid JSON object only**, matching this schema exactly:
 
   ```json

@@ -1,0 +1,50 @@
+system: |
+  You are a careful data annotator.
+  You create new benchmark examples that test analytical reasoning across multiple documents.
+  Follow the provided abstract instruction faithfully.
+  Ground all content in the supplied documents.
+  Do not copy text verbatim or use named entities from the input.
+  The goal is to emulate the *style* and *difficulty* of long-context reasoning tasks.
+
+  STYLE GUIDELINES:
+  - The question must require understanding and comparing information across at least two documents.
+  - The answer should synthesize reasoning and evidence rather than extract a single fact.
+  - Maintain an analytical, objective tone (no subjective or opinionated phrasing).
+  - Prefer explanatory or comparative questions; avoid yes/no or definition-style questions.
+  - Limit answers to about 150 words unless the reasoning requires more detail.
+  - Ensure the question and answer together test comprehension and synthesis over retrieval.
+
+user: |-
+  Follow the meta-instruction and documents below to create one new QA pair.
+
+  META-INSTRUCTION:
+  {{ instruction_to_annotator }}
+
+
+  Reasoning type: {{ reasoning_type }}
+  Estimated difficulty: {{ estimated_difficulty }}
+
+  REQUIREMENTS
+  - Use at least TWO distinct documents meaningfully.
+  - Formulate ONE well-posed question that reflects the meta-instruction.
+  - Write ONE correct, grounded answer, consistent with the documents.
+  - Include a short 2–5 step reasoning RATIONALE showing how the answer was derived.
+  - Cite the documents actually used (e.g., ["D1","D3"]).
+
+  DOCUMENTS
+  {{ docs_block }}
+  # Each document is given in the format:
+  # [D1] Title (optional)
+  # text...
+  # [D2] ...
+  # [D3] ...
+
+  Return only one valid JSON object matching this schema:
+
+  ```json
+  {
+    "question": "Generated question that matches the instruction.",
+    "answer": "Grounded and concise answer based on the documents.",
+    "rationale": ["step 1", "step 2", "step 3"],
+    "used_docs": ["D?", "D?"]
+  }

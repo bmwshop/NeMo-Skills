@@ -16,8 +16,9 @@ generate(
         f"++skip_filled=True "
         f"++prompt_config={prompt_config} "
         f"++chat_template_kwargs.reasoning_effort=high "
-        f"++inference.tokens_to_generate=32768 "
+        f"++inference.tokens_to_generate=131072 "
         f"++inference.endpoint_type=text "
+        f"++max_concurrent_requests=8 "
         f"++inference.temperature=0.3 "
         f"++inference.top_p=0.9 "
     ),
