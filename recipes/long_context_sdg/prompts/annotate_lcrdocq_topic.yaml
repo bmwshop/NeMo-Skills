@@ -1,25 +1,53 @@
+system: |
+  You are a precise annotation analyst.
+  Your task is to summarize the *instructional logic* behind human-authored benchmark examples.
+  Do not reproduce or paraphrase any text, facts, or entities from the input.
+  Respond ONLY in valid JSON following the schema shown below.
+  If you must reason internally, do so silently; do not include explanations or commentary in your final output.
+
 user: |-
-  Given the following documents and question, perform these steps:
-    1. Identify the main domain or topic area of the question-documents pair (e.g., eferfre etc.).
-    2. List the top {num_subtopics} subtopics discussed or implied. Each subtopic should represent a distinct theme, process, or concept related to the main domain.
-    3. Analyze and understand the question and its solution in the context of the documents. Identify all the reasoning steps (e.g., Step 1, Step 2, Step 3) and summarize the knowledge points at each step.
-    4. Provide the solution to the question in the context of the documents.
-    5. Output your response strictly in the following JSON format:
-       {{
-         "domain": "<main domain>",
-         "subtopics": ["<subtopic_1>", "<subtopic_2>", ..., "<subtopic_N>"],
-         "reasoning_steps": ["<reasoning_step_1>", "<reasoning_step_2>", ..., "<reasoning_step_N>"],
-         "knowledge_points": ["<knowledge_point_1>", "<knowledge_point_2>", ..., "<knowledge_point_N>"],
-         "solution": "<solution>"
-       }}
+  You are analyzing a long-context benchmark example that contains:
 
+  - A set of source documents
+  - A question written by a human annotator about those documents
+  - A reference answer written by the annotator
 
-  Given Documents:
+  Your task is to infer the *abstract annotation instruction* that could have guided the annotator to create such a question–answer pair.
+
+  The goal is to describe **how the annotator reasoned about the documents and constructed the task**, 
+  not to restate or paraphrase any text from them.
+
+  **Strict rules to prevent leakage**
+  - Do NOT copy, quote, or paraphrase any phrases, named entities, or numbers from the documents, question, or answer.
+  - Use only generic placeholders such as [Document A], [Document B], [Concept X].
+  - Focus on abstract task design, reasoning type, and answer expectations.
+  - Write at the level of general instruction a human annotator could follow on unseen documents.
+
+  Return **one valid JSON object only**, matching this schema exactly:
+
+  ```json
+  {
+    "goal": "One concise sentence describing what understanding or skill the annotator was testing.",
+    "instruction_to_annotator": "A general, reusable instruction another annotator could follow on new documents to create a similar QA pair.",
+    "reasoning_type": "factual_retrieval | comparative | causal | synthesis | evaluation | predictive",
+    "reasoning_depth": "recall | comprehension | analysis | synthesis | evaluation",
+    "expected_answer_style": "short factual phrase | comparative paragraph | multi-step reasoning | synthesis essay | other",
+    "constraints": "Optional limits on length, tone, or number of documents referenced.",
+    "estimated_difficulty": "easy | medium | hard"
+  }
+  ```
+
+  Below is the full benchmark example.
   
+  ---
+  DOCUMENTS:
   {docs}
 
-  Given Question:
-  
+  QUESTION:
   {original_question}
 
- 
+  ANSWER:
+  {expected_answer}
+
+  ---
+  Produce only the JSON object. Do not include explanations, commentary, or any preamble.

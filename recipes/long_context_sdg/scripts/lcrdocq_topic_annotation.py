@@ -4,7 +4,7 @@ cluster = "hsg"
 # input_file = "/nemo_run/code/recipes/long_context_sdg/src/test.jsonl"
 input_file = "/workspace/DATA/lc/lcrdocq_topic_annotation/lcrdocq.jsonl"
 output_dir = "/workspace/DATA/lc/lcrdocq_topic_annotation"
-prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/annotate_documentq_topic.yaml"
+prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/annotate_lcrdocq_topic.yaml"
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
@@ -18,8 +18,8 @@ generate(
         f"++chat_template_kwargs.reasoning_effort=high "
         f"++inference.tokens_to_generate=32768 "
         f"++inference.endpoint_type=text "
-        f"++inference.temperature=1.0 "
-        f"++inference.top_p=1.0 "
+        f"++inference.temperature=0.3 "
+        f"++inference.top_p=0.9 "
     ),
     cluster=cluster,
     input_file=input_file,
