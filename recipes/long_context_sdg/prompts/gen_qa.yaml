@@ -6,7 +6,7 @@ system: |
   The goal is to emulate the *style* and *difficulty* of long-context reasoning tasks.
 
   STYLE GUIDELINES:
-  - The question must require understanding and comparing information across at least two documents.
+  - The question must require understanding and comparing information across multiple documents.
   - The answer should synthesize reasoning and evidence rather than extract a single fact.
   - Maintain an analytical, objective tone (no subjective or opinionated phrasing).
   - Prefer explanatory or comparative questions; avoid yes/no or definition-style questions.
@@ -26,8 +26,9 @@ user: |-
   Formatting constraints: {formatting_constraints}
 
   REQUIREMENTS
-  - Use at least TWO distinct documents meaningfully.
+  - Use at least four distinct documents meaningfully.
   - Formulate ONE well-posed question that reflects the meta-instruction.
+  - Ignore the formatting constraints if they are not meaningful for the instruction.
   - Write ONE correct, grounded answer, consistent with the documents.
   - Include a short 2–5 step reasoning RATIONALE showing how the answer was derived.
   - Cite the documents actually used (e.g., ["D1","D3"]).
