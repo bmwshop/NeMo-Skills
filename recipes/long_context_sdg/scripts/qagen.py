@@ -28,8 +28,10 @@ generate(
     model=teacher_model,
     server_type="sglang",
     server_args="--context-len 262144 --ep-size 8",
+    postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_qa.py {output_dir}/output.jsonl {output_dir}/annotated_qa.jsonl",
     # Server parameters
     num_chunks=32,
+    dependent_jobs=2,
     server_gpus=4,
     server_nodes=2,
 )
