@@ -33,12 +33,11 @@ user: |-
   - Cite the documents actually used (e.g., ["D1","D3"]).
 
   DOCUMENTS
-  {{ docs_block }}
+  {{ docs }}
   # Each document is given in the format:
-  # [D1] Title (optional)
-  # text...
-  # [D2] ...
-  # [D3] ...
+  # BEGIN DOCUMENT (number):
+  # <text>
+  # END DOCUMENT
 
   Return only one valid JSON object matching this schema:
 
