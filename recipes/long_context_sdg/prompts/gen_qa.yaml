@@ -17,13 +17,13 @@ user: |-
   Follow the meta-instruction and documents below to create one new QA pair.
 
   META-INSTRUCTION:
-  {{ instruction }}
+  {instruction}
 
   ATTRIBUTES:
-  Difficulty: {{ difficulty }}
-  Reasoning type: {{ reasoning_type }}
-  Reasoning depth: {{ reasoning_depth }}
-  Formatting constraints: {{ formatting_constraints }}
+  Difficulty: {difficulty}
+  Reasoning type: {reasoning_type}
+  Reasoning depth: {reasoning_depth}
+  Formatting constraints: {formatting_constraints}
 
   REQUIREMENTS
   - Use at least TWO distinct documents meaningfully.
@@ -32,19 +32,21 @@ user: |-
   - Include a short 2–5 step reasoning RATIONALE showing how the answer was derived.
   - Cite the documents actually used (e.g., ["D1","D3"]).
 
-  DOCUMENTS
-  {{ docs }}
   # Each document is given in the format:
   # BEGIN DOCUMENT (number):
   # <text>
   # END DOCUMENT
 
+  DOCUMENTS
+  {docs}
+ 
+
   Return only one valid JSON object matching this schema:
 
   ```json
-  {
+  {{
     "question": "Generated question that matches the instruction.",
     "answer": "Grounded and concise answer based on the documents.",
     "rationale": ["step 1", "step 2", "step 3"],
     "used_docs": ["D?", "D?"]
-  }
+  }}
