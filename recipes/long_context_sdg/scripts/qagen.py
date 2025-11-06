@@ -29,7 +29,7 @@ generate(
     server_type="sglang",
     server_args="--context-len 262144 --ep-size 8",
     # Server parameters
-    num_chunks=16,
+    num_chunks=1,
     server_gpus=4,
     server_nodes=2,
 )
