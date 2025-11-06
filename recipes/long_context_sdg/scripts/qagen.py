@@ -2,7 +2,7 @@ from nemo_skills.pipeline.cli import generate, wrap_arguments
 
 cluster = "hsg"
 # input_file = "/nemo_run/code/recipes/long_context_sdg/src/test.jsonl"
-input_file = "/workspace/DATA/lc/lcrdocq_topic_annotation/samples_50k.jsonl"
+input_file = "/workspace/DATA/lc/lcrdocq_topic_annotation/samples_10k.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen"
 prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_qa.yaml"
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
