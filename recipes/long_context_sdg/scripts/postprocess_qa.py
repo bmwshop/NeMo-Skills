@@ -26,7 +26,12 @@ def extract_generation_fields(input_file, output_file):
     with open(input_file, "r", encoding="utf-8") as f_in, \
          open(output_file, "w", encoding="utf-8") as f_out:
         for line_num, line in enumerate(f_in, start=1):
-            line = line.strip()
+            try:
+                line = line.strip()
+            except MemoryError:
+                print(f"Skipping oversized line {line_num} (MemoryError)")
+                continue
+                
             if not line:
                 continue
             data = json.loads(line)
