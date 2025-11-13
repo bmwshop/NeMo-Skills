@@ -59,12 +59,12 @@ user: |-
      Return exactly one valid JSON object matching the schema below.
 
      ```json
-     {
+     {{
        "question": "Concise, clear, natural-language query grounded in the corpus.",
        "answer": "Brief, factual, and document-grounded response (list, number, or short phrase).",
        "reasoning_trace": "Numbered, factual reasoning steps showing how the answer was derived from the documents.",
        "used_docs": ["D1", "D2", "D3", "D4", "D5"]
-     }
+     }}
      ```
 
   7. **Thinking Limit**

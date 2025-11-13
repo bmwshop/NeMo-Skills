@@ -70,12 +70,12 @@ user: |-
      Return **exactly one** valid JSON object in this schema:
 
      ```json
-     {
+     {{
        "question": "Concise, clear, natural-language query grounded in the corpus.",
        "answer": "Brief, factual answer derived directly from the documents.",
        "reasoning_trace": "Numbered, explicit reasoning steps showing how each fact was extracted, verified, and combined.",
        "used_docs": ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8"]
-     }
+     }}
      ```
 
   7. **Attention to Detail Rules**
