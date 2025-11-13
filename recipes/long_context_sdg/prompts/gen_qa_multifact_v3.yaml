@@ -1,0 +1,123 @@
+system: |
+  You are an expert question–answer generation and reasoning model.
+  You create detailed, factual, document-grounded QA pairs that test
+  multi-entity extraction, conditional reasoning, and careful aggregation
+  of facts across multiple documents.
+
+  Your goal is to teach precise reading, cross-document synthesis,
+  and rigorous step-by-step reasoning. Every question must depend on
+  multiple facts that are explicitly stated in the supplied documents.
+  Do not rely on external knowledge or inferred assumptions.
+
+user: |-
+  You are given the following collection of documents:
+
+  {docs}
+
+  ---
+  **TASK**
+
+  Create a concise QA pair that tests *attention to factual detail* by requiring the model to:
+  - Extract many distinct entities or facts from multiple documents.
+  - Apply a **conditional filter** to select a subset of relevant documents.
+  - Optionally perform logical or arithmetic operations (e.g., grouping, comparison, ranking, averaging, summing).
+  - Present a **step-by-step factual reasoning trace** that shows how every part of the answer was derived.
+
+  The question must require synthesis across multiple detailed factual statements
+  rather than relying on a single mention or simple lookup.
+
+  ---
+  **REQUIREMENTS**
+
+  1. **Document Selection**
+     - Choose at least **eight distinct documents** from the corpus.
+     - Select them using a clear condition (e.g., “documents published in 2023,” “documents authored by universities,” or “documents related to climate data”).
+     - For each selected document, identify **at least five distinct facts or entities**.
+
+  2. **Question Construction**
+     - Formulate a **natural-language question** that explicitly describes:
+       - the filtering condition (which subset of documents to use);
+       - what list, quantity, or comparison should be derived.
+     - The question should be specific and factual, not abstract or qualitative.
+     - Avoid trivial retrieval (e.g., “list all entities mentioned”).
+     - Examples:
+         - “List all the species mentioned in environmental reports published in 2023.”
+         - “Among documents authored by banks, which companies are listed as borrowers?”
+         - “From all conference reports, what are the average attendance figures per event?”
+
+  3. **Reasoning Trace**
+     - Write a **structured, detailed reasoning trace** that:
+       1. Lists which documents satisfy the filtering condition.
+       2. Enumerates at least five facts per selected document.
+       3. Describes how these facts were normalized, compared, or aggregated.
+       4. Explains how the final answer was derived.
+     - Each step must cite the supporting document identifiers (e.g., “D3”, “D5”, etc.).
+     - Strive for precision and completeness — missing or incorrect facts lower quality.
+
+  4. **Answer**
+     - Provide the final answer as:
+       - a concise list (entities, numbers, phrases), or
+       - a single computed/derived value (sum, average, etc.).
+     - Use **standard numeric formatting** (e.g., commas, rounding to nearest whole number).
+     - If information is insufficient, return `"NOT ANSWERABLE"`.
+
+  5. **Citations and Factual Integrity**
+     - Always cite the exact documents used: e.g. `["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8"]`.
+     - Each fact in the reasoning trace must trace back to a specific document.
+     - Include all relevant facts that contribute to the answer — do not omit or summarize away detail.
+
+  6. **Output Format**
+     Return **exactly one** valid JSON object in this schema:
+
+     ```json
+     {
+       "question": "Concise, clear, natural-language query grounded in the corpus.",
+       "answer": "Brief, factual answer derived directly from the documents.",
+       "reasoning_trace": "Numbered, explicit reasoning steps showing how each fact was extracted, verified, and combined.",
+       "used_docs": ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8"]
+     }
+     ```
+
+  7. **Attention to Detail Rules**
+     - Facts must be extracted exactly as stated (no rounding, paraphrasing, or assumption).
+     - Every quantity, name, or date must match its document context.
+     - When deduplicating or aggregating entities, note normalization steps explicitly.
+     - Verify that all used facts are unique, non-redundant, and contextually valid.
+     - Highlight cross-document consistency or contradiction if relevant.
+
+  8. **Thinking Limit**
+     - Limit total reasoning to **8,192 tokens**.
+     - Focus on accuracy, not verbosity.
+
+  ---
+  **EXAMPLE**
+
+  Example question:  
+  "List all the countries that the people mentioned in the travel itinerary documents travelled to in 2023."
+
+  Example reasoning_trace:  
+  "1. Selected 8 travel itinerary documents from 2023.  
+   2. From each document, extracted at least five unique person–country pairs:  
+      - D1: Kenya, Uganda, Tanzania, Rwanda, Ethiopia  
+      - D2: Germany, Switzerland, France, Czechia, Belgium  
+      - D3: Japan, Singapore, South Korea, Thailand, Vietnam  
+      - D4: Spain, Portugal, Italy, Brazil, Argentina, Ireland  
+      - D5: United States, Canada, Mexico, South Korea, Taiwan, India, UAE  
+      - D6: India, Indonesia, Malaysia, Philippines, Vietnam, Hong Kong, Singapore, Japan  
+      - D7: Australia, New Zealand, Fiji, Papua New Guinea, Samoa, Vanuatu, Tonga  
+      - D8: Canada, Mexico, Chile, Peru, Colombia, United States, Costa Rica  
+   3. Verified all trips occurred in 2023.  
+   4. Normalized and deduplicated country names across documents.  
+   5. Produced final list of 39 unique countries."
+
+  Example answer:  
+  "Argentina, Australia, Belgium, Brazil, Canada, Chile, Colombia, Costa Rica, Czechia, Ethiopia, Fiji, France, Germany, Hong Kong, India, Indonesia, Ireland, Italy, Japan, Kenya, Malaysia, Mexico, New Zealand, Papua New Guinea, Peru, Philippines, Portugal, Rwanda, Samoa, Singapore, South Korea, Spain, Switzerland, Tanzania, Thailand, Tonga, Uganda, United Arab Emirates, United States, Vanuatu."
+
+  ---
+  **QUALITY CHECKLIST**
+  - [ ] Uses at least 8 documents and 5+ facts per document.
+  - [ ] Applies a clear filtering condition on documents.
+  - [ ] Includes all factual evidence explicitly in the reasoning trace.
+  - [ ] Maintains exact numeric, textual, and date accuracy.
+  - [ ] Final answer is concise, deduplicated, and grounded.
+  - [ ] Returns one valid JSON object only.
