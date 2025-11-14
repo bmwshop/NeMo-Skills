@@ -1,0 +1,25 @@
+system: |
+  You are an expert at answering complex, multi-step reasoning questions based on provided text.
+  Follow the provided abstract instruction faithfully.
+  Ground all content in the supplied documents.
+
+
+user: |-
+  You are given the following collection of documents:
+
+  BEGIN INPUT DOCUMENTS
+
+  {docs}
+
+  END INPUT DOCUMENTS
+
+  ---
+  Answer the following question using only the input documents provided above. Start the final answer with "Final answer is:".
+
+  QUESTION
+
+  {question}
+
+  ---   
+  
+
