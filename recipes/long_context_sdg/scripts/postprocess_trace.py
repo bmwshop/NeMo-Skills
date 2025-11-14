@@ -8,18 +8,13 @@ def parse_json_after_think(s: str):
     if "</think>" not in s:
         raise ValueError("No </think> found in the generation.")
 
-    after = s.split("</think>", 1)[-1].strip()
+    before, after = s.split("</think>", 1)
+    after = after.strip()
+    before = before.strip()
 
-    # 2) strip optional ```json ... ``` fences
-    after = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", after, flags=re.DOTALL)
-
-    # 3) find the first JSON object with the standard decoder (avoids brittle regex {…} grabs)
-    dec = json.JSONDecoder()
-    # locate first '{'
-    i = after.find("{")
-    if i == -1:
-        raise ValueError("No JSON object start found after </think>.")
-    obj, end = dec.raw_decode(after[i:])
+    obj = {} # the new reasoning trace and answer
+    obj["reasoning_trace"] = before
+    obj["answer"] = after
     return obj
 
 def extract_generation_fields(input_file, output_file):
@@ -31,10 +26,16 @@ def extract_generation_fields(input_file, output_file):
             except MemoryError:
                 print(f"Skipping oversized line {line_num} (MemoryError)")
                 continue
-
+                
             if not line:
                 continue
             data = json.loads(line)
+            
+            if "answer" in data: # keep the original answer for reference
+                data["answer0"] = data.pop("answer")
+            if "reasoning_trace" in data: # keep the original reasoning trace for reference
+                data["reasoning0"] = data.pop("reasoning_trace")
+            
             generation = data.get("generation", "").strip()
             if generation:
                 try:
@@ -54,7 +55,7 @@ def extract_generation_fields(input_file, output_file):
                 f_out.write(json.dumps(data, ensure_ascii=False) + "\n")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Extract answer and reasoning trace from generation field in JSONL.")
+    parser = argparse.ArgumentParser(description="Extract reasoning trace and answer from generation field in JSONL.")
     parser.add_argument("--input", type=str, required=True, help="Input JSONL file path")
     parser.add_argument("--output", type=str, required=True, help="Output JSONL file path")
     args = parser.parse_args()
