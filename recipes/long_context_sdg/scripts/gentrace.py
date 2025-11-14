@@ -1,12 +1,12 @@
 from nemo_skills.pipeline.cli import generate, wrap_arguments
 
 cluster = "hsg"
-# input_file = "/nemo_run/code/recipes/long_context_sdg/src/test.jsonl"
-# input_file = "/workspace/DATA/lc/lcrqagen_v3/g/69/intermediate_p.jsonl"
-# output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/intermediate_p.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b"
+input_file = "/workspace/DATA/lc/lcrqagen_v3/g/69/intermediate_p.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces_b"
+
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/intermediate_p.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b"
 
 # input_file = "/workspace/DATA/lc/lcrqagen_v2/Government_Consultations-16384-130000_qa.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v2/traces"
