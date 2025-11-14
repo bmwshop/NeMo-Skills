@@ -6,7 +6,7 @@ cluster = "hsg"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces"
 
 input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/intermediate_p.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces"
+output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b"
 
 # input_file = "/workspace/DATA/lc/lcrqagen_v2/Government_Consultations-16384-130000_qa.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v2/traces"
@@ -14,7 +14,8 @@ output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces"
 # input_file = "/workspace/DATA/lc/lcrqagen_a_v2/intermediate_p.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_a_v2/traces"
 
-prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace.yaml"
+# prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace.yaml"
+prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace_b.yaml"
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
