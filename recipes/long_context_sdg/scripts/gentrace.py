@@ -5,11 +5,11 @@ cluster = "hsg"
 # input_file = "/workspace/DATA/lc/lcrqagen_v3/g/69/intermediate_p.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces"
 
-# input_file = "/workspace/DATA/lc/lcrqagen_v3/g/76/intermediate_p.jsonl"
-# output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces"
+input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/intermediate_p.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v2/Government_Consultations-16384-130000_qa.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v2/traces"
+# input_file = "/workspace/DATA/lc/lcrqagen_v2/Government_Consultations-16384-130000_qa.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v2/traces"
 
 # input_file = "/workspace/DATA/lc/lcrqagen_a_v2/intermediate_p.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_a_v2/traces"
