@@ -33,12 +33,12 @@ user: |-
      - List all used document IDs in "used_docs".
   7) Output Format
      - Return exactly ONE JSON object:
-       {
+       {{
          "question": "...",
          "answer": "...",
          "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
 
   8) Example Question Types
      - Financial/comparative metrics
