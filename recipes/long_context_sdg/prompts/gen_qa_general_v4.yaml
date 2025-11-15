@@ -1,0 +1,62 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+  Use <think limit=8192> for internal reasoning before output (do not include this tag in the final JSON).
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires connecting multiple facts across the corpus.
+  - Make the answer short (entities, numbers, or brief phrases).
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps on explicit facts only.
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step (e.g., "D3").
+  3) Question
+     - Natural, precise; requires filtering + cross-referencing (avoid trivial lookups).
+  4) Answer
+     - Short and factual (1–10 tokens); comma-separated if a list.
+     - If not answerable from the docs, return "NOT ANSWERABLE".
+  5) Formatting
+     - If the question specifies a format, follow it exactly (e.g., rounding, casing, order, separators).
+     - If no format is given, return the raw, exact value without rounding or transformation.
+     - Examples:
+         • Numbers — “rounded to one decimal”, “in thousands”, “as % with two decimals”
+         • Text — “full name with middle initial”, “UPPERCASE”, “Last, First”
+         • Dates — “DD/MM/YYYY”, “Month Year”, “ISO”
+         • Lists — “comma-separated”, “alphabetical order”, “one per line”
+  6) Citations
+     - List all used document IDs in "used_docs".
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  8) Example Question Types
+     - Financial/comparative metrics
+     - Legal/regulatory interpretation
+     - Multi-document synthesis
+     - Temporal/conditional logic
+     - Research/classification
+
+  9) Question Types to Avoid
+     - Counting (>10), single-document retrieval, overly technical, contrived, or visual-dependent questions.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Applies conditional/filtering logic ✔
+  - Single JSON object ✔
+  - No external or visual knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}
