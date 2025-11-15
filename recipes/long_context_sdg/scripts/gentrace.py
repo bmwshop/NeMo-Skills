@@ -2,8 +2,8 @@ from nemo_skills.pipeline.cli import generate, wrap_arguments
 
 cluster = "hsg"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/intermediate_p.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces_b"
+input_file = "/workspace/DATA/lc/lcrqagen_v3/g/76/intermediate_p.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces_b"
 
 # input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/intermediate_p.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b"
