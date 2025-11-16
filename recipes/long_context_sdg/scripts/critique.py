@@ -9,8 +9,12 @@ tokens_to_generate = 65536
 input_file = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces/trace.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces/critiques"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/trace.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/critiques"
+input_file = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces/trace.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces/critiques"
+
+
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/trace.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/critiques"
 
 # input_file = "/workspace/DATA/lc/lcrqagen_v4/sec/general/i.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v4/sec/general/critiques"
