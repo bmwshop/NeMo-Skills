@@ -2,8 +2,11 @@ from nemo_skills.pipeline.cli import generate, wrap_arguments
 
 cluster = "hsg"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/g/76/intermediate_p.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces_b"
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/g/76/intermediate_p.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces_b"
+
+input_file = "/workspace/DATA/lc/lcrqagen_v4/sec/general/intermediate_p.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/sec/general/traces_b"
 
 # input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/intermediate_p.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b"
@@ -20,16 +23,15 @@ prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace_b.yam
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
 dependent_jobs = 0
-num_servers = 32
+num_servers = 64
 
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
-
+# f"++chat_template_kwargs.reasoning_effort=high "
 generate(
     ctx=wrap_arguments(
         f"++skip_filled=True "
         f"++prompt_config={prompt_config} "
-        f"++chat_template_kwargs.reasoning_effort=high "
         f"++inference.tokens_to_generate=32768 "
         f"++inference.endpoint_type=text "
         f"++max_concurrent_requests=8 "
