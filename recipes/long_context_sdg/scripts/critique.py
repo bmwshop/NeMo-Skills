@@ -1,9 +1,13 @@
 from nemo_skills.pipeline.cli import generate, wrap_arguments
 
 cluster = "hsg"
+tokens_to_generate = 65536
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces_b/trace.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces_b/critiques"
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces_b/trace.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces_b/critiques"
+
+input_file = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces/trace.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces/critiques"
 
 # input_file = "/workspace/DATA/lc/lcrqagen_v4/sec/general/i.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v4/sec/general/critiques"
@@ -32,7 +36,7 @@ generate(
     ctx=wrap_arguments(
         f"++skip_filled=True "
         f"++prompt_config={prompt_config} "
-        f"++inference.tokens_to_generate=32768 "
+        f"++inference.tokens_to_generate={tokens_to_generate} "
         f"++inference.endpoint_type=text "
         f"++max_concurrent_requests=8 "
         f"++inference.temperature=0.3 "
