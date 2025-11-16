@@ -15,11 +15,12 @@ output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces/critiques"
 input_file = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces_b/trace.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces_b/critiques"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces/trace.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces/critiques"
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces/trace.jsonl"
+input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/critiques/critique.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/rewrites"
 
-input_file = "/workspace/DATA/dan/v2/trace_0.jsonl"
-output_dir = "/workspace/DATA/dan/v2/critiques_0"
+# input_file = "/workspace/DATA/dan/v2/trace_0.jsonl"
+#output_dir = "/workspace/DATA/dan/v2/critiques_0"
 
 # input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces_b/trace.jsonl"
 #output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces_b/critiques"
@@ -40,12 +41,12 @@ output_dir = "/workspace/DATA/dan/v2/critiques_0"
 # output_dir = "/workspace/DATA/lc/lcrqagen_a_v2/traces"
 
 # prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace.yaml"
-prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/critique.yaml"
+prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/rewrite.yaml"
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
-dependent_jobs = 5
-num_servers = 32
+dependent_jobs = 1
+num_servers = 16
 
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
@@ -66,7 +67,7 @@ generate(
     model=teacher_model,
     server_type="sglang",
     server_args="--context-len 262144 --ep-size 8",
-    postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_qa.py {output_dir}/output.jsonl {output_dir}/critique.jsonl",
+    postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_qa.py {output_dir}/output.jsonl {output_dir}/rewrite.jsonl",
     num_chunks=num_servers,
     dependent_jobs=dependent_jobs,
     server_gpus=4,
