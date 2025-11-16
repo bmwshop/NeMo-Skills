@@ -15,9 +15,9 @@ output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces/rewrites"
 input_file = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces_b/critiques/critique.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces_b/rewrites"
 
-# input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces/trace.jsonl"
-input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/critiques/critique.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/rewrites"
+
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/critiques/critique.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/rewrites"
 
 # input_file = "/workspace/DATA/dan/v2/trace_0.jsonl"
 #output_dir = "/workspace/DATA/dan/v2/critiques_0"
