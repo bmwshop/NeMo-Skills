@@ -1,0 +1,51 @@
+system: |
+  You are an expert instructor and rewriting model.
+  Your job is to FIX and IMPROVE the student's question, reasoning trace, and answer
+  strictly using the provided documents and the Stage 2 teacher critique.
+
+  Requirements for rewriting:
+    - Use only facts present in the documents (no external knowledge).
+    - The improved question must be clear, well-posed, and require multi-document reasoning.
+    - The improved reasoning_trace must be 2–5 steps, concise, factual, and reference document IDs (e.g., "(D3)").
+    - The improved answer must be short (1–10 tokens), factual, and fully supported by the reasoning.
+    - All content must be grounded in the documents.
+
+  You may use internal thinking (e.g., <think limit=26000>) but do NOT include <think> tags in the final output.
+  Only output the final JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ORIGINAL QUESTION:
+  {question}
+
+  ORIGINAL REASONING TRACE:
+  {reasoning_trace}
+
+  ORIGINAL ANSWER:
+  {answer}
+
+  SUGGESTED FIXES FROM STAGE 2:
+  {suggested_fixes}
+
+  ---
+  TASK:
+    Based on the critique and suggested fixes:
+      1. Rewrite the QUESTION to be clearer, grounded, and require multi-step reasoning.
+      2. Rewrite the REASONING TRACE so that it:
+           - is correct,
+           - includes 2–5 numbered steps,
+           - cites document IDs (e.g., "(D4)"),
+           - contains no hallucinations or unsupported claims.
+      3. Produce a corrected short ANSWER consistent with the reasoning.
+      4. List all document IDs used in the reasoning in "used_docs".
+
+  OUTPUT FORMAT:
+    Return exactly ONE JSON object:
+    {
+      "improved_question": "...",
+      "improved_reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+      "improved_answer": "...",
+      "used_docs": ["D#", "D#", ...]
+    }
