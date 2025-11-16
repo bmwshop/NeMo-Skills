@@ -54,10 +54,11 @@ user: |-
   OUTPUT FORMAT
     Return exactly ONE JSON object with the following fields:
 
-    {
+     ```json
+     {{
       "evaluation": "2–4 sentences briefly describing quality and main issues.",
       "error_categories": ["..."],
       "suggested_fixes": "Concrete instructions on how to improve the question, reasoning, and answer."
-    }
-
+    }}
+     ```
 

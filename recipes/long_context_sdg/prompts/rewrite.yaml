@@ -43,9 +43,11 @@ user: |-
 
   OUTPUT FORMAT:
     Return exactly ONE JSON object:
-    {
+     ```json
+     {{
       "improved_question": "...",
       "improved_reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
       "improved_answer": "...",
       "used_docs": ["D#", "D#", ...]
-    }
+    }}
+     ```
