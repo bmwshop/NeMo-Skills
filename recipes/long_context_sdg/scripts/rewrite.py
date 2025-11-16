@@ -9,11 +9,14 @@ output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces_b/rewrites"
 input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces/critiques/critique.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces/rewrites"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces/critiques/critique.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces/rewrites"
+input_file = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces/critiques/critique.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces/rewrites"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces_b/critiques/critique.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces_b/rewrites"
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces/critiques/critique.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces/rewrites"
+
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces_b/critiques/critique.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces_b/rewrites"
 
 
 # input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/critiques/critique.jsonl"
