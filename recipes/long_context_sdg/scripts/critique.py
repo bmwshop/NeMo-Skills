@@ -24,8 +24,8 @@ output_dir = "/workspace/DATA/dan/v2/critiques_0"
 input_file = "/workspace/DATA/lc/lcrqagen_v4/sec/general/traces_b/trace.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v4/sec/general/traces_b/critiques"
 
-# input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces_b/trace.jsonl"
-#output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces_b/critiques"
+input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces/trace.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces/critiques"
 
 # input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/trace.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/critiques"
@@ -47,8 +47,8 @@ prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/critique.yaml"
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
-dependent_jobs = 4
-num_servers = 32
+dependent_jobs = 1
+num_servers = 16
 
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
