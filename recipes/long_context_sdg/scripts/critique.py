@@ -18,8 +18,8 @@ output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/69/traces_b/critiques"
 input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces/trace.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces/critiques"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces_b/trace.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces_b/critiques"
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces_b/trace.jsonl"
+#output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/mf/traces_b/critiques"
 
 # input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/trace.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b/critiques"
