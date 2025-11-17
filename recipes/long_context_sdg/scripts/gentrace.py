@@ -8,14 +8,28 @@ cluster = "hsg"
 input_file = "/workspace/DATA/lc/lcrqagen_v4/sec/general/intermediate_p.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v4/sec/general/traces_b"
 
-# input_file = "/workspace/DATA/lc/lcrqagen_v3/c/tr/intermediate_p.jsonl"
-# output_dir = "/workspace/DATA/lc/lcrqagen_v3/c/tr/traces_b"
 
-# input_file = "/workspace/DATA/lc/lcrqagen_v2/Government_Consultations-16384-130000_qa.jsonl"
-# output_dir = "/workspace/DATA/lc/lcrqagen_v2/traces"
+input_file = "/workspace/DATA/lcr_docs/Academia-16384-130000.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/a/general"
 
-# input_file = "/workspace/DATA/lc/lcrqagen_a_v2/intermediate_p.jsonl"
-# output_dir = "/workspace/DATA/lc/lcrqagen_a_v2/traces"
+input_file = "/workspace/DATA/lcr_docs/Legal-16384-130000.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/l/general"
+
+input_file = "/workspace/DATA/lcr_docs/Marketing-16384-130000.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/m/general"
+
+input_file = "/workspace/DATA/lcr_docs/Industry_Reports-16384-130000.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/i/general"
+
+input_file = "/workspace/DATA/lcr_docs/Survey_Reports-16384-130000.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/s/general"
+
+input_file = "/workspace/DATA/lcr_docs/Company_Documents-16384-130000.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/c/general"
+
+input_file = "/workspace/DATA/lcr_docs/Government_Consultations-16384-130000.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/g/general"
+
 
 # prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace.yaml"
 prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace_b.yaml"
