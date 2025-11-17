@@ -17,8 +17,8 @@ output_dir = "/workspace/DATA/lc/lcrqagen_v4/i/general"
 input_file = "/workspace/DATA/lcr_docs/Survey_Reports-16384-130000.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v4/s/general"
 
-# input_file = "/workspace/DATA/lcr_docs/Company_Documents-16384-130000.jsonl"
-# output_dir = "/workspace/DATA/lc/lcrqagen_v4/c/general"
+input_file = "/workspace/DATA/lcr_docs/Company_Documents-16384-130000.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/c/general"
 
 # input_file = "/workspace/DATA/lcr_docs/Government_Consultations-16384-130000.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v4/g/general"
