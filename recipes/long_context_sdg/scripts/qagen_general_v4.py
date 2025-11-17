@@ -20,8 +20,8 @@ output_dir = "/workspace/DATA/lc/lcrqagen_v4/s/general"
 # 3input_file = "/workspace/DATA/lcr_docs/Company_Documents-16384-130000.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v4/c/general"
 
-# input_file = "/workspace/DATA/lcr_docs/Government_Consultations-16384-130000.jsonl"
-# output_dir = "/workspace/DATA/lc/lcrqagen_v4/g/general"
+input_file = "/workspace/DATA/lcr_docs/Government_Consultations-16384-130000.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/g/general"
 
 
 prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_qa_general_v4.yaml"
