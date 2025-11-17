@@ -5,30 +5,30 @@ cluster = "hsg"
 # input_file = "/workspace/DATA/lc/lcrqagen_v3/g/76/intermediate_p.jsonl"
 # output_dir = "/workspace/DATA/lc/lcrqagen_v3/g/76/traces_b"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v4/sec/general/intermediate_p.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v4/sec/general/traces_b"
+# input_file = "/workspace/DATA/lc/lcrqagen_v4/sec/general/intermediate_p.jsonl"
+#output_dir = "/workspace/DATA/lc/lcrqagen_v4/sec/general/traces_b"
 
 
-input_file = "/workspace/DATA/lcr_docs/Academia-16384-130000.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v4/a/general"
+# input_file = "/workspace/DATA/lc/lcrqagen_v4/a/general/intermediate_p.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v4/a/general/traces_b"
 
-input_file = "/workspace/DATA/lcr_docs/Legal-16384-130000.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v4/l/general"
+# input_file = "/workspace/DATA/lc/lcrqagen_v4/c/general/intermediate_p.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v4/c/general/traces_b"
 
-input_file = "/workspace/DATA/lcr_docs/Marketing-16384-130000.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v4/m/general"
+# input_file = "/workspace/DATA/lc/lcrqagen_v4/m/general/intermediate_p.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v4/m/general/traces_b"
 
-input_file = "/workspace/DATA/lcr_docs/Industry_Reports-16384-130000.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v4/i/general"
+# input_file = "/workspace/DATA/lc/lcrqagen_v4/i/general/intermediate_p.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v4/i/general/traces_b"
 
-input_file = "/workspace/DATA/lcr_docs/Survey_Reports-16384-130000.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v4/s/general"
+# input_file = "/workspace/DATA/lc/lcrqagen_v4/l/general/intermediate_p.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v4/l/general/traces_b"
 
-input_file = "/workspace/DATA/lcr_docs/Company_Documents-16384-130000.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v4/c/general"
+# input_file = "/workspace/DATA/lc/lcrqagen_v4/s/general/intermediate_p.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v4/s/general/traces_b"
 
-input_file = "/workspace/DATA/lcr_docs/Government_Consultations-16384-130000.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v4/g/general"
+input_file = "/workspace/DATA/lc/lcrqagen_v4/g/general/intermediate_p.jsonl"
+output_dir = "/workspace/DATA/lc/lcrqagen_v4/g/general/traces_b"
 
 
 # prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace.yaml"
@@ -36,8 +36,8 @@ prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace_b.yam
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
-dependent_jobs = 4
-num_servers = 64
+dependent_jobs = 1
+num_servers = 16
 
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
