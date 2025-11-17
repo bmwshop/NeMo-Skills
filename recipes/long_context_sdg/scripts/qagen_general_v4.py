@@ -20,8 +20,8 @@ output_dir = "/workspace/DATA/lc/lcrqagen_v4/s/general"
 input_file = "/workspace/DATA/lc/lcr_docs/Company_Documents-16384-130000.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v4/c/general"
 
-input_file = "/workspace/DATA/lc/lcr_docs/Government_Consultations-16384-130000.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v4/g/general"
+# input_file = "/workspace/DATA/lc/lcr_docs/Government_Consultations-16384-130000.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v4/g/general"
 
 
 prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_qa_general_v4.yaml"
@@ -38,7 +38,7 @@ generate(
     ctx=wrap_arguments(
         f"++skip_filled=True "
         f"++prompt_config={prompt_config} "
-        f"++inference.tokens_to_generate=32768 "
+        f"++inference.tokens_to_generate=16384 "
         f"++inference.endpoint_type=text "
         f"++max_concurrent_requests=8 "
         f"++inference.temperature=0.6 "
