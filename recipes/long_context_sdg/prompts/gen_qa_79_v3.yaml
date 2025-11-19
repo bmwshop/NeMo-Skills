@@ -1,0 +1,100 @@
+task: "Generate quantitative and reasoning-based QA pairs from document sets containing empirical, statistical, or categorical information"
+
+goal: >
+  Create question–answer pairs that require a model to locate quantitative or categorical
+  information in documents, apply logical or arithmetic reasoning, interpret subsets or
+  conditions, reconcile multiple sources if needed, and explain its reasoning transparently.
+
+inputs:
+  documents:
+    description: >
+      A set of documents that may include empirical studies, reports, submissions, audits,
+      technical papers, or analyses. Documents may contain numbers, time ranges, categories,
+      classifications, tables, or structured findings.
+    examples:
+      - title: "<any report or analysis>"
+        type: "research | policy | technical | regulatory | financial"
+        content: "<contains figures, sample sizes, counts, percentages, or outcome categories>"
+
+instructions:
+  - Step 1: Identify all relevant numerical, categorical, or outcome-based facts.
+  - Step 2: Determine which subset or condition the question refers to (e.g., time period,
+      outcome category, group, region, domain-specific classification).
+  - Step 3: Extract the values required for reasoning.
+  - Step 4: Where multiple documents present related figures, assess how they relate
+      (e.g., broader vs. narrower dataset, updated vs. older data).
+  - Step 5: Perform the necessary arithmetic or comparison to reach a conclusion.
+  - Step 6: Provide an answer grounded strictly in the documents.
+
+question_requirements:
+  - Must be answerable **only** from the provided documents.
+  - Should reference a meaningful constraint or subset (e.g., “between [years]”, “in this category”,
+      “according to this dataset”, “under these conditions”).
+  - Should require the model to combine, filter, compare, or compute using documented values.
+  - Avoid trivial lookups; require at least one reasoning step (e.g., selection, calculation,
+      cross-source reconciliation).
+  - Use natural language phrasing such as:
+      * “Based on the documents, how many…?”
+      * “According to the data provided, what proportion…?”
+      * “Given the figures in the report, what is the total…?”
+      * “Using the criteria outlined, how many instances meet the condition…?”
+
+answer_requirements:
+  - Provide a **clear numeric or categorical result** based solely on document evidence.
+  - Include a transparent reasoning trace describing:
+      * which documents were used
+      * which facts or numbers were extracted
+      * how the computation or selection was performed
+  - If the documents contain conflicting figures, explain the difference and select the figure
+      most consistent with the question’s conditions (e.g., broader dataset, final results).
+  - If the question cannot be answered, state **“NOT ANSWERABLE”** and briefly explain why.
+
+output_format: |
+  - question: "<natural-language quantitative or category-based question>"
+    documents_used:
+      - "<document title(s)>"
+    facts_referenced:
+      - "<numeric or categorical facts with brief contextual notes>"
+    reasoning:
+      - "<step-by-step explanation of calculation, comparison, or filtering>"
+    answer: "<final numeric or category result>"
+
+generation_guidelines:
+  quantitative_reasoning_types:
+    - subset selection: filtering data by time range, group, or condition
+    - comparison: contrasting figures across documents or categories
+    - aggregation: summing or combining counts from multiple sources
+    - computation: applying percentages, ratios, or formulas stated in the documents
+    - source reconciliation: explaining why one dataset is broader or narrower than another
+  question_diversity:
+    - simple numeric retrieval paired with reasoning
+    - multi-source synthesis questions
+    - ranking or sorting questions
+    - proportional or percentage-based calculations
+    - outcome-classification questions based on documented categories
+  domain_agnostic_constraints:
+    - Do not assume a specific field (legal, scientific, financial, etc.)
+    - Ensure the template applies to any empirical or structured dataset
+
+evaluation_criteria:
+  - groundedness: all facts must appear in the documents
+  - correctness: arithmetic and logical steps must be valid
+  - transparency: reasoning must be auditable and explicit
+  - clarity: answers must be numerically or categorically precise
+  - generality: instructions must not rely on any domain-specific example
+
+example_pair (generic and domain-agnostic):
+  - question: >
+      Based on the provided documents, how many items fall into the specified category
+      within the defined time range?
+    documents_used:
+      - "<Document A>"
+      - "<Document B>"
+    facts_referenced:
+      - "Document A reports 120 total cases during the period."
+      - "Document B indicates that 15% of these cases fall into the specified category."
+    reasoning:
+      - "Identify total count from Document A."
+      - "Apply the category percentage from Document B."
+      - "Compute 120 × 0.15 = 18."
+    answer: "18 items fall into the specified category for the time range."

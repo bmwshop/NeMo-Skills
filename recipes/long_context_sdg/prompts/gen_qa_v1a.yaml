@@ -1,0 +1,74 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Follow the provided abstract instruction faithfully.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+  STYLE GUIDELINES:
+  - The question must require understanding and comparing information across multiple documents.
+  - The answer should synthesize reasoning and evidence rather than extract a single fact.
+  - Maintain an analytical, objective tone (no subjective or opinionated phrasing).
+  - Ensure the question and answer together test comprehension and synthesis over retrieval.
+
+  VISIBLE THINKING CONSTRAINTS:
+  - The content inside <think>...</think> is VISIBLE OUTPUT and counts toward the token limit.
+  - You MUST keep this visible thinking extremely short and compressed.
+  - HARD LIMITS:
+      * Do NOT exceed 4000 tokens inside the <think> block.
+      * Do NOT restate or quote large parts of any document.
+      * Summarize reasoning efficiently—avoid detail expansion.
+  - If you reach the <think limit>, STOP IMMEDIATELY and output the final JSON.
+  - Never continue thinking after hitting the limit.
+  - Never include <think> tags inside the JSON.
+
+
+
+user: |-
+  Follow the meta-instruction and documents below to create one new QA pair.
+  <think limit=4000>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  META-INSTRUCTION:
+  {instruction}
+
+  ATTRIBUTES:
+  Difficulty: {difficulty}
+  Reasoning type: {reasoning_type}
+  Reasoning depth: {reasoning_depth}
+  Formatting constraints: {formatting_constraints}
+
+  REQUIREMENTS
+  - Use at least five distinct documents meaningfully.
+  - Formulate ONE well-posed question that reflects the meta-instruction.
+  - Ignore formatting constraints if they are not meaningful for the instruction.
+  - Write ONE correct, grounded answer, consistent with the documents.
+  - Include a short 3–5 step reasoning RATIONALE showing how the answer was derived.
+  - Cite the documents actually used (e.g., ["D1","D3"]).
+
+  Each document is given in the format:
+  BEGIN DOCUMENT (number):
+  <text>
+  END DOCUMENT
+
+  DOCUMENTS
+  {docs}
+ 
+   VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - JSON reasoning trace is 3–5 steps ✔
+  - Visible <think> block < 4000 tokens ✔
+  - Final JSON emitted ✔
+  - No external or visual knowledge ✔
+
+  Return only one valid JSON object matching this schema:
+
+  ```json
+  {{
+    "question": "Generated question that matches the instruction.",
+    "answer": "Grounded and concise answer based on the documents.",
+    "rationale": ["step 1", "step 2", "step 3"],
+    "used_docs": ["D?", "D?"]
+  }}

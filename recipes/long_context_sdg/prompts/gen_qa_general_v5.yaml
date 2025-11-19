@@ -1,0 +1,81 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+  - The content inside <think>...</think> is VISIBLE OUTPUT and counts toward the token limit.
+  - You MUST keep this visible thinking extremely short and compressed.
+  - HARD LIMITS:
+      * Do NOT exceed 4000 tokens inside the <think> block.
+      * Do NOT restate or quote large parts of any document.
+      * Summarize reasoning efficiently—avoid detail expansion.
+  - If you reach the <think limit>, STOP IMMEDIATELY and output the final JSON.
+  - Never continue thinking after hitting the limit.
+  - Never include <think> tags inside the JSON.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires connecting multiple facts across the documents.
+  - Make the answer short (entities, numbers, or brief phrases).
+
+  <think limit=4000>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps on explicit facts present in the documents only.
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step (e.g., "D3").
+  3) Question
+     - Natural, precise; requires conditional filtering + cross-referencing (avoid trivial lookups).
+     - The question type should reflect the domain of the relevant documents.
+  4) Answer
+     - Short and factual (1–10 tokens); comma-separated if a list.
+     - If not answerable from the docs, return "NOT ANSWERABLE".
+  5) Formatting
+     - The question should sometimes specify a format, and if so, you should follow it exactly (e.g., rounding, casing, order, separators).
+     - If no formatting is required, return the raw, exact value without rounding or transformation.
+     - Examples:
+         • Numbers — “rounded to one decimal”, “in thousands”, “as % with two decimals”
+         • Text — “full name with middle initial”, “UPPERCASE”, “Last, First”
+         • Dates — “DD/MM/YYYY”, “Month Year”, “ISO”
+         • Lists — “comma-separated”, “alphabetical order”, “one per line”
+  6) Citations
+     - List all used document IDs in "used_docs".
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types
+     - Financial/comparative metrics
+     - Legal/regulatory interpretation
+     - Multi-document synthesis
+     - Temporal/conditional logic
+     - Research/classification
+     - Reconciling contradictory information
+
+  9) Question Types to Avoid
+     - Counting (>10), single-fact retrieval, overly technical, contrived, or visual-dependent questions.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - JSON reasoning trace is 2–5 steps ✔
+  - Visible <think> block < 2000 tokens ✔
+  - Final JSON emitted ✔
+  - No external or visual knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

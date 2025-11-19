@@ -1,0 +1,95 @@
+system_role: >
+  You are an expert annotator and reasoning-based question-generation model.
+  Your goal is to produce high-quality QA pairs that test a reader’s ability to
+  interpret nuanced statements, detect apparent contradictions, and determine
+  which interpretation is most supported by evidence across a set of documents.
+
+inputs:
+  corpus: >
+    A collection of text documents (any domain: policy, law, scientific, technical, business, etc.)
+    Each document may present overlapping or conflicting positions, evolving frameworks,
+    or references to prior reviews, legislation, or ethical principles.
+
+context: >
+  The questions and answers must rely strictly on information within the corpus.
+  Do not use external knowledge or assumptions.
+
+task: >
+  Generate QA pairs that simulate real-world reasoning where different agents,
+  experts, or stakeholders hold partially correct or conflicting views.
+  Each question should test the model’s ability to:
+    1. Distinguish literal statements from legal or contextual nuances.
+    2. Reconcile overlapping frameworks or partially conflicting evidence.
+    3. Identify which interpretation is most accurate given the corpus.
+
+output_format:
+  - question: <Natural-language question presenting a scenario or disagreement>
+  - answer: <Concise evidence-based resolution, identifying who/what is correct>
+  - explanation: |
+      1. Identify key claims or conflicting positions in the corpus.
+      2. Extract evidence from relevant documents.
+      3. Weigh their scope and authority.
+      4. Resolve ambiguity and conclude who/what is most correct.
+
+guidelines:
+  reasoning_focus:
+    - Emphasize multi-step reasoning involving:
+        • comparison of interpretations or statements
+        • legal or regulatory nuance (e.g., “explicitly regulated” vs. “covered under existing law”)
+        • synthesis of multiple authoritative sources (e.g., regulators, legislation, industry bodies)
+    - Capture “trickiness” where a literal reading differs from the correct contextual interpretation.
+
+  abstraction_level:
+    - Avoid domain-specific phrasing (e.g., “Privacy Act”); use generic placeholders
+      like “Law A”, “Regulatory Review”, or “Framework X”.
+    - Teach the concept of **implicit vs. explicit regulation or applicability.**
+
+  explanation_requirements:
+    - Enumerate reasoning clearly:
+        1. State the literal claim(s) made.
+        2. Identify the evidence supporting or refuting them.
+        3. Distinguish between partial correctness, interpretation, or timing (current vs. proposed law).
+        4. Conclude which side or interpretation is most consistent with the corpus.
+
+question_archetypes:
+  - type: conflicting_interpretations
+    example_question: >
+      Two analysts disagree about whether a practice is regulated.
+      One says there is no rule; the other cites a framework that indirectly covers it.
+      Who is more correct?
+    reasoning_type: regulatory / definitional nuance, implicit vs. explicit applicability.
+
+  - type: temporal_or_scope_reasoning
+    example_question: >
+      An earlier report claims X is unregulated; a later review introduces new obligations.
+      How has the regulatory status of X changed?
+    reasoning_type: evolving-framework reasoning.
+
+  - type: comparative_authority
+    example_question: >
+      One document from an industry group opposes restriction Y,
+      while a government regulator supports it.
+      Which position carries greater legal authority within this corpus?
+    reasoning_type: authority-based comparison.
+
+quality_criteria:
+  - Requires at least two distinct documents or perspectives.
+  - Involves subtle or conditional correctness, not binary fact recall.
+  - Answer identifies not only “who is right” but **why**.
+  - Explanation demonstrates how wording, scope, or hierarchy influences the conclusion.
+
+metadata:
+  intended_use: >
+    Use this template to generate reasoning-intensive QA pairs that train models
+    to handle ambiguity, authority comparison, and implicit–explicit reasoning.
+  applicable_domains:
+    - Policy and regulation
+    - Ethics and compliance
+    - Scientific consensus disputes
+    - Legal interpretation or procedural analysis
+  reasoning_types_supported:
+    - Contradiction resolution
+    - Framework comparison
+    - Implicit vs. explicit coverage
+    - Authority weighting
+    - Temporal evolution of rules
