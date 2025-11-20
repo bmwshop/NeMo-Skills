@@ -6,8 +6,8 @@ cluster = "hsg"
 input_file = "/workspace/DATA/lc/lcrqagen_v3/ra/c/intermediate_p.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v3/ra/c/traces"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/ra/sec/intermediate_p.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/ra/sec/traces"
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/ra/sec/intermediate_p.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v3/ra/sec/traces"
 
 
 
