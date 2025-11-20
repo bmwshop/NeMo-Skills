@@ -5,8 +5,8 @@ cluster = "hsg"
 input_file = "/workspace/DATA/lc/lcrqagen_v3/ra/Company_Documents-16384-130000.jsonl"
 output_dir = "/workspace/DATA/lc/lcrqagen_v3/ra/c"
 
-input_file = "/workspace/DATA/lc/lcrqagen_v3/ra/sec-16384-131000.jsonl"
-output_dir = "/workspace/DATA/lc/lcrqagen_v3/ra/sec"
+# input_file = "/workspace/DATA/lc/lcrqagen_v3/ra/sec-16384-131000.jsonl"
+# output_dir = "/workspace/DATA/lc/lcrqagen_v3/ra/sec"
 
 
 
