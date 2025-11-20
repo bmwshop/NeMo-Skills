@@ -1,0 +1,57 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Follow the provided abstract instruction faithfully.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+  - The content inside <think>...</think> is VISIBLE OUTPUT and counts toward the token limit.
+  - You MUST keep this visible thinking extremely short and compressed.
+  - HARD LIMITS:
+      * Do NOT exceed 4000 tokens inside the <think> block.
+      * Do NOT restate or quote large parts of any document.
+      * Summarize reasoning efficiently—avoid detail expansion.
+  - If you reach the <think limit>, STOP IMMEDIATELY and output the final JSON.
+  - Never continue thinking after hitting the limit.
+  - Never include <think> tags inside the JSON.
+  
+user: |-
+  You are given the following collection of documents:
+
+  {docs}
+
+  ---
+inputs:
+  documents: |
+    A collection of documents from any domain
+    (e.g., policy reports, scientific papers, financial filings,
+    regulatory summaries, technical manuals, etc.).
+
+instructions:
+  core_requirements:
+    - The question must require synthesizing information from
+      multiple parts of the documents.
+    - The question must involve explicit entities or categories
+      mentioned in the documents.
+    - The question must require a transformation, such as:
+        * ranking
+        * correlation
+        * filtering
+        * classifying
+        * comparing
+        * aggregating numerical information
+    - The question must include at least one constraint
+      (e.g., exclude an entity, restrict to a time period, consider only a subset).
+    - The question must be fully grounded in facts explicitly present in the documents.
+    - No external knowledge may be required.
+
+output_format:
+  question_only: true
+  reasoning_hidden: true
+
+example_question: >
+  Based on the provided documents, there appears to be a relationship between
+  environmental compliance scores and the number of equipment failures reported
+  across different facilities. Identify and rank the facilities explicitly named
+  in the documents according to the total number of failures recorded in the
+  past five years. Exclude any facilities that are listed as “inactive.”

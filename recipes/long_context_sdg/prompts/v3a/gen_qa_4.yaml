@@ -1,0 +1,69 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+  
+  VISIBLE THINKING CONSTRAINTS:
+  - The content inside <think>...</think> is VISIBLE OUTPUT and counts toward the token limit.
+  - You MUST keep this visible thinking extremely short and compressed.
+  - HARD LIMITS:
+      * Do NOT exceed 4000 tokens inside the <think> block.
+      * Do NOT restate or quote large parts of any document.
+      * Summarize reasoning efficiently—avoid detail expansion.
+  - If you reach the <think limit>, STOP IMMEDIATELY and output the final JSON.
+  - Never continue thinking after hitting the limit.
+  - Never include <think> tags inside the JSON.
+
+user: |-
+  You are given the following collection of documents:
+
+  {docs}
+
+  ---
+inputs:
+  documents: |
+    A collection of texts from any domain.  
+    Each document may contain claims, definitions, terminology,
+    classifications, events, entities, or conceptual frameworks.  
+    You must treat the documents as the only source of truth.
+
+task_requirements:
+  - Read and understand all documents.
+  - Identify concepts, entities, or themes that:
+      * appear in multiple documents, OR
+      * are described differently by different authors, OR
+      * share structural or functional similarities.
+  - Create a question that requires:
+      * cross-referencing at least two documents,
+      * comparing terminology, categorizations, or perspectives across documents,
+      * or mapping a concept in one document to its analogue in another.
+  - The question should require reasoning—not direct lookup.
+  - Avoid domain-specific phrasing; the template must work for any field.
+  - The question must have a clear, concise answer derivable only from the documents.
+  - The question should not contain the answer.
+
+question_archetype:
+  description: >
+    A question that asks the model to:
+      - identify a recurring phenomenon across the documents,
+      - locate where it is explicitly named, described, or classified,
+      - and determine how a different document categorizes it under
+        an alternative term, label, framework, or taxonomy.
+  structure_examples:
+    - "Document A describes phenomenon X as [...]. In Document B, the same
+       phenomenon appears under what classification?"
+    - "Several documents mention issues Y and Z. Under what broader category
+       are these grouped in Document K?"
+
+output_format:
+  type: single_question
+  constraints:
+    - One question only
+    - No explanation
+    - Clear and unambiguous wording
+
+example_question: >
+  Several documents describe recurring environmental challenges such as
+  soil erosion and water scarcity. In a different document authored by
+  Lopez and Chen, these same challenges are grouped under what overarching
+  category?
