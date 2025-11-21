@@ -1,4 +1,5 @@
 from nemo_skills.pipeline.cli import generate, wrap_arguments
+import argparse
 
 cluster = "hsg"
 
