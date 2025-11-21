@@ -3,7 +3,7 @@ from nemo_skills.pipeline.cli import generate, wrap_arguments
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Generate QA pairs with specified template')
-parser.add_argument('template', type=str, help='Template configuration to use', required=True)
+parser.add_argument('--template', type=str, help='Template configuration to use', required=True)
 args = parser.parse_args()
 
 template = args.template
