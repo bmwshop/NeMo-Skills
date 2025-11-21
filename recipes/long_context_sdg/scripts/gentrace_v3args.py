@@ -24,8 +24,8 @@ prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace_1a.ya
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
-dependent_jobs = 1
-num_servers = 32
+dependent_jobs = 2
+num_servers = 1
 
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
