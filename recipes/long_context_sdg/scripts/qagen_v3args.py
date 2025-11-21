@@ -22,7 +22,7 @@ teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 #     print(f"Prompt configuration file not found: {prompt_config}")
 #     exit(1)
 
-dependent_jobs = 2
+dependent_jobs = 3
 num_servers = 1
 
 #  f"++max_concurrent_requests=512 "
