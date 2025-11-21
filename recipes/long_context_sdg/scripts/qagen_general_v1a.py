@@ -25,7 +25,7 @@ generate(
     ctx=wrap_arguments(
         f"++skip_filled=True "
         f"++prompt_config={prompt_config} "
-        f"++inference.tokens_to_generate=16384 "
+        f"++inference.tokens_to_generate=32768 "
         f"++inference.endpoint_type=text "
         f"++max_concurrent_requests=8 "
         f"++inference.temperature=0.6 "

@@ -21,8 +21,8 @@ if not os.path.exists(prompt_config):
     print(f"Prompt configuration file not found: {prompt_config}")
     exit(1)
 
-dependent_jobs = 1
-num_servers = 2
+dependent_jobs = 2
+num_servers = 1
 
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
@@ -31,7 +31,7 @@ generate(
     ctx=wrap_arguments(
         f"++skip_filled=True "
         f"++prompt_config={prompt_config} "
-        f"++inference.tokens_to_generate=8192 "
+        f"++inference.tokens_to_generate=32768 "
         f"++inference.endpoint_type=text "
         f"++max_concurrent_requests=8 "
         f"++inference.temperature=0.3 "
