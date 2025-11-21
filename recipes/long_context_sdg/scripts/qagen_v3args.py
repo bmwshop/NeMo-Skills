@@ -1,5 +1,6 @@
 import argparse
 from nemo_skills.pipeline.cli import generate, wrap_arguments
+import os
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Generate QA pairs with specified template')
