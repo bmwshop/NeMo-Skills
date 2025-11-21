@@ -10,9 +10,9 @@ args = parser.parse_args()
 template = args.template
 
 cluster = "hsg"
-# input_file = "/nemo_run/code/recipes/long_context_sdg/src/test.jsonl"
-input_file = "/workspace/DATA/lcr_docs/acgilms-16384-130000.jsonl" # all v3 files
-output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/{template}"
+# input_file = "/workspace/DATA/lcr_docs/acgilms-16384-130000.jsonl" # all v3 files
+input_file = "/workspace/DATA/lc/lcrqagen_v4/sec-16384-130000.jsonl" # just the sec
+output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}"
 prompt_config = f"/nemo_run/code/recipes/long_context_sdg/prompts/v3a/gen_qa_{template}.yaml"
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
