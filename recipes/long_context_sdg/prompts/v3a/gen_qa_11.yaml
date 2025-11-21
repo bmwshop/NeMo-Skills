@@ -1,0 +1,82 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-step analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • locating a specific quantitative value (e.g., metric, measurement, ratio, score) within the corpus,
+      • identifying *which* entity, time period, or event is associated with that value,
+      • and computing an additional derived quantity (difference, percentage change, delta, margin, etc.) using information from another document.
+  - The question must involve **two sequential reasoning steps**:
+      (1) find the entity/period/events tied to a specific numerical criterion,
+      (2) compute something about that entity/period/events from related documents.
+  - The answer must be concise (numbers, entity names, or short phrases).
+
+  <think limit=8192>
+  Keep visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if limit is reached.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Identify at least one numerical value explicitly stated in the documents.
+     - Ensure the value appears *at least twice* in different contexts (e.g., a metric and a table).
+     - Require extracting the *correct entity or period* based on matching that value.
+     - Require a secondary computation based on another document (e.g., difference between periods, change in rank, percentage change).
+
+  2) Reasoning Trace
+     - Provide a concise, step-by-step chain of thought referencing doc IDs (e.g., "D2").
+     - The reasoning must show:
+         • how the target numerical value was located,
+         • how the associated entity/period/event was determined,
+         • how the follow-up computation was formed using other documents.
+
+  3) Question
+     - Must involve conditional numeric lookup + associated-entity identification + a derived calculation.
+     - Must not be answerable using a single document.
+     - Avoid trivial retrieval (e.g., "What was the revenue?" alone).
+     - Avoid domain-specific jargon unless present in documents.
+
+  4) Answer
+     - Provide only required numeric values and entity/period names.
+     - If multiple values are required, present them in a short, clean format.
+     - If not answerable, output "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return **exactly one JSON object**:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  6) Citations
+     - List only the IDs of documents you used.
+
+  7) Example Allowed Archetypes
+     - Identify the month/year in which a specific metric equals a given numeric value, then compute the change from the prior month.
+     - Identify which product model had a specific performance score, then compute how much higher/lower it was than another model.
+     - Identify which survey sample shows a given percentage, then compute the delta relative to another sample.
+     - Identify which region had a given measurement threshold, then compute the ranking among all regions.
+
+  8) Example (Different Domain)
+     - “In the astronomy observation logs, during which observation window did the measured luminosity equal 4.2×10⁵ units, and by what percentage did this differ from the luminosity recorded in the preceding observation window? Report the final difference to two decimal places.”
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires numeric lookup + entity/period identification ✔
+  - Requires a derived computation ✔
+  - Multi-document reasoning ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

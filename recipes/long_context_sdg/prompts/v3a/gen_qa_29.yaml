@@ -1,0 +1,86 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving extraction, classification, and aggregation.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • identifying multiple instances of additions (e.g., acquisitions, gains, increases),
+      • identifying multiple instances of subtractions (e.g., disposals, losses, decreases),
+      • ensuring these events occur within a specified time window or conditional scope,
+      • and computing a **net total** (additions minus subtractions).
+  - The answer must be short (a single numeric value or concise list).
+
+  <think limit=8192>
+  Keep visible reasoning extremely concise.
+  Do not restate evidence.
+  Stop immediately when reaching the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Identify ≥2 additive events and ≥1 subtractive event (or vice versa).
+     - Ensure the question cannot be answered using a single document.
+     - Require filtering based on a time window, attribute, or other explicit criterion.
+
+  2) Reasoning Trace
+     - Provide a compact step-by-step chain-of-thought referencing document IDs (e.g., “D4”).
+     - Must demonstrate:
+         • how additive events were located,
+         • how subtractive events were located,
+         • how the net value was computed.
+
+  3) Question
+     - Ask for a **net total** computed across the filtered documents.
+     - Include an explicit constraint (e.g., “over the last 12 months”, “during the 2020–2023 project cycle”, “within all regions reporting data”).
+     - The question must require multi-document arithmetic.
+     - Avoid trivial or single-document queries.
+
+  4) Answer
+     - Provide only the final numerical result or concise categorical output.
+     - If not answerable, respond with "NOT ANSWERABLE".
+
+  5) Formatting
+     - Use the exact output JSON structure if required.
+     - No external knowledge; use only document contents.
+
+  6) Citations
+     - Include all document IDs used in “used_docs”.
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ...",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - “Across all reports from 2020–2023, what is the net number of housing units added (new units built minus units demolished)?”
+     - “Considering all university budget documents from FY21–FY24, what is the net change in tenure-track faculty (hires minus departures)?”
+     - “Across all conservation area surveys, what is the net wildlife population change (births + migrations in − deaths − migrations out)?”
+
+  9) Example Question (different domain)
+     - “Across excavation reports from 2018–2022, what is the net number of catalogued artifacts added to the museum collection after accounting for new finds minus confirmed losses?”
+
+  10) Question Types to Avoid
+      - Single-document lookup questions.
+      - Questions requiring only addition or only subtraction.
+      - Subjective or evaluative questions (“Why did they gain land?”).
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires extraction of additions + subtractions ✔
+  - Requires computing a net total ✔
+  - Produces a single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

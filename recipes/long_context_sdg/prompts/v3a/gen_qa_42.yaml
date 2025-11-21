@@ -1,0 +1,98 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document analytical reasoning.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question requiring:
+      • extraction of a specific quantitative metric across ≥5 documents,
+      • comparison of that metric across two time periods (e.g., year-over-year),
+      • calculation of the numerical difference for each document,
+      • ranking those differences,
+      • identifying the item with the **second-largest** difference,
+      • and reporting both the item and the magnitude of the change.
+  - The question must require **cross-document numerical comparison**, not single-document lookup.
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - The metric must be explicitly present in each document (e.g., operating margin, rainfall, revenue, mortality rate, exam scores).
+     - The question must require extracting:
+         • value_A (e.g., FY2024),
+         • value_B (e.g., FY2023),
+       then computing Δ = value_A − value_B for each document.
+     - Document-level entities must be identifiable (e.g., quarters, regions, teams, species).
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs (e.g., "D3").
+     - Include:
+         • how the metric was located in each document,
+         • how values from the two periods were paired,
+         • how each difference was calculated,
+         • how the ranking was determined,
+         • how the second-largest difference was selected.
+
+  3) Question
+     - Natural, precise, explicitly ranking-based.
+     - Must ask:
+         • which entity/time/category had the **second-largest year-over-year difference**, and
+         • what that difference was.
+     - Must not allow trivial retrieval or single-document answers.
+
+  4) Answer
+     - Short and factual (1–10 tokens for entity + numerical value).
+     - Example format:
+         "Q2, +6%" or "Region B, −12 units".
+     - If multiple entities tie for second-largest change, list them comma-separated.
+     - If not answerable, output "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow any specified output format exactly.
+     - If none is specified, return raw names as they appear in the documents.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Across all regional climate reports, which region showed the **second-largest YOY increase** in average temperature, and by how much?
+     - Across all academic department reports, which department had the **second-largest YOY change** in enrollment?
+     - Across all hospital statistics documents, which ward recorded the **second-largest YOY drop** in infection rates?
+     - Across all product performance files, which product had the **second-largest YOY revenue increase**, and what was the gain?
+
+  9) Example Question (from a different domain)
+     - “Across all country-level agricultural reports, which crop category experienced the **second-largest year-over-year change** in yield, and what was the change?”
+
+  10) Question Types to Avoid
+      - Pure maximum/minimum without ranking.
+      - Single-document retrieval.
+      - Estimations or subjective assessments.
+      - Metrics not explicitly stated.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires multi-document extraction of paired-year metrics ✔
+  - Requires ranking and identifying second-largest change ✔
+  - Outputs one JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

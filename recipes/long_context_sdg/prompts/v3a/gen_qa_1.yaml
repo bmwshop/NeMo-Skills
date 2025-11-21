@@ -1,57 +1,92 @@
 system: |
   You are an expert question-generation and reasoning model.
-  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
-  Follow the provided abstract instruction faithfully.
+  Produce one high-quality, factual question that tests analytical comparison,
+  ranking, filtering, or correlation across multiple documents.
   Ground everything strictly in the supplied documents—no outside knowledge.
 
-  VISIBLE THINKING CONSTRAINTS:
-  - The content inside <think>...</think> is VISIBLE OUTPUT and counts toward the token limit.
-  - You MUST keep this visible thinking extremely short and compressed.
-  - HARD LIMITS:
-      * Do NOT exceed 4000 tokens inside the <think> block.
-      * Do NOT restate or quote large parts of any document.
-      * Summarize reasoning efficiently—avoid detail expansion.
-  - If you reach the <think limit>, STOP IMMEDIATELY and output the final JSON.
-  - Never continue thinking after hitting the limit.
-  - Never include <think> tags inside the JSON.
-  
 user: |-
-  You are given the following collection of documents:
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • extracting entities explicitly mentioned in the documents,
+      • comparing or ranking those entities using numerical or categorical attributes,
+      • and applying at least one explicit constraint (e.g., exclude an entity or category).
+  - The answer must be short (entities only; 1–10 tokens).
 
-  {docs}
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps only on explicit facts such as:
+         • counts,
+         • frequencies,
+         • classifications,
+         • impacts,
+         • characteristics,
+         • or any measurable/documented attribute.
+     - The question must reference a well-defined attribute or metric
+       (e.g., frequency, duration, magnitude, severity, count).
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning.
+     - Reference document IDs in each step (e.g., "D3").
+     - The reasoning must show:
+         • how the relevant attribute was identified,
+         • how entities were extracted,
+         • how comparison/ranking/filtering was determined.
+
+  3) Question
+     - Natural, precise, grounded fully in the documents.
+     - Must ask the model to **identify, rank, list, or filter entities**
+       based on an attribute explicitly stated in the documents.
+     - Must include at least one constraint
+       (e.g., exclude an entity, restrict a timeframe, consider only a subset).
+
+  4) Answer
+     - Short and factual (entity names only).
+     - If multiple, use comma-separated values.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return the raw entity names as they appear in the documents.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Rank entities by the number of reported events, incidents, or occurrences.
+     - Identify which listed items satisfy a threshold or constraint.
+     - Filter entities based on explicit inclusion/exclusion rules.
+     - Compare entities using a shared metric stated in the documents.
+
+  9) Question Types to Avoid
+     - Summary questions not requiring comparison or filtering.
+     - Pure retrieval from one document.
+     - Questions using implied or external knowledge.
 
   ---
-inputs:
-  documents: |
-    A collection of documents from any domain
-    (e.g., policy reports, scientific papers, financial filings,
-    regulatory summaries, technical manuals, etc.).
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires comparison/ranking/filtering ✔
+  - Fully document-grounded ✔
+  - Requires entity extraction ✔
+  - Returns one JSON object ✔
+  - No external knowledge ✔
 
-instructions:
-  core_requirements:
-    - The question must require synthesizing information from
-      multiple parts of the documents.
-    - The question must involve explicit entities or categories
-      mentioned in the documents.
-    - The question must require a transformation, such as:
-        * ranking
-        * correlation
-        * filtering
-        * classifying
-        * comparing
-        * aggregating numerical information
-    - The question must include at least one constraint
-      (e.g., exclude an entity, restrict to a time period, consider only a subset).
-    - The question must be fully grounded in facts explicitly present in the documents.
-    - No external knowledge may be required.
-
-output_format:
-  question_only: true
-  reasoning_hidden: true
-
-example_question: >
-  Based on the provided documents, there appears to be a relationship between
-  environmental compliance scores and the number of equipment failures reported
-  across different facilities. Identify and rank the facilities explicitly named
-  in the documents according to the total number of failures recorded in the
-  past five years. Exclude any facilities that are listed as “inactive.”
+  ---
+  DOCUMENTS:
+  {docs}

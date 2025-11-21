@@ -1,0 +1,87 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires connecting multiple explicit facts across the documents.
+  - The question must force the model to:
+      • detect an event, attribute, or data point mentioned in ≥2 documents,
+      • locate an associated entity or property referenced elsewhere,
+      • and integrate these facts into a single answerable query.
+  - The final answer must be short (entity, number, location, date, or brief phrase).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - All reasoning must be based solely on explicit statements.
+     - The question must require a chain of evidence across multiple documents, such as:
+         • Document A references an event/date/attribute,
+         • Document B or C specifies a related property/value,
+         • Answer emerges only by combining them.
+
+  2) Reasoning Trace
+     - Provide a concise, step-by-step reasoning sequence; cite doc IDs (e.g., "D2").
+     - The trace must show:
+         • how the triggering event/attribute was located,
+         • how the connected entity/value was extracted from another document,
+         • how the final answer was determined.
+
+  3) Question
+     - Natural, precise, and grounded entirely in the documents.
+     - Must require multi-document linkage.
+     - Avoid trivial single-document fact extraction.
+
+  4) Answer
+     - Short, factual, and directly supported by the documents.
+     - If the answer requires a number or named entity, return only that (no explanation).
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow the output schema exactly.
+
+  6) Citations
+     - Provide a "used_docs" list containing all document IDs referenced in reasoning.
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (generic, domain-agnostic)
+     - Which location was the site of the event described in Document A, according to the classification rules defined in Document C?
+     - Which organization was responsible for the initiative mentioned in Document B, based on the assignment list in Document E?
+     - What numerical threshold (defined in Document C) applies to the entity featured in Document D?
+     - According to the policies in Document F, what category does the item discussed in Document A fall into?
+
+  9) Example Question (different domain: historical archives)
+     - “One letter dated March 14, 1912 describes an expedition leader preparing for a journey. Another document lists the destinations approved for funding that year. According to the documents, which destination was this leader authorized to travel to?”
+
+  10) Question Types to Avoid
+      - Pure summarization.
+      - Single-document lookups.
+      - Hypothetical or speculative questions.
+      - Questions relying on external world knowledge.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires multi-document factual linkage ✔
+  - Produces one JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

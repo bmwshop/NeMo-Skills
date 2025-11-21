@@ -1,0 +1,90 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving temporal identification of a notable
+  change, milestone, or inflection point.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question that requires the model to:
+      • identify a notable change, increase, decrease, milestone, or shift
+        explicitly described across the documents,
+      • determine the specific time period (e.g., quarter, year, phase)
+        in which that change occurred,
+      • and answer with that time period.
+  - The answer must be short (a specific quarter, year, period label, etc.).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Select ≥1 explicitly described change or milestone.
+     - Ensure the change is quantifiable or clearly stated
+       (e.g., “almost 30% increase”, “record high”, “sharp decline”).
+     - The question must ask **when** that change occurred.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference document IDs in each step (e.g., "D3").
+     - The trace must show:
+         • where the change was mentioned,
+         • how its associated time period was located,
+         • how the conclusion was derived.
+
+  3) Question
+     - Natural, precise, and explicitly temporal.
+     - Must specify:
+         • the change/milestone,
+         • which values or patterns are being tracked,
+         • that the answer is a time period (quarter, year, phase).
+     - Avoid trivial or single-document questions.
+
+  4) Answer
+     - Short, factual, and containing only the time period (e.g., "Q4 FY2024").
+     - If the time period cannot be determined from the documents, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return the exact time period label as it appears in the documents.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - In which fiscal quarter did the company report its first double-digit decline
+       in production volumes across the manufacturing reports?
+     - According to the clinical trial summaries, during which study phase did the
+       reported adverse event rate first exceed 15%?
+     - Across the environmental impact assessments, in which year did Region A
+       reach its highest recorded carbon-emissions increase?
+
+  9) Question Types to Avoid
+     - Simple counting questions.
+     - Questions that ask for ranking or comparison rather than identifying a time period.
+     - Causal “why” questions.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires identifying a change/milestone ✔
+  - Requires determining a specific time period ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

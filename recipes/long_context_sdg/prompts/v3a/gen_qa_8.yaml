@@ -1,0 +1,89 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • identifying a metric, definition, or procedural rule described in one document,
+      • locating a corresponding value, measurement, or instance in another document,
+      • and determining whether the second document provides a valid answer.
+  - The final answer must be a short factual value (number, date, name, or brief phrase) or "NOT ANSWERABLE".
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - All reasoning must rely solely on explicit textual content.
+     - The question must require:
+         • extracting a formal definition, formula, or criterion from Document A,
+         • identifying the corresponding metric/value in Document B,
+         • and verifying whether the value is present, fully specified, or absent.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning with doc IDs (e.g., "D4").
+     - The reasoning must show:
+         • how the metric/definition was identified,
+         • how the mapped metric/value was located,
+         • how the final answer was determined,
+         • and whether the documents contain a complete answer.
+
+  3) Question
+     - Natural and precise.
+     - Must require multi-document linkage (definition in one document, value in another).
+     - Avoid trivial single-document fact extraction.
+     - Avoid speculative interpretation.
+
+  4) Answer
+     - A short factual value (e.g., “$667,804 thousand”, “March 2019”, “ISO Category 3”).
+     - If the necessary value does not appear in any document, answer **"NOT ANSWERABLE"**.
+
+  5) Formatting
+     - Follow the specified output schema exactly.
+
+  6) Citations
+     - List all referenced document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (domain-agnostic)
+     - A law in Document A defines a “priority action” as any measure meeting certain criteria. What is the number of priority actions reported in Document B for the fiscal year?
+     - Document A defines a “Level-II incident” as one causing structural damage. Document D reports incidents for the same region. How many Level-II incidents occurred?
+     - Document C defines a “Category 1 specimen” using a biological criterion. Document F lists specimen counts. What is the reported count of Category 1 specimens?
+     - Document A defines the metric “Adjusted Harvest Yield.” What was the Adjusted Harvest Yield reported for Region 4 in Document E?
+
+  9) Example Question (different domain: environmental compliance)
+     - “Document A defines ‘Net Carbon Impact’ as emissions excluding offsets, sequestration credits, and purchased reductions. Based on this definition, what is the Net Carbon Impact reported for Facility B in Document C? Report your answer in metric tons.”
+
+  10) Question Types to Avoid
+      - Simple lookups from a single document.
+      - Summary or opinion questions.
+      - Questions requiring external facts or domain assumptions.
+      - Questions where the mapping between definitions and metrics is not textually grounded.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires identifying + mapping a defined metric ✔
+  - Requires checking whether another document reports a corresponding value ✔
+  - Returns a single grounded factual value or NOT ANSWERABLE ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

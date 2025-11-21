@@ -1,0 +1,84 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical
+  reasoning across multiple documents. Ground everything strictly in the
+  supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires identifying which entities
+    (e.g., individuals, organizations, items, labels) appear in *all* of the
+    specified documents, and determining **how many** such entities there are.
+  - The final answer must be short: a single integer (1–10 tokens).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps on explicit entity lists or mentions found in the documents.
+     - The question must require:
+         • extracting entity sets from multiple documents,
+         • computing the intersection of those sets,
+         • returning the size of that intersection.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs (e.g., "D3").
+     - Show:
+         • how entity sets were identified,
+         • how cross-document matching was performed,
+         • how the final count was computed from the intersection.
+
+  3) Question
+     - Natural and precise.
+     - Must ask: **“How many entities appear in all of the specified documents?”**
+     - Must reference the subset of documents being compared (implicitly or explicitly).
+     - Must require intersection-based filtering, not simple listing.
+
+  4) Answer
+     - A single integer representing the number of entities appearing in all documents.
+     - If no such entities exist, answer "0".
+     - If not answerable from the documents, answer "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return raw integer only (unless the prompt explicitly specifies otherwise).
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     Return exactly ONE JSON object:
+     {{
+       "question": "...",
+       "answer": "...",
+       "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+       "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+     }}
+
+  8) Example Question Types (for this archetype)
+     - How many species appear in all environmental logs?
+     - How many authors are listed in every manuscript version?
+     - How many product codes occur in every batch report?
+     - How many tagged items appear in all inventory sheets?
+
+  9) Question Types to Avoid
+     - Questions asking the names rather than the count.
+     - Purely single-document lookups.
+     - Questions requiring external domain knowledge.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Applies entity-set extraction + intersection logic ✔
+  - Requires returning a count ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

@@ -1,0 +1,87 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests entity-identification
+  based on statements, viewpoints, or claims expressed across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires identifying which entity
+    (organization, company, individual, institution, stakeholder) expressed a
+    specific viewpoint, claim, emphasis, or stated priority within the documents.
+  - Make the answer short (entity names only; 1–10 tokens).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise. Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base the question on explicit statements where an entity expresses:
+       • a viewpoint,
+       • an emphasis on importance,
+       • advocacy for a priority,
+       • or a stated focus/goal.
+     - The question must reference a specific theme, capability, priority area,
+       risk, need, policy element, or domain concept mentioned by an entity.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step
+       (e.g., "D3").
+     - The reasoning must show:
+         • how the theme/claim was identified,
+         • how the relevant entity statements were located,
+         • how the expressing entity was determined.
+
+  3) Question
+     - Natural, precise, and document-grounded.
+     - Must ask: **"Which entity expressed this viewpoint?"**
+     - Must require filtering + matching a viewpoint/claim across multiple docs.
+     - Avoid trivial lookups or single-sentence questions.
+
+  4) Answer
+     - Short and factual (entity name(s) only).
+     - If multiple entities, use comma-separated values.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow the specified format exactly.
+     - Use entity names as written verbatim in the documents.
+
+  6) Citations
+     - List all document IDs used in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Which researcher emphasised the importance of long-term soil monitoring?
+     - Which institution stated that data transparency is essential for compliance?
+     - Which organization highlighted rapid response capability as a core priority?
+     - Which individual argued that early detection technologies are critical?
+
+  9) Question Types to Avoid
+     - Questions asking for summaries rather than identifying the expressing entity.
+     - Pure single-document lookups.
+     - Statements not clearly attributed to an entity in the documents.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires identifying an entity expressing a specific viewpoint ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

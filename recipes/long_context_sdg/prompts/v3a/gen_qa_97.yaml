@@ -1,0 +1,89 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests cross-document
+  entity-classification reasoning.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK:
+    - Create exactly one question whose answer requires:
+        • identifying an entity (object, group, profession, species, organization, etc.)
+          that is described in one document, and
+        • determining the broader group, category, or classification that this entity
+          belongs to according to another document.
+    - Make the answer short (category/group name only; 1–10 tokens).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS:
+    Evidence & Scope:
+      - Use at least 5 distinct documents.
+      - Base all steps on explicit statements showing relationships such as:
+          • subset/superset
+          • type-of / kind-of
+          • subcategory / parent category
+      - The question must link:
+          • one document describing the entity, with
+          • another document defining its broader classification.
+
+    Reasoning Trace:
+      - Provide concise, step-by-step reasoning; reference doc IDs (e.g., "D3").
+      - Show:
+          • how the entity was located,
+          • how the broader group was identified,
+          • how the cross-document link was established.
+
+    Question:
+      - Must be natural and precise.
+      - Must ask: "This entity belongs to which broader group?"
+      - Must require entity-matching + classification lookup across documents.
+      - Avoid trivial single-document answers.
+
+    Answer:
+      - Short and factual (category/group name only).
+      - If multiple valid answers exist, comma-separate them.
+      - If not answerable, output "NOT ANSWERABLE".
+
+    Formatting:
+      - Follow specified format exactly when provided.
+      - Otherwise, output raw category/group names.
+
+    Citations:
+      - List all used document IDs in "used_docs".
+
+    Output Format:
+      - Return exactly ONE JSON object structured as:
+        {{
+          "question": "...",
+          "answer": "...",
+          "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+        }}
+
+    Example Question Types:
+      - Identify the broader biological class of a species described in one document.
+      - Identify the parent category of a profession described elsewhere in the corpus.
+      - Identify the overarching group an object or artifact is classified under.
+      - Identify which higher-level category a subgroup belongs to.
+
+    Question Types to Avoid:
+      - Summaries.
+      - Pure single-document retrieval.
+      - Speculative or hypothetical classifications.
+      - Definitional questions that don’t require cross-document linking.
+
+  ---
+  VALIDATION CHECK:
+    - Uses ≥5 documents: true
+    - Requires entity identification + classification mapping: true
+    - Requires cross-document reasoning: true
+    - Outputs exactly one JSON object: true
+    - No external knowledge: true
+
+  ---
+  DOCUMENTS: "{docs}"

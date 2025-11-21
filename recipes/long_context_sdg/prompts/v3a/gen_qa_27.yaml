@@ -1,0 +1,86 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning
+  across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • locating multiple quantitative or categorical facts scattered across documents,
+      • filtering by a clearly defined time window, condition, or attribute,
+      • and computing a combined value (sum, net total, count, or similar) from those findings.
+  - The answer must be short and factual (numbers or short category labels).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately when reaching the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract ≥2 distinct values tied to a specific filter (e.g., time period, event type, category).
+     - Combine these values using an explicit arithmetic or logical rule (e.g., sum, difference, union count).
+     - Ensure the question cannot be answered from a single document.
+
+  2) Reasoning Trace
+     - Provide a short, step-by-step reasoning trace referencing doc IDs (e.g., “D2”).
+     - Show:
+         • how the qualifying events/items were identified,
+         • how the correct values were extracted,
+         • and how the final computation was performed.
+
+  3) Question
+     - Must ask for a **computed value derived from multiple documents**.
+     - Must include a **filtering condition** (e.g., “during the 12 months ending…”, “among artifacts dated after…”, etc.).
+     - Avoid trivial single-document lookups.
+     - Avoid purely definitional or qualitative questions.
+
+  4) Answer
+     - Provide only the final numeric or categorized result.
+     - If multiple values are required, format as a short comma-separated list.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow any specified output format exactly.
+     - No outside knowledge or assumptions beyond what appears in the documents.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ...",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - “What is the total number of regulatory complaints filed in the past 18 months across all agencies?”
+     - “Across all 2021–2023 survey waves, what is the combined number of respondents who selected Option C?”
+     - “Summing all fossil discoveries dated after 10,000 BCE across sites, how many specimens were identified?”
+
+  9) Example Question (different domain)
+     - “Considering archaeological excavation reports over the five-year period ending 2020, how many additional ceramic fragments were recovered across all sites?”
+
+  10) Question Types to Avoid
+      - Anything answerable from a single document.
+      - Questions that do not require arithmetic/combinatorial reasoning.
+      - Opinion-based or hypothetical questions.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires extraction + filtering + computation ✔
+  - Multi-document reasoning ✔
+  - Returns single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

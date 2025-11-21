@@ -1,0 +1,89 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical
+  reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires identifying the entities
+    (individuals, organizations, items, terms, or any named units)
+    that appear in **every** document in a specified subset.
+  - The question must also require ordering those entities using a clearly
+    defined sorting rule (e.g., alphabetical by last name).
+  - The final answer must be the list of entities in the correct order.
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps strictly on explicit entity mentions in the documents.
+     - The question must require:
+         • extracting entity sets from multiple documents,
+         • identifying which ones occur in *all* of those documents,
+         • applying an ordering rule to the surviving set.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference document IDs (e.g., "D3").
+     - Show:
+         • how entity sets were identified,
+         • how cross-document matching was performed,
+         • how the sorting rule was applied to produce the final ordered list.
+
+  3) Question
+     - Natural, precise phrasing.
+     - Must ask: **“Which entities appear in all of the specified documents?”**
+     - Must explicitly specify the sorting rule (e.g., alphabetical by last name).
+     - Must require cross-document persistence, not single-document lookup.
+
+  4) Answer
+     - A comma-separated list of entities exactly as they appear in the documents,
+       ordered according to the rule.
+     - If no entity appears in all documents, answer "NONE".
+     - If not answerable, answer "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return entity names exactly as written in the documents (no normalization in output).
+     - Sorting rules apply only to the **ordering**, not to modifying names.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     Return exactly one JSON object:
+     {{
+       "question": "...",
+       "answer": "...",
+       "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+       "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+     }}
+
+  8) Example Question Types (for this archetype)
+     - Which individuals appear in all meeting attendance logs? List alphabetically by surname.
+     - Which organizations appear in every policy submission? Sort alphabetically.
+     - Which product codes occur in all inventory sheets? Sort ascending.
+     - Which contributors are named in all manuscript versions? Sort by last name.
+
+  9) Question Types to Avoid
+     - Counting questions (use the counting archetype instead).
+     - Questions requiring external data or assumptions about similarity.
+     - Single-document retrieval.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires cross-document persistence reasoning ✔
+  - Requires list output ordered by a defined rule ✔
+  - Requires explicit multi-document matching ✔
+  - One JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

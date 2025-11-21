@@ -1,0 +1,83 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question that requires comparing two related documents or time-separated versions
+    and identifying which entity (organization, person, group, etc.) appears in the later list
+    but not in the earlier one.
+  - The answer must be short (entity names; 1–10 tokens).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Select two documents that include comparable lists (e.g., supporters, stakeholders, members,
+       participants, vendors, contributors, signatories).
+     - Extract both lists and determine what was newly added between them.
+     - The question must explicitly refer to both documents or their dates.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference document IDs in each step (e.g., "D3").
+     - The trace must show:
+         • how the two lists were located,
+         • what entities they contain,
+         • which entity appears only in the later list.
+
+  3) Question
+     - Natural, precise, and explicitly comparative.
+     - Must describe:
+         • the earlier document/time,
+         • the later document/time,
+         • the specific list or category being compared,
+         • and ask which additional entity appears in the later list.
+     - Avoid trivial or single-document lookups.
+
+  4) Answer
+     - Short and factual (entity name(s) only), comma-separated if multiple.
+     - If no new entities appear or the comparison cannot be performed, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return the exact entity names as they appear in the documents; no transformations.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Which additional company joined the list of approved vendors between the Q1 and Q2 reports?
+     - Comparing the 2021 and 2022 donor lists, which donor appears only in 2022?
+     - Between the first and final drafts of the proposal, which new stakeholder organization was added?
+
+  9) Question Types to Avoid
+     - Purely counting entities.
+     - Single-document retrieval.
+     - Questions asking for removed entities instead of added ones (unless explicitly allowed).
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires cross-document list comparison ✔
+  - Requires filtering + set difference reasoning ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

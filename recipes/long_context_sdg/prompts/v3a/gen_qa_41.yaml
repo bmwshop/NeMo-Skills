@@ -1,0 +1,96 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document analytical reasoning.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • extracting a numeric or ordinal metric from multiple documents,
+      • comparing those values across documents,
+      • identifying which document, time period, category, or entity corresponds to the
+        **second-highest** (or otherwise rank-based) value.
+  - The question must be solvable only through multi-document comparison.
+  - The answer must be short (1–10 tokens) and correspond to a document-anchored entity
+    such as a category, period, group, product, unit, team, etc.
+
+  <think limit=8192>
+  Keep visible reasoning extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract a clearly defined metric from each document (e.g., revenue, population,
+       score, temperature, attendance, cost, production output).
+     - Ensure the metric is explicitly stated—no inference beyond the text.
+     - The values must be ranked to determine the second-highest result.
+     - The question must reference:
+         • the metric,
+         • the basis of comparison (e.g., “across all years,” “across species,”
+           “across regions,” “across experiments”),
+         • and require multi-document cross-referencing.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step (e.g., "D3").
+     - The reasoning must show:
+         • how the metric was located in each document,
+         • how the ranking was determined,
+         • how the second-highest value was identified.
+
+  3) Question
+     - Natural, precise, and explicitly tied to comparative ranking.
+     - Must ask for the entity/time/category with the **second-highest** (or analogous rank-based) value.
+     - Must *not* be answerable via single-document lookup.
+
+  4) Answer
+     - Short (1–10 tokens).
+     - Provide only the entity/time/category name as written in the documents.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow any specified output format exactly.
+     - If none is specified, provide raw entity names as they appear in the documents.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Across all recorded climate logs, which year had the **second-highest average rainfall**?
+     - Across the five departments’ annual reports, which department reported the **second-highest headcount**?
+     - Across all species’ field observation documents, which species showed the **second-highest population growth**?
+     - Across all match summaries, which team achieved the **second-highest total scoring margin**?
+     - Across all listed experiments, which experiment produced the **second-highest yield**?
+
+  9) Example Question (different domain)
+     - “Across all regional health surveillance reports, which region recorded the **second-highest incidence rate of influenza**?”
+
+  10) Question Types to Avoid
+      - Single-document numerical lookup.
+      - Summaries that do not require ranking.
+      - Questions requiring inference or estimation not explicitly stated in text.
+      - Subjective or speculative metrics (e.g., “most important,” “best performance”).
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires numeric extraction + ranking ✔
+  - Requires identifying the second-highest result ✔
+  - Produces one JSON object ✔
+  - Grounded strictly in the documents ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

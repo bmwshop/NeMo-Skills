@@ -1,0 +1,92 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual comparison question that requires extracting
+  quantitative or categorical information from multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • locating two (or more) numerical or categorical facts from different documents,
+      • comparing them (e.g., difference, ratio, ordering, which is larger),
+      • and synthesizing the comparison into a single, precise question.
+  - Make the answer short (numbers, simple phrases, or category labels).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract quantitative or categorical facts that appear in different documents.
+     - The question must reference a specific pair of attributes, metrics, or quantities
+       (e.g., percentages, counts, dates, proportions, categories).
+     - The answer must require combining or comparing information across documents.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step (e.g., "D3").
+     - The reasoning must show:
+         • how each metric/fact was located,
+         • how the comparison was determined,
+         • how the final answer was derived.
+
+  3) Question
+     - Natural and precise.
+     - Must ask for a **comparison** (difference, ratio, greater/less, ranking, etc.).
+     - Must require multi-document fact extraction and synthesis.
+     - Avoid trivial lookups (e.g., answers found in a single document).
+
+  4) Answer
+     - Short and factual (numbers, percentages, or simple categories).
+     - If multiple values are required, use comma-separated formatting.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow any specified format exactly if provided.
+     - If not specified, return the raw numerical/categorical answer as it appears in the documents.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this comparison archetype)
+     - "What is the percentage difference between Metric A in Document X and Metric B in Document Y?"
+     - "Which value is larger: the proportion of Group A in Doc X or the share of Outcome B in Doc Y?"
+     - "By how many units does the reported count in Doc X exceed the corresponding count in Doc Y?"
+
+  9) Example from a completely different domain
+     - Documents:
+         • Doc A reports the average annual rainfall in Region M.
+         • Doc B reports the percentage of farms in Region N experiencing drought.
+       Example Question:
+         "What is the absolute difference between the average annual rainfall in Region M
+          and the proportion of farms experiencing drought in Region N?"
+
+  10) Question Types to Avoid
+      - Pure single-document retrieval.
+      - Vague comparisons without explicit metrics.
+      - Summaries, definitions, or conceptual questions without measurable facts.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Comparison-based reasoning ✔
+  - Requires extracting and comparing multi-document facts ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

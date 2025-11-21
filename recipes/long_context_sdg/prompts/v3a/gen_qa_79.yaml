@@ -1,0 +1,86 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests quantitative, analytical,
+  and condition-based reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • extracting one or more quantitative facts from the documents,
+      • applying a logical or arithmetic condition (e.g., filtering by category or time-period),
+      • performing a computation or comparison that cannot be answered by simple lookup.
+  - Make the answer a single numeric value or short numeric expression (1–10 tokens).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps entirely on explicit numerical or categorical data in the documents.
+     - The question must involve:
+         • identifying a relevant dataset described in the documents,
+         • selecting the subset that satisfies a defined condition (e.g., time range, outcome type),
+         • computing a value from that subset (e.g., counts, proportions, totals, differences).
+     - Must require multi-step reasoning; avoid pure extraction.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step (e.g., "D3").
+     - The reasoning must show:
+         • how the dataset was located,
+         • how the relevant subset/condition was identified,
+         • how the computation was performed based on documented numbers.
+
+  3) Question
+     - Natural and precise.
+     - Must ask for a **computed numeric result** that depends on filtering and/or combining
+       data across documents.
+     - Avoid trivial lookups (e.g., “What is the total number reported?”).
+
+  4) Answer
+     - Short and factual (single numeric answer).
+     - If intermediate numeric values appear, only the final number goes in "answer".
+     - If the documents do not provide enough information, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow the required JSON output format strictly.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Archetypes (not domain-specific)
+     - “How many items fall into category X between years A and B?”
+     - “Given the total cases and the percentage belonging to a subset, what is the computed number?”
+     - “Using the documented breakdown of outcomes, how many meet the specified condition?”
+     - “Across the dataset described, how many entities satisfy a defined attribute?”
+
+  9) Question Types to Avoid
+     - Pure factual extraction (no reasoning).
+     - Single-document lookup questions.
+     - Questions that depend on unreported totals or require external assumptions.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires numeric extraction + filtering + computation ✔
+  - Requires cross-document reasoning ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

@@ -1,0 +1,90 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests cross-document
+  entity-to-attribute linkage.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK:
+    - Create exactly one question whose answer requires:
+        • identifying an entity (organization, company, individual, or group)
+          that is recognized, awarded, highlighted, or classified in one document, and
+        • retrieving a specific technology, tool, capability, methodology,
+          or other attribute associated with that same entity from another document.
+    - The answer must be short (1–10 token attribute/technology name).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS:
+    Evidence & Scope:
+      - Use ≥5 distinct documents.
+      - The question must require:
+          • locating an entity based on an explicit recognition/award/category/status
+            described in one document,
+          • and then identifying a technology/tool/technique connected to that entity
+            in another document.
+      - The recognition/award/classification MUST appear in one document,
+        and the technology/tool MUST appear in a different document.
+
+    Reasoning Trace:
+      - Provide concise, step-by-step reasoning; reference doc IDs (e.g., "D3").
+      - The reasoning must show:
+          • how the recognized/awarded entity was identified,
+          • which document assigns the recognition or status,
+          • which document links that entity to a technology,
+          • how the cross-document connection was validated.
+
+    Question:
+      - Natural and precise.
+      - Must ask: **“Which technology/tool is associated with the entity recognized for X?”**
+      - Must require multi-document entity resolution + attribute lookup.
+      - Avoid trivial single-document retrieval.
+
+    Answer:
+      - Short and factual (technology/tool name only).
+      - If multiple correct answers, comma-separate.
+      - If not answerable, return "NOT ANSWERABLE".
+
+    Formatting:
+      - Follow any provided format exactly.
+      - If not specified, output the raw technology/tool name.
+
+    Citations:
+      - List all used document IDs in "used_docs".
+
+    Output Format:
+      - Return exactly ONE JSON object:
+        {{
+          "question": "...",
+          "answer": "...",
+          "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+        }}
+
+    Example Question Types:
+      - Identify the technology used by the organization awarded for best sustainability initiative.
+      - Identify the method associated with the individual recognized for pioneering a technique.
+      - Identify the tool linked to the company named top performer in a specific category.
+      - Identify the system associated with the entity awarded for excellence in a defined field.
+
+    Question Types to Avoid:
+      - Pure single-document lookups.
+      - Questions that only ask for the award, not the associated technology.
+      - Hypothetical or non-evidence-based attribute queries.
+      - Summaries instead of targeted attribute extraction.
+
+  ---
+  VALIDATION CHECK:
+    - Uses ≥5 documents: true
+    - Requires entity recognition + separate attribute lookup: true
+    - Requires cross-document reasoning: true
+    - Outputs a single JSON object: true
+    - No external knowledge: true
+
+  ---
+  DOCUMENTS: "{docs}"

@@ -1,0 +1,85 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • extracting a repeated quantitative or categorical variable across multiple documents,
+      • computing uniqueness, frequency, or variability of those values,
+      • and identifying which item (entity, category, metric, currency, etc.) demonstrates the most distinct values.
+  - Make the answer short (1–5 tokens).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - The question must require:
+         • assembling a list of comparable values across documents,
+         • comparing how often those values change or differ,
+         • determining which item has the greatest diversity of values.
+     - Variables may include (abstractly): scores, prices, counts, performance indicators, currency percentages, product totals, experimental outputs, etc.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step (e.g., "D3").
+     - The reasoning must show:
+         • how comparable variables were identified,
+         • how values were extracted across documents,
+         • how uniqueness or variability was computed,
+         • how the final "most variable item" was determined.
+
+  3) Question
+     - Must be natural and precise.
+     - Must ask for **which item shows the highest number of unique values**, or a clearly analogous uniqueness/variability measure.
+     - Should require joining, comparing, and counting across documents (non-trivial).
+
+  4) Answer
+     - Short factual output (1–5 tokens).
+     - If multiple items tie, list them comma-separated.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow any specified format exactly if provided.
+     - If not specified, return the item name(s) as they appear in the documents.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - “Across all quarterly student-performance reports, which skill area shows the highest number of distinct proficiency ratings?”
+     - “Considering all weekly weather summaries, which city experienced the most unique temperature ranges?”
+     - “Looking at all supplier-quality audits, which defect category shows the widest variety of severity classifications?”
+     - “Across all museum attendance logs, which exhibition has the most distinct monthly visitor counts?”
+
+  9) Question Types to Avoid
+     - Questions answered from a single document.
+     - Questions requiring summation rather than uniqueness/variability.
+     - Questions about trends without a countable uniqueness element.
+     - Any question requiring external datasets.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires cross-document comparison and uniqueness computation ✔
+  - Returns a single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

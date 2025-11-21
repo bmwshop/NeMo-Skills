@@ -1,0 +1,90 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving extraction, comparison, and identification
+  of the largest value.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question that requires:
+      • extracting a comparable count-like metric (e.g., number of deals, items, events, customers, cases),
+      • from multiple documents,
+      • comparing these values,
+      • and identifying which document, period, entity, or category has the **largest** value.
+  - The answer should be short (1–5 tokens).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - The question must require:
+         • extracting a **specific numeric count**,  
+         • across multiple documents or time periods,  
+         • performing a max operation (“which is largest?”).
+     - Values may include (abstractly): number of deals, transactions, cases, units sold,
+       attendees, failures, citations, defects, applications, sign-ups, etc.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step (e.g., "D3").
+     - The reasoning must show:
+         • how the relevant count metric was identified,
+         • how values were extracted across documents,
+         • how the comparison was performed,
+         • how the largest value was determined.
+
+  3) Question
+     - Must be natural and precise.
+     - Must ask: **“Which [period/entity/category] had the largest number of X?”**
+     - Must require numerical comparison across ≥3 documents (not trivial lookup).
+
+  4) Answer
+     - Short factual output (1–5 tokens).
+     - If tie, list tied entities comma-separated.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow any specified answer formatting exactly if provided.
+     - If unspecified, return raw names as they appear in the documents.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - “Across all monthly incident reports, which month recorded the highest number of safety violations?”
+     - “Among all service centers in the annual summary, which center handled the most customer cases?”
+     - “Across all academic terms, which course had the highest number of enrolled students?”
+     - “Across all regional market reports, which region saw the largest number of new subscriptions?”
+
+  9) Question Types to Avoid
+     - Pure trend questions (e.g., “How did the number change?”).
+     - Single-document lookups.
+     - Questions that ask for sums or averages rather than identifying the maximum.
+     - Any question requiring external or assumed knowledge.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires extraction + comparison of counts ✔
+  - Identifies the largest value ✔
+  - Returns a single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

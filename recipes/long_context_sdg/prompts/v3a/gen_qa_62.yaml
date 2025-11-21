@@ -1,0 +1,91 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving entity-tracking, document identification,
+  and relational inference.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question that requires:
+      • identifying a specific document using a factual attribute
+        (e.g., a numerical value, a described event, a unique condition),
+      • locating a specific entity-initiated action within that document
+        (e.g., first question, first request, first complaint),
+      • and asking which entity performed the corresponding response/action.
+  - The answer must be short (a single entity name or short phrase).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Select one factual attribute that uniquely identifies a document.
+     - Locate an entity’s first action (e.g., question, comment, report) inside that document.
+     - Ask about the entity who executed the associated response/action.
+     - The question must require cross-document navigation + intra-document retrieval.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference document IDs in each step (e.g., "D3").
+     - The trace must show:
+         • how the identifying attribute was found,
+         • how the target document was isolated,
+         • how the entity’s first action was located,
+         • how the responder was determined.
+
+  3) Question
+     - Natural, precise, and explicitly relational.
+     - Must describe:
+         • the identifying attribute of the target document,
+         • the actor whose first action triggers the inquiry,
+         • the type of response/action to be identified.
+     - Avoid trivial or single-step questions.
+
+  4) Answer
+     - Short and factual (e.g., “Dr. Lee”, “The Regional Supervisor”).
+     - If key information is missing, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return the exact entity names as they appear in the documents; no transformations.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - “In the compliance report that documented exactly 17 safety violations,
+        who issued the official response to the first complaint filed by the technician?”
+     - “In the wildlife survey that recorded the lowest total bird population,
+        who authored the first expert commentary that followed the initial observation?”
+     - “In the transportation audit that reported a fuel efficiency of 31.4 MPG,
+        who delivered the response to the first public inquiry?”
+
+  9) Question Types to Avoid
+     - Purely counting entities.
+     - Questions answerable from a single sentence.
+     - Questions requiring causal or speculative reasoning.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires document identification ✔
+  - Requires multi-step relational retrieval ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

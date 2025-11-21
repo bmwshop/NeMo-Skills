@@ -1,0 +1,82 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests interpretive, comparative,
+  and analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires determining **which entity or interpretation is most correct**
+    when two or more individuals, organizations, or viewpoints in the documents express
+    **conflicting or partially correct claims**.
+  - The answer must be short (1–10 tokens): a name, role, or concise interpretation.
+
+  <think limit=8192>
+  Keep your visible reasoning extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Identify statements that:
+         • conflict,
+         • partially disagree,
+         • interpret the same rule/framework differently,
+         • contrast explicit vs. implicit applicability,
+         • reflect differing readings of policy, law, or procedure.
+     - The question must reference a **specific issue, rule, framework, requirement,
+       or interpretation** mentioned by the disagreeing parties.
+
+  2) Reasoning Trace
+     - Provide a concise, step-by-step reasoning trace.
+     - Each step must reference document IDs (e.g., "D2").
+     - Show:
+         • how the issue was identified,
+         • how each interpretation appeared,
+         • how the corpus supports one interpretation over the other.
+
+  3) Question
+     - Must involve a scenario with **two or more disagreeing viewpoints**.
+     - Must ask: **“Who is most correct?”** or **“Which interpretation is most accurate?”**
+     - Requires synthesis of claims + comparison of evidence across documents.
+     - Avoid trivial lookups (e.g., “Who supports policy X?”).
+
+  4) Answer
+     - Provide only the entity name or interpretation that is most supported by the documents.
+     - If genuinely unresolved, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  6) Example Question Types (for this archetype)
+     - Two analysts disagree about whether an activity is regulated—who is most correct?
+     - Two organizations interpret the scope of a review differently—whose interpretation matches the text?
+     - Two experts claim different obligations apply—who is correct based on the evidence?
+     - Two stakeholders read a policy requirement differently—identify which reading is supported.
+
+  7) Question Types to Avoid
+     - Questions requiring only a single document.
+     - Yes/no questions without justification.
+     - Non-contrastive factual lookup questions.
+     - Diffuse or hypothetical questions not grounded in text.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Contains conflicting interpretations ✔
+  - Requires interpretive + comparative reasoning ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

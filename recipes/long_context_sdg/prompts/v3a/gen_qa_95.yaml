@@ -1,0 +1,94 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests cross-document
+  quantitative comparison.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK:
+    - Create exactly one question whose answer requires:
+        • identifying at least two documents that each report a
+          quantitative value (percentage, count, rate, score, etc.)
+          about the same measurable subject, and
+        • comparing those values to determine which one is larger,
+          smaller, higher, lower, or otherwise greater in magnitude.
+    - The answer must be short (usually a number or percentage).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS:
+    Evidence & Scope:
+      - Use ≥5 distinct documents.
+      - The question must require:
+          • locating *two* distinct numerical estimates referring to the
+            same metric/topic/variable,
+          • ensuring both refer to the same conceptual quantity,
+          • comparing the values to identify the larger or smaller one.
+      - The values must be explicitly stated and not inferred.
+
+    Reasoning Trace:
+      - Provide concise, step-by-step reasoning; reference doc IDs (e.g., "D3").
+      - The reasoning must show:
+          • how the shared metric/topic was identified,
+          • where each numerical estimate was located,
+          • how the comparison was performed.
+
+    Question:
+      - Natural and precise.
+      - Must ask for a comparison outcome:
+          • “Which value is larger?”  
+          • “What is the higher percentage?”  
+          • “Which estimate is greater?”  
+      - Must clearly specify the shared metric/topic being compared.
+
+    Answer:
+      - Short and factual (e.g., “50%”, “137”, “12.4%”).
+      - If multiple values tie, report all of them.
+      - If not answerable, return "NOT ANSWERABLE".
+
+    Formatting:
+      - Follow the specified output structure exactly if provided.
+      - If not specified, return only the numerical value(s).
+
+    Citations:
+      - List all used document IDs in "used_docs".
+
+    Output Format:
+      - Return exactly ONE JSON object:
+        {{
+          "question": "...",
+          "answer": "...",
+          "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+        }}
+
+    Example Question Types:
+      - Two documents report different failure rates for a device.
+        Which is higher?
+      - Two studies estimate population growth percentages.
+        What is the larger estimate?
+      - Two reports list annual revenue figures.
+        Which document reports the greater amount?
+
+    Question Types to Avoid:
+      - Single-document numerical retrieval.
+      - Qualitative comparisons (e.g., “better”, “worse” with no numbers).
+      - Vague metrics that do not clearly match across documents.
+      - Computations that require combining values across documents
+        instead of comparing them directly.
+
+  ---
+  VALIDATION CHECK:
+    - Uses ≥5 documents: true
+    - Requires finding two quantitative estimates: true
+    - Performs a comparison: true
+    - Outputs a single JSON object: true
+    - No external knowledge: true
+
+  ---
+  DOCUMENTS: "{docs}"

@@ -1,0 +1,88 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving comparison, computation, and ranking.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question that requires:
+      • extracting quantitative or categorical values from multiple documents,
+      • computing a relationship (e.g., differences, percentage change, ratios),
+      • and ranking the entities based on those computed results.
+  - The answer must be short (numbers, entity names, or ordered lists).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Select ≥3 comparable entities, time periods, or categories.
+     - Extract one value per entity from two or more documents.
+     - Compute a relationship (difference, delta, ratio, etc.) between these values.
+     - The question must explicitly ask for a descending or ascending ranking.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference document IDs in each step (e.g., "D3").
+     - The trace must show:
+         • how each value was located,
+         • how the computed comparison was derived,
+         • how the entities were ranked from the computed results.
+
+  3) Question
+     - Natural, precise, and explicitly comparative.
+     - Must describe:
+         • which entities/time periods are compared,
+         • which metric is extracted,
+         • which computation is expected (e.g., difference),
+         • and the required ranking order (ascending or descending).
+     - Avoid trivial or single-document questions.
+
+  4) Answer
+     - Short, factual, and formatted as an ordered list or set of entities (e.g., "A, B, C").
+     - If the computation cannot be performed due to missing values, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return the exact entity names as they appear in the documents; no transformations.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Rank the three research facilities based on the increase in annual water usage
+       between the earliest and latest environmental reports.
+     - Using the wildlife population surveys, compute the change in bird counts
+       for Zones A, B, and C, and rank the zones from largest to smallest decline.
+     - Across the climate datasets, which region shows the greatest temperature increase
+       from the earliest recorded year to the latest?
+
+  9) Question Types to Avoid
+     - Purely counting entities.
+     - Single-document comparisons.
+     - Questions that require explaining causes rather than computing values.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires cross-document computation ✔
+  - Requires ranking based on computed results ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

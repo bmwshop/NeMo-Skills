@@ -1,0 +1,91 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that requires selecting the most relevant
+  documents from a provided document set.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires identifying which document(s)
+    from the corpus are most relevant to a specified role, scenario, or objective.
+  - The question must ask for specific document attributes (e.g., full titles, publication dates,
+    authors, sections).
+  - Make the answer short (document titles only; 1–25 tokens).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps on explicit document content such as:
+         • subject matter,
+         • regulatory relevance,
+         • guidance applicability,
+         • thematic fit with the described scenario.
+     - The question must present:
+         • a user role or persona,
+         • a concrete goal or task,
+         • a requirement to choose the most relevant document(s).
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step (e.g., "D3").
+     - The reasoning must show:
+         • how the persona's goal was interpreted,
+         • how relevant documents were identified,
+         • how the final document selection was determined.
+
+  3) Question
+     - Natural and precise.
+     - Must ask: **“Which document(s) should they review?”**
+     - Requires filtering + document-matching across multiple documents.
+     - Avoid trivial lookups (e.g., not simply “Which document mentions X?”).
+
+  4) Answer
+     - Short and factual (document title(s) only).
+     - If multiple documents, use comma-separated values.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow any specified format exactly if provided.
+     - If not specified, return the raw document titles as they appear.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Which documents should a climate-risk consultant review when preparing
+       a resilience strategy?
+     - Which reports should a medical regulator examine when evaluating safety guidelines?
+     - Which documents should a supply-chain auditor prioritise for reviewing compliance risks?
+     - Which two studies should a transportation planner consult when analysing congestion policy?
+
+  9) Question Types to Avoid
+     - Pure content summarisation.
+     - Single-document factual retrieval.
+     - Hypothetical or speculative questions not grounded in specific document content.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires document-selection logic ✔
+  - Asks which document(s) are relevant ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

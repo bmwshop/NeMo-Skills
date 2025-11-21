@@ -1,0 +1,86 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires identifying which entity (organization, company, individual, stakeholder)
+    expressed a particular viewpoint, objection, or disagreement found within the documents.
+  - Make the answer short (entity names only; 1–10 tokens).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps on explicit statements where an entity expresses:
+         • disagreement,
+         • opposition,
+         • concern,
+         • a diverging stance,
+         • or an alternative interpretation.
+     - The question must reference a specific issue, requirement, proposal, policy element,
+       or defined concept that the entity commented on.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step (e.g., "D3").
+     - The reasoning must show:
+         • how the issue was identified,
+         • how viewpoints were located,
+         • how the disagreeing entity was determined.
+
+  3) Question
+     - Natural and precise.
+     - Must ask: **“Which entity expressed this viewpoint?”**
+     - Requires filtering + viewpoint-matching across multiple documents.
+     - Avoid trivial lookups (e.g., not simply “Who opposed the bill overall?”).
+
+  4) Answer
+     - Short and factual (entity name(s) only).
+     - If multiple entities, use comma-separated values.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow any specified format exactly if provided.
+     - If not specified, return the raw entity names as they appear in the documents.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Identify which stakeholder voiced concerns about a regulatory requirement.
+     - Identify which organization disagreed with a proposed definition.
+     - Identify which individual objected to a procedural safeguard.
+     - Identify which company argued against a liability or compliance obligation.
+
+  9) Question Types to Avoid
+     - Questions asking for a summary rather than identifying a disagreeing entity.
+     - Pure single-document retrieval.
+     - Overly technical or speculative viewpoints not clearly expressed in text.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Applies filtering + viewpoint extraction logic ✔
+  - Requires identifying an entity expressing a specific stance ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

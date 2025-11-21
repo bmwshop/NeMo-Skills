@@ -1,108 +1,90 @@
 system: |
   You are an expert question-generation and reasoning model.
-  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Produce one high-quality, factual question that tests conditional/analytical
+  reasoning across multiple documents.
   Ground everything strictly in the supplied documents—no outside knowledge.
 
-  VISIBLE THINKING CONSTRAINTS:
-  - The content inside <think>...</think> is VISIBLE OUTPUT and counts toward the token limit.
-  - You MUST keep this visible thinking extremely short and compressed.
-  - HARD LIMITS:
-      * Do NOT exceed 4000 tokens inside the <think> block.
-      * Do NOT restate or quote large parts of any document.
-      * Summarize reasoning efficiently—avoid detail expansion.
-  - If you reach the <think limit>, STOP IMMEDIATELY and output the final JSON.
-  - Never continue thinking after hitting the limit.
-  - Never include <think> tags inside the JSON.
-  
-
 user: |-
-  You are given a set of documents, each labeled D1, D2, D3, etc.:
-
-  {docs}
-
   ---
   TASK
-  Create QA pairs that ask the reader to determine which among several candidate
-  statements is NOT consistent with a structural pattern shared across the documents.
-  A “structural pattern” refers to any recurring textual feature, such as:
-    • how sections begin or end
-    • how descriptions are formatted
-    • which metadata fields appear regularly
-    • how authors introduce content
-    • how processes, steps, or headings are structured
+  - Create exactly one question whose answer requires identifying which of several
+    candidate statements **does NOT match a structural pattern** shared across 
+    a defined section of all documents.
+  - The question must supply multiple labeled options (A, B, C, optionally D).
+  - The answer must be short: the incorrect option letter and its statement text.
 
-  The question must require analyzing the repeated structure, not subject matter.
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
 
-  ---
   REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Select a structural section common across the documents 
+       (e.g., introductions, abstracts, disclaimers, opening remarks, metadata blocks,
+       procedural steps, acknowledgments).
+     - Determine the **consistent structural actions or statements** that appear 
+       across *all* documents.
+     - Provide 2–4 candidate statements: exactly **one** must not align with the pattern.
 
-  1) Question Construction
-     - Select a structural element that appears across ≥5 documents.
-     - Construct a multiple-choice question with labeled options A, B, C (optionally D).
-     - Exactly one option must NOT match the observed pattern.
-     - Wording must be abstract, neutral, and domain-agnostic.
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning referencing specific document IDs.
+     - Show:
+         • how the structural section was located,
+         • what similarities exist across documents,
+         • which option contradicts those similarities.
+     - Reasoning must be based solely on text explicitly present in the documents.
 
-  2) Evidence Trace
-     - Provide a concise, auditable evidence_trace showing:
-         • the structural pattern identified across documents,
-         • supporting snippets or pinpoint paraphrases,
-         • which option does not match the pattern.
-     - Each item must cite document IDs.
+  3) Question
+     - Must ask: **“Which of the following is NOT a shared similarity?”** (or equivalent phrasing)
+     - Must include labeled answer choices A, B, C (and optionally D).
+     - Must explicitly tie options to the chosen structural section.
 
-  3) Answer Format
-     - Return the incorrect option using its letter AND statement text.
-     - If evidence is insufficient, answer:
+  4) Answer
+     - Must include **both** the incorrect option letter and the statement text.
+     - If multiple statements fail to match the pattern, respond:
        "NOT DETERMINABLE FROM DOCUMENTS".
+     - If all statements match, respond:
+       "NONE".
 
-  4) Output JSON Schema
-     {
-       "question": "Full question including labeled options A, B, C...",
-       "answer": "<LETTER>: <text of incorrect option>",
-       "evidence_trace": [
-         {
-           "pattern": "<description of shared structural pattern>",
-           "support": "<quote or pinpoint paraphrase>",
-           "docs": ["D1","D2"]
-         }
-       ],
-       "used_docs": ["D1","D2","D3"]
-     }
+  5) Formatting
+     - Provide options exactly as written in the generated question.
+     - Do not modify the option text in the answer.
 
-  5) Constraints
-     - Use only evidence in the provided documents.
-     - Keep evidence_trace ≤ 10 items.
-     - No inner thoughts or external facts.
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "<LETTER>: <statement>",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Which statement is NOT a shared feature of the introductory paragraphs?
+     - Which option does NOT match how the documents present their metadata headers?
+     - Which candidate is NOT a consistent element of the procedural opening lines?
+     - Which statement does NOT describe a recurring pattern in the abstracts?
+
+  9) Question Types to Avoid
+     - Questions asking about content rather than structural patterns.
+     - Questions answerable using a single document.
+     - Questions that require outside knowledge about how documents “should” be structured.
 
   ---
-  EXAMPLE (different domain: museum artifact catalog entries)
+  VALIDATION CHECK
+  - ≥5 documents ✔
+  - Structural pattern identification ✔
+  - Multi-option filtering with one false option ✔
+  - Requires cross-document comparison ✔
+  - One JSON object ✔
+  - No external knowledge ✔
 
-  question: |
-    Across all artifact catalog entries in D1, D2, and D3, which of the following
-    statements is NOT a common structural feature of how each entry begins?
-
-    A: Each entry begins with the artifact’s title or object name.
-    B: Each entry begins with a summary of the artifact’s historical significance.
-    C: Each entry includes an identification number near the beginning.
-
-  evidence_trace:
-    [
-      {
-        "pattern":"Entries begin with the artifact’s title",
-        "support":"D1: 'Vessel with Spiral Motif'; D2: 'Bronze Spearhead'; D3: 'Ceramic Figurine'",
-        "docs":["D1","D2","D3"]
-      },
-      {
-        "pattern":"Entries include an identification number early in the description",
-        "support":"D1: 'Catalog No. 1184'; D2: 'ID: SP-204'; D3: 'Item #C-992'",
-        "docs":["D1","D2","D3"]
-      },
-      {
-        "pattern":"No entry begins with historical significance",
-        "support":"Reviewed opening sections of D1–D3; none start with contextual/historical discussion",
-        "docs":["D1","D2","D3"]
-      }
-    ]
-
-  answer: "B: Each entry begins with a summary of the artifact’s historical significance."
-
-  used_docs: ["D1","D2","D3"]
+  ---
+  DOCUMENTS:
+  {docs}

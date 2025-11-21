@@ -1,0 +1,92 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving entity extraction, filtering, and counting.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question that requires:
+      • identifying a specific category of named entities (e.g., customers,
+        research sites, species, organizations) mentioned across the documents,
+      • applying a clearly stated filtering criterion (e.g., time period,
+        attribute, status, action),
+      • extracting only those entities that satisfy the criterion,
+      • and counting how many such entities exist.
+  - The answer must be short (a single integer).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Identify ≥1 category of named entities that appears in multiple documents.
+     - Apply ≥1 explicit filtering condition stated in the documents
+       (e.g., quarter, region, status, descriptor).
+     - The question must ask solely for the **count** of the filtered entities.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference document IDs in each step (e.g., "D3").
+     - The trace must show:
+         • where each relevant entity was found,
+         • why it meets the filtering criterion,
+         • and how the count was derived.
+
+  3) Question
+     - Natural, precise, and explicitly entity-counting.
+     - Must specify:
+         • the entity type,
+         • the filtering condition,
+         • and that the requested output is the total count.
+     - Avoid ambiguous or multi-interpretation categories.
+
+  4) Answer
+     - A single integer.
+     - If the documents do not provide enough information to derive the count,
+       return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return exact entity names in the reasoning trace as they appear in the documents.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Across the ecological reports, how many plant species are explicitly described
+       as newly documented during the latest survey year?
+     - Based on the educational audits, how many universities are identified
+       as receiving accreditation updates in the most recent cycle?
+     - In the conservation datasets, how many animal populations are noted
+       as having newly established habitats during the reported period?
+
+  9) Question Types to Avoid
+     - Ranking or ordering entities.
+     - Numerical computations other than simple counting.
+     - Single-document entity lists.
+     - Questions requiring explanations instead of counts.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires entity extraction + filtering ✔
+  - Requires counting ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

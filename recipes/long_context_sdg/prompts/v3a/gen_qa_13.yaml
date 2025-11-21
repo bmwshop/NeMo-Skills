@@ -1,0 +1,84 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document
+  analytical reasoning involving numerical lookup and cross-referencing.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question requiring:
+      • identifying which entity, period, or scenario corresponds to a specific
+        numerical value appearing in the documents,
+      • and retrieving an additional metric associated with that same entity/period.
+  - The question must require searching multiple documents and combining information
+    across at least two distinct tables, lists, or numeric sections.
+  - The answer must be short (a number, percentage, or brief phrase).
+
+  <think limit=8192>
+  Keep visible thinking extremely concise.
+  Do not restate evidence.
+  Stop when you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Identify a *unique* numerical value appearing in the corpus (e.g., revenue,
+       measurement, score, count, metric).
+     - Require determining the associated entity/period by locating the matching
+       value within at least one document.
+     - Require retrieving a *second* metric about that same entity/period from
+       another document (e.g., EPS, error rate, density, satisfaction score).
+
+  2) Reasoning Trace
+     - Provide concise multi-step reasoning referencing doc IDs (e.g., "D4").
+     - Must demonstrate:
+         • where the target numeric value was found,
+         • how the correct entity/period was identified,
+         • where the secondary metric was retrieved.
+
+  3) Question
+     - Should explicitly reference:
+         • the numeric matching condition, and
+         • the secondary metric to be retrieved.
+     - Should NOT be answerable using a single document.
+     - Avoid trivial single-step “lookup” questions.
+
+  4) Answer
+     - Output only the requested metric(s), formatted cleanly.
+     - If the question is unanswerable, output "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return exactly one JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  6) Example Archetypes
+     - Identify the month in which temperature reached a specific value, then report
+       humidity during that same month.
+     - Identify the dataset where an error metric equals a threshold, then state the
+       sample size for that dataset.
+     - Identify the region with a given production figure, then return its year-over-year growth.
+     - Identify the experiment run where a measurement matches a target number,
+       then return the corresponding p-value.
+
+  7) Example (Different Domain)
+     - “For the telescope log entry where observed luminosity was 4.2×10⁵ units,
+        what was the recorded spectral width during that same observation window?”
+
+  ---
+  VALIDATION CHECK
+  - Numeric-based entity/period identification ✔
+  - Secondary metric lookup from another document ✔
+  - Multi-document reasoning ✔
+  - One JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

@@ -1,69 +1,92 @@
 system: |
   You are an expert question-generation and reasoning model.
-  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Produce one high-quality, factual question that tests cross-document
+  conceptual mapping, terminology comparison, and abstraction.
   Ground everything strictly in the supplied documents—no outside knowledge.
-  
-  VISIBLE THINKING CONSTRAINTS:
-  - The content inside <think>...</think> is VISIBLE OUTPUT and counts toward the token limit.
-  - You MUST keep this visible thinking extremely short and compressed.
-  - HARD LIMITS:
-      * Do NOT exceed 4000 tokens inside the <think> block.
-      * Do NOT restate or quote large parts of any document.
-      * Summarize reasoning efficiently—avoid detail expansion.
-  - If you reach the <think limit>, STOP IMMEDIATELY and output the final JSON.
-  - Never continue thinking after hitting the limit.
-  - Never include <think> tags inside the JSON.
 
 user: |-
-  You are given the following collection of documents:
+  ---
+  TASK
+  - Create exactly one question whose answer requires identifying:
+      • a concept, phenomenon, issue, or theme recurring across several documents,
+      • and determining how a different document categorizes, names, or groups
+        that same concept under a broader umbrella term, label, or framework.
+  - Make the answer short (1–10 tokens; typically a category or term).
 
-  {docs}
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps on explicit statements describing:
+         • recurring concepts,
+         • shared topics or issues,
+         • parallel constructs,
+         • or cross-document thematic links.
+     - The question must reference a specific recurring concept
+       and ask how a different author/document reclassifies it.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs (e.g., "D3").
+     - The reasoning must show:
+         • how the recurring concept was identified,
+         • where it appeared across multiple documents,
+         • how another document grouped or renamed it,
+         • and how that mapping was determined.
+
+  3) Question
+     - Natural, precise, and grounded.
+     - Must ask: **“Under what umbrella term does [another document/author] categorize these?”**
+     - Requires multi-document synthesis and terminology comparison.
+     - Avoid trivial lookups and avoid purely definitional questions.
+
+  4) Answer
+     - Short and factual (a term, label, or category).
+     - If multiple valid terms exist, choose the most explicit one.
+     - If ambiguous or absent, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow any specified output format exactly.
+     - If none is provided, return only the raw term(s) as they appear.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Several documents discuss recurring environmental pressures such as erosion
+       and water scarcity. In a different document authored by Lopez and Chen,
+       under what umbrella term are these pressures grouped?
+     - Multiple documents refer to parallel economic risks. Under what category
+       does another paper classify these risks?
+     - Several reports describe similar operational failures. How does an external
+       study label this set of failures?
+
+  9) Question Types to Avoid
+     - Questions that ask for summaries rather than cross-document category mapping.
+     - Pure single-document retrieval.
+     - Questions whose answers do not involve a classification, label, or grouping.
 
   ---
-inputs:
-  documents: |
-    A collection of texts from any domain.  
-    Each document may contain claims, definitions, terminology,
-    classifications, events, entities, or conceptual frameworks.  
-    You must treat the documents as the only source of truth.
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires multi-document conceptual matching ✔
+  - Answer is a category/umbrella term ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
 
-task_requirements:
-  - Read and understand all documents.
-  - Identify concepts, entities, or themes that:
-      * appear in multiple documents, OR
-      * are described differently by different authors, OR
-      * share structural or functional similarities.
-  - Create a question that requires:
-      * cross-referencing at least two documents,
-      * comparing terminology, categorizations, or perspectives across documents,
-      * or mapping a concept in one document to its analogue in another.
-  - The question should require reasoning—not direct lookup.
-  - Avoid domain-specific phrasing; the template must work for any field.
-  - The question must have a clear, concise answer derivable only from the documents.
-  - The question should not contain the answer.
-
-question_archetype:
-  description: >
-    A question that asks the model to:
-      - identify a recurring phenomenon across the documents,
-      - locate where it is explicitly named, described, or classified,
-      - and determine how a different document categorizes it under
-        an alternative term, label, framework, or taxonomy.
-  structure_examples:
-    - "Document A describes phenomenon X as [...]. In Document B, the same
-       phenomenon appears under what classification?"
-    - "Several documents mention issues Y and Z. Under what broader category
-       are these grouped in Document K?"
-
-output_format:
-  type: single_question
-  constraints:
-    - One question only
-    - No explanation
-    - Clear and unambiguous wording
-
-example_question: >
-  Several documents describe recurring environmental challenges such as
-  soil erosion and water scarcity. In a different document authored by
-  Lopez and Chen, these same challenges are grouped under what overarching
-  category?
+  ---
+  DOCUMENTS:
+  {docs}

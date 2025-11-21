@@ -1,0 +1,89 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • identifying which entity (organization, company, individual) exhibits a specific action,
+        policy, strategy, or financial/operational behavior found within the documents, and
+      • extracting a quantitative value associated with that same entity from elsewhere
+        in the document set.
+  - The answer must be short (a number, range, or single quantitative value).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - The question must involve:
+         • detecting a specific behavior or strategy (e.g., "discloses a hedging program",
+           "reports a cybersecurity policy", "implements a sustainability initiative"), and
+         • locating a related numeric metric for that same entity (e.g., revenue, cost,
+           percentage, growth rate).
+     - Behavior and metric must come from different documents or different sections.
+
+  2) Reasoning Trace
+     - Provide concise step-by-step reasoning showing:
+         • how the behavioral feature was detected,
+         • how the matching entity was located across documents,
+         • how the correct quantitative metric was retrieved.
+     - Cite doc IDs in parentheses, e.g. (D4).
+
+  3) Question
+     - Must combine:
+         • identification (“the company/entity that …”), and
+         • computation or retrieval (“what was its … value?”).
+     - Must not be answerable by examining a single document.
+
+  4) Answer
+     - One short numeric value or range (e.g., “7.1B”, “12%”, “3.4”).
+     - If not answerable, output "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow the specified output structure exactly.
+     - Answer must replicate document values exactly, including units and rounding
+       conventions (unless the question imposes new rounding rules).
+
+  6) Citations
+     - Include all document IDs used in the reasoning trace.
+
+  7) Output Format
+     - Return exactly ONE JSON object formatted as:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - “For the entity that reports implementing a sector-wide emissions-reduction framework,
+        what was its 2022 operating margin?”
+     - “Among the organizations that disclose a data-governance policy, what was the one-year
+        change in its cybersecurity compliance score?”
+     - “For the manufacturer that reports a hedging strategy for commodity inputs,
+        what were its 2021 cost-of-goods-sold on a normalized basis?”
+
+  9) Question Types to Avoid
+     - Simple single-document numeric queries.
+     - Questions where the behavior and metric come from the same paragraph.
+     - Questions requiring external financial knowledge or domain inference not found in documents.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires cross-document matching of behavior + metric ✔
+  - Involves numeric retrieval or computation ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

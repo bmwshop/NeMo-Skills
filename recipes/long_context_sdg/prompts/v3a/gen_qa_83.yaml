@@ -1,0 +1,82 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires counting how many times a specific event,
+    revision, update, or procedural action occurred across multiple documents or time periods.
+  - The answer must be short: a single integer (1–3 digits).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Identify a recurring event (e.g., amendments, revisions, inspections, updates, approvals).
+     - Extract all instances of the event from at least two different sources or time windows.
+     - The question must require **aggregation** across these sources.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference doc IDs in each step (e.g., "D3").
+     - The trace must show:
+         • how event occurrences were located in each document,
+         • which dates/time frames were included,
+         • how the final count was computed.
+
+  3) Question
+     - Natural, precise, and explicitly tied to:
+         • a starting point (e.g., a date, version, milestone), and
+         • the need to combine counts across categories or time periods.
+     - Should require filtering + counting + aggregation, not a trivial lookup.
+
+  4) Answer
+     - A single integer representing the combined count.
+     - If the documents do not allow a definitive count, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - No rounding or reformatting; output raw integer only.
+     - If the question requests a specific format (e.g., "integer only"), follow it exactly.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - How many times was a policy updated across two reporting cycles?
+     - How many revisions occurred across the project logs from 2021–2023?
+     - Across both maintenance reports, how many safety inspections were recorded?
+     - Combining both quarterly filings, how many restatements were issued?
+
+  9) Question Types to Avoid
+     - Pure single-document counts.
+     - Vague or undefined “events”.
+     - Questions requiring counting more than ~10 instances.
+     - Non-factual or speculative questions (e.g., predicting future changes).
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires counting + aggregation across sources ✔
+  - Single JSON object ✔
+  - Answer is a short integer ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

@@ -1,0 +1,88 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical
+  reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires identifying entities
+    (individuals, organizations, items, labels, etc.) that appear in **only one**
+    of several documents, but not in the others.
+  - The question must also require sorting the resulting entities by a clearly
+    defined rule (e.g., alphabetical by last name, tie-break by first name).
+  - The final answer must be a list of entity names ordered according to that rule.
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps on explicit entity mentions in the documents.
+     - The question must require:
+         • extracting entity sets from multiple documents,
+         • computing the **symmetric difference** (entities that appear in ONLY ONE),
+         • applying the specified ordering rule to the survivors.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning referencing document IDs (e.g., "D3").
+     - Show:
+         • how entity lists were extracted,
+         • how matches and non-matches were identified,
+         • how the sort rule (alphabetical by last name, tie-break by first name) was applied.
+
+  3) Question
+     - Natural, precise phrasing.
+     - Must ask: **“Which entities appear in only one of the documents?”** (or equivalent).
+     - Must include an explicit sorting rule (alphabetical by last name, tie-break by first name).
+     - Must require multi-document comparison, not single-document lookup.
+
+  4) Answer
+     - A list of entity names exactly as written in the documents, sorted correctly.
+     - If no entity appears in only one document, answer "NONE".
+     - If the result cannot be determined, answer "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return names exactly as they appear in the documents.
+     - Sorting applies only to ordering, not to modifying the text.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#", ...]
+       }}
+
+  8) Example Question Types (for this archetype)
+     - Which attendees appear in only one meeting log? List alphabetically by surname.
+     - Which authors are unique to a single manuscript version? Sort by last name.
+     - Which product codes occur in only one inventory list? Sort numerically or alphabetically.
+     - Which contributors are present in only one project file? Sort alphabetically.
+
+  9) Question Types to Avoid
+     - Questions asking for counts instead of lists.
+     - Questions involving entities appearing in all documents (different archetype).
+     - Single-document lookups.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires symmetric-difference entity extraction ✔
+  - Requires ordered list output ✔
+  - Requires multi-document comparison ✔
+  - One JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}
