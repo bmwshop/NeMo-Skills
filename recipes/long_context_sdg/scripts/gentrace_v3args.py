@@ -1,6 +1,6 @@
-import argparse
 from nemo_skills.pipeline.cli import generate, wrap_arguments
-import os
+
+cluster = "hsg"
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Generate QA pairs with specified template')
@@ -11,31 +11,24 @@ args = parser.parse_args()
 template = args.template
 category = args.category
 if category == "sec":
-    input_file = "/workspace/DATA/lc/lcrqagen_v4/sec-16384-130000.jsonl"
-    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}"
+    input_file = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}/intermediate_p.jsonl"
+    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}/traces"
 else:
-    input_file = "/workspace/DATA/lcr_docs/acgilms-16384-130000.jsonl"
-    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/{template}"
+    input_file = f"/workspace/DATA/lc/lcrqagen_v3a/{template}/intermediate_p.jsonl"
+    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/{template}/traces"
 
-cluster = "hsg"
-# input_file = "/workspace/DATA/lcr_docs/acgilms-16384-130000.jsonl" # all v3 files
-# input_file = "/workspace/DATA/lc/lcrqagen_v4/sec-16384-130000.jsonl" # just the sec
-# output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}"
-prompt_config = f"/nemo_run/code/recipes/long_context_sdg/prompts/v3a/gen_qa_{template}.yaml"
+
+# prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace.yaml"
+prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace_1a.yaml"
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
-# if not os.path.exists(prompt_config):
-#     # raise FileNotFoundError(f"Prompt configuration file not found: {prompt_config}")
-#     print(f"Prompt configuration file not found: {prompt_config}")
-#     exit(1)
-
-dependent_jobs = 3
-num_servers = 1
+dependent_jobs = 1
+num_servers = 32
 
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
-
+# f"++chat_template_kwargs.reasoning_effort=high "
 generate(
     ctx=wrap_arguments(
         f"++skip_filled=True "
@@ -52,13 +45,12 @@ generate(
     model=teacher_model,
     server_type="sglang",
     server_args="--context-len 262144 --ep-size 8",
-    dependent_jobs=dependent_jobs,
-    postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_qa.py {output_dir}/output.jsonl {output_dir}/qa.jsonl",
-    # Server parameters
     num_chunks=num_servers,
+    dependent_jobs=dependent_jobs,
+    postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_trace.py --input {output_dir}/output.jsonl --output {output_dir}/trace.jsonl",
     server_gpus=4,
     server_nodes=2,
 )
-# dependent_jobs=dependent_jobs,
+
 # server_args="--async-scheduling"
 # postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_domain_gens.py {output_dir}/output.jsonl {output_dir}/annotated_topics.jsonl",
