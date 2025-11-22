@@ -8,6 +8,7 @@ parser.add_argument('--template', type=str, help='Template configuration to use'
 parser.add_argument('--category', type=str, help='Category of input file', required=True)
 args = parser.parse_args()
 
+MAX_SEQ_LEN = 524288
 template = args.template
 category = args.category
 if category == "sec":
@@ -51,7 +52,7 @@ generate(
     output_dir=output_dir,
     model=teacher_model,
     server_type="sglang",
-    server_args="--context-len 262144 --ep-size 8",
+    server_args=f"--context-len {MAX_SEQ_LEN} --ep-size 8",
     dependent_jobs=dependent_jobs,
     postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_qa.py {output_dir}/output.jsonl {output_dir}/qa.jsonl",
     # Server parameters

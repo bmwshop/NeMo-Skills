@@ -1,0 +1,96 @@
+system: |
+  You are an expert in question–answer generation and document reasoning.
+  Your goal is to create high-quality QA pairs that test an intelligent reader’s
+  ability to perform cross-document entity comparison and set reasoning.
+  Use only the provided documents; do not rely on external knowledge or unstated assumptions.
+
+user: |-
+  You are given the following collection of documents:
+
+  {docs}
+
+  ---
+  **TASK**
+
+  Generate QA pairs that require identifying entities or groups that overlap,
+  differ, or occur uniquely across multiple documents.
+  Questions should test the model’s ability to reason about inclusion,
+  exclusion, intersection, and union of entity sets.
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+  
+  ---
+  **REQUIREMENTS**
+
+  1. **Question Construction**
+     - Ask about membership relationships between documents, e.g.:
+       • Who appears in both / only one / all documents?
+       • Which entities are unique to a subset?
+       • How many entities overlap across given documents?
+     - Use clear, neutral phrasing (not trivia-style).
+     - Design the question so that answering requires consulting ≥2 documents.
+
+  2. Normalization & Matching
+     - Normalize entities before comparison (e.g., trim whitespace; case-fold; remove honorifics;
+       standardize middle initials and punctuation; collapse common aliases if obviously the same in text).
+     - Treat two mentions as the same entity only if the documents make that equivalence explicit
+       (e.g., “Alex (Aleksandr) Zukin” → same). When uncertain, treat as distinct and note ambiguity.
+
+  3. **Reasoning Trace**
+     - Write a **structured, detailed reasoning trace** that:
+       1. Lists which documents were used to answer the question.
+       2. Enumerate the supporting entities or facts that were used to answer the question.
+       3. Describes how these facts were normalized, compared, or aggregated.
+       4. Explains how the final answer was derived.
+     - Each step must cite the supporting document identifiers (e.g., “D3”, “D5”, etc.).
+     - Strive for precision and completeness — missing or incorrect facts lower quality.
+
+  4. **Answer Format**
+     - Provide the final entity list or count clearly.
+     - Order entities alphabetically or by any rule mentioned in the question.
+
+
+  5. **Citations and Factual Integrity**
+     - Always cite the exact documents used: e.g. `["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8"]`.
+     - Each fact in the reasoning trace must trace back to a specific document.
+     - Include all relevant facts that contribute to the answer — do not omit or summarize away detail.
+     - Do not cite documents you did not use.
+
+  6. **Output Format**
+     Return **exactly one** valid JSON object in this schema:
+
+     ```json
+     {{
+       "question": "Concise, clear, natural-language query grounded in the corpus.",
+       "answer": "Brief, factual answer derived directly from the documents.",
+       "reasoning_trace": "Numbered, explicit reasoning steps showing how each fact was extracted, verified, and combined.",
+       "used_docs": ["D1", "D2", "D3", "D4", "D5"]
+     }}
+     ```
+
+  ---
+  **EXAMPLE**
+
+  Example question:  
+  "Across the three project-proposal documents, which research teams are listed as contributors in exactly two of them? List them alphabetically by team name."
+
+  Example reasoning_trace:  
+  " 1. Document A lists: Quantum Systems, DeepBio, NeuralForge, and VisionLoop.  
+    2. Document B lists: NeuralForge, VisionLoop, TerraAI, and DeepBio.  
+    3. Document C lists: TerraAI, DeepBio, CloudSense, and VisionLoop.  
+    4. Teams appearing in exactly two documents:
+         - DeepBio (A, B, C → appears in all three? → remove)  
+         - NeuralForge (A & B only)  
+         - VisionLoop (A & B & C → all three? → remove)  
+         - TerraAI (B & C only)  
+    5. Remaining teams that appear in *exactly two* documents:
+         NeuralForge and TerraAI."
+
+  Example answer:  
+  "NeuralForge; TerraAI"
+
+

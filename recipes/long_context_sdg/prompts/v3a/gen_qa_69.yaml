@@ -1,0 +1,98 @@
+system: |
+  You are an expert question–answer generation and reasoning model.
+  Your role is to produce high-quality, factual QA pairs that test
+  conditional and analytical reasoning across multiple documents.
+
+  Every question must be strictly grounded in the content of the supplied documents.
+  You must not rely on outside knowledge, background assumptions, or inferred facts
+  that are not explicitly stated in the corpus.
+
+user: |-
+  You are given the following collection of documents:
+
+  {docs}
+
+  ---
+  **TASK**
+  Create a single, concise QA pair that requires the model to extract a *conditional list* of entities.
+  The question must involve two related conditions, for example:
+  - “In all documents that satisfy condition A, list all entities that satisfy condition B.”
+  - “Among the reports written in 2023, which organizations mention a funding amount over $1M?”
+  - “From documents authored by government agencies, list all laws or acts they reference.”
+
+  The question should compel the model to:
+  - Examine multiple documents for qualifying conditions.
+  - Identify subsets of documents or entities that meet a given filter.
+  - Extract and aggregate entities meeting a secondary condition.
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+  
+  ---
+  **REQUIREMENTS**
+
+  1. **Evidence and Scope**
+     - Use factual information from at least **five distinct documents**.
+     - For each relevant document, extract (if available):
+       - title, date, author, summary, and key entities.
+     - Base all reasoning steps on explicitly stated facts.
+
+  2. **Reasoning Trace**
+     - Provide a clear, step-by-step factual reasoning trace, such as:
+       1. Identify which documents meet the first condition.
+       2. Within those documents, extract entities meeting the second condition.
+       3. Aggregate or order the resulting entities logically.
+     - Each step must reference evidence from specific documents.
+
+  3. **Question Construction**
+     - Phrase the question naturally and precisely.
+     - The question must require filtering and cross-referencing multiple documents.
+     - Avoid trivial retrieval (e.g., “List all names mentioned”).
+     - Prefer compositional logic (A → subset of docs → extract B).
+
+  4. **Answer**
+     - The final answer should be concise: a list of entities, numbers, or short phrases.
+     - Use commas or list formatting for clarity.
+     - If there is insufficient information to satisfy the question, output `"NOT ANSWERABLE"`.
+
+  5. **Citations**
+     - Always cite the documents used, e.g. `["D1", "D2", "D3", "D4", "D5"]`.
+
+  6. **Output Format**
+     Return exactly one valid JSON object matching the schema below.
+
+     ```json
+     {{
+       "question": "Concise, clear, natural-language query grounded in the corpus.",
+       "answer": "Brief, factual, and document-grounded response (list, number, or short phrase).",
+       "reasoning_trace": "Numbered, factual reasoning steps showing how the answer was derived from the documents.",
+       "used_docs": ["D1", "D2", "D3", "D4", "D5"]
+     }}
+     ```
+
+  ---
+  **Example**
+
+  Example question:  
+  "I am looking for documents about guinea pigs. Please list all guinea pig prices found in these documents."
+
+  Example reasoning_trace:  
+  "1. Document D3 is about Abyssinian guinea pigs and states that they are priced at $100.  
+   2. Document D7 discusses Peruvian guinea pigs priced at $200.  
+   3. Document D10 is about American Crested guinea pigs priced at $150.  
+   4. Therefore, the list of guinea pig prices is [$100, $200, $150]."
+
+  Example answer:  
+  "$100, $200, $150"
+
+  ---
+  **Checklist for a Valid QA Pair**
+  - Uses ≥5 documents as evidence.
+  - Applies at least one **conditional filter** across documents.
+  - Extracts a **list of entities or numeric values** that meet a secondary condition.
+  - Includes an explicit, numbered reasoning trace.
+  - Produces a single, well-structured JSON object.
+  - Contains no external knowledge or unverifiable assumptions.

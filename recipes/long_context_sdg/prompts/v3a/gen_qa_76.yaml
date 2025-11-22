@@ -1,0 +1,103 @@
+system: |
+  You are an expert question–answer generation and reasoning model.
+  Your task is to create high-quality, factual QA pairs that test analytical reasoning
+  and quantitative synthesis across multiple documents.
+
+  You must generate questions that require combining information from at least five
+  distinct documents and performing logical, arithmetic, or comparative operations.
+  Base every question strictly on the evidence in the supplied documents — no external
+  knowledge, assumptions, or hallucinated context are permitted.
+
+  Your QA pairs must evaluate the ability of a model to locate, combine, and compute
+  multiple document-grounded facts to reach a concise, verifiable conclusion.
+
+user: |-
+  You are given the following collection of documents:
+
+  {docs}
+
+  ---
+  **TASK**
+  Create a concise, document-grounded QA pair that tests multi-step analytical reasoning.
+
+  The question should require the model to:
+  - Extract quantitative or factual data from the corpus (e.g., prices, populations, revenues, memberships, dates)
+  - Combine or compare information across **at least five distinct documents**
+  - Perform explicit logical or arithmetic reasoning (e.g., summing, averaging, comparing, ranking, estimating)
+  - Derive a new value or conclusion that cannot be answered by direct lookup
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+  
+  ---
+  **REQUIREMENTS**
+
+  1. **Grounding**
+     - Use only facts explicitly stated in the documents.
+     - Do not invent numbers or entities.
+     - Cite each document used (e.g., ["D1", "D2", "D3", "D4", "D5"]).
+
+  2. **Question Construction**
+     - Ask for a *computed or inferred quantity* (not a direct retrieval).
+     - Use clear, natural-language phrasing.
+     - Avoid yes/no or purely descriptive questions.
+     - Example verbs: *calculate, estimate, compare, determine, rank, average, project.*
+
+  3. **Reasoning Trace**
+     - Provide a factual, step-by-step reasoning trace:
+       1. Identify all relevant facts (with document references).
+       2. Perform logical or mathematical operations on them.
+       3. Explain how each fact contributes to the conclusion.
+     - Use concise numbered sentences.
+
+  4. **Answer**
+     - State the final numeric or factual result clearly (e.g., "$62,500", "37%", "five countries").
+     - Use standard numeric formatting (commas, rounded values).
+     - The answer should be short — a number, short list, or concise phrase.
+
+  5. **Fallback**
+     - If insufficient data is available to meet these requirements, output `"NOT ANSWERABLE"`.
+
+  6. **Output Format**
+     Return **exactly one** valid JSON object matching this schema:
+
+     ```json
+     {{
+       "question": "Concise, clear, natural-language query grounded in the corpus.",
+       "answer": "Brief, computed answer derived from the documents.",
+       "reasoning_trace": "Numbered, factual reasoning steps describing how the answer was derived from document evidence.",
+       "used_docs": ["D1", "D2", "D3", "D4", "D5"]
+     }}
+     ```
+
+  ---
+  **Example**
+
+  Example question:  
+  "How much money did Alice likely spend on her European vacations in 2024?"
+
+  Example reasoning_trace:  
+  "1. Document D1 states that Alice spent $15,000 on her vacation in Greece in April 2024.  
+   2. Document D5 states that Alice spent $10,000 on her vacation in Italy in May 2024.  
+   3. Document D10 states that Alice goes to Europe five times a year on average.  
+   4. Average cost per trip = ($15,000 + $10,000) / 2 = $12,500.  
+   5. Multiply by five trips per year → $12,500 × 5 = $62,500."
+
+  Example answer:  
+  "$62,500"
+
+  ---
+  **Constraints**
+  - Use evidence from ≥5 unique documents.
+  - The total reasoning process must remain within 8,192 tokens.
+  - Ensure the question cannot be answered using a single document.
+  - Do not quote or copy large verbatim sections; summarize relevant facts succinctly.
+  - Never rely on external world knowledge, background facts, or implied assumptions.
+
+  ---
+  **Goal**
+  Produce one self-contained, document-grounded QA example that demonstrates
+  *quantitative synthesis and reasoning across multiple sources*.

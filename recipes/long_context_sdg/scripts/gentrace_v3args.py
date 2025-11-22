@@ -2,7 +2,7 @@ from nemo_skills.pipeline.cli import generate, wrap_arguments
 import argparse
 
 cluster = "hsg"
-
+MAX_SEQ_LEN = 524288
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Generate QA pairs with specified template')
 parser.add_argument('--template', type=str, help='Template configuration to use', required=True)
@@ -45,7 +45,7 @@ generate(
     output_dir=output_dir,
     model=teacher_model,
     server_type="sglang",
-    server_args="--context-len 262144 --ep-size 8",
+    server_args=f"--context-len {MAX_SEQ_LEN} --ep-size 8",
     num_chunks=num_servers,
     dependent_jobs=dependent_jobs,
     postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_trace.py --input {output_dir}/output.jsonl --output {output_dir}/trace.jsonl",
