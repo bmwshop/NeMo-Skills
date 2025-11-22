@@ -21,7 +21,7 @@ category = args.category
 
 if category == "sec":
     # input_file = f"/workspace/DATA/lc/lcrqagen_v4/sec-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
-    input_file = f"/workspace/DATA/lcr_docs/simple/sec/sec-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
+    input_file = f"/workspace/DATA/lcr_docs/simple/sec/sec-{args.data_chunk_size}-{args.data_maxlength}.simple.jsonl"
     output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}-{args.data_chunk_size}-{args.data_maxlength}"
 else:
     # input_file = f"/workspace/DATA/lcr_docs/acgilms-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
