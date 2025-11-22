@@ -18,19 +18,15 @@ TEMPERATURE = 0.3
 TOP_P = 0.9
 template = args.template
 category = args.category
-if args.data_chunk_size != 16384 or args.data_maxlength != 130000:
-    output_suffix = f"-{args.data_chunk_size}-{args.data_maxlength}"
-else:
-    output_suffix = ""
-    
-print(f"Output suffix: {output_suffix}")
 
 if category == "sec":
-    input_file = f"/workspace/DATA/lc/lcrqagen_v4/sec-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
-    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}{output_suffix}"
+    # input_file = f"/workspace/DATA/lc/lcrqagen_v4/sec-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
+    input_file = f"/workspace/DATA/lcr_docs/simple/sec/sec-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
+    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}-{args.data_chunk_size}-{args.data_maxlength}"
 else:
-    input_file = f"/workspace/DATA/lcr_docs/acgilms-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
-    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/{template}"
+    # input_file = f"/workspace/DATA/lcr_docs/acgilms-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
+    input_file = f"/workspace/DATA/lcr_docs/simple/acgilms-{args.data_chunk_size}-{args.data_maxlength}_sh.jsonl"
+    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/{template}-{args.data_chunk_size}-{args.data_maxlength}"
 
 cluster = "hsg"
 # input_file = "/workspace/DATA/lcr_docs/acgilms-16384-130000.jsonl" # all v3 files
