@@ -6,9 +6,14 @@ import os
 parser = argparse.ArgumentParser(description='Generate QA pairs with specified template')
 parser.add_argument('--template', type=str, help='Template configuration to use', required=True)
 parser.add_argument('--category', type=str, help='Category of input file', required=True)
+parser.add_argument('--servers', type=int, help='Number of servers', default=1)
+parser.add_argument('--jobs', type=int, help='Number of jobs', default=3)
+parser.add_argument('--concurrent_requests', type=int, help='Number of concurrent requests', default=8)
 args = parser.parse_args()
 
 MAX_SEQ_LEN = 524288
+TEMPERATURE = 0.3
+TOP_P = 0.9
 template = args.template
 category = args.category
 if category == "sec":
@@ -31,8 +36,9 @@ teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 #     print(f"Prompt configuration file not found: {prompt_config}")
 #     exit(1)
 
-dependent_jobs = 3
-num_servers = 1
+dependent_jobs = args.jobs
+num_servers = args.servers
+concurrent_requests = args.concurrent_requests
 
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
@@ -43,9 +49,9 @@ generate(
         f"++prompt_config={prompt_config} "
         f"++inference.tokens_to_generate=32768 "
         f"++inference.endpoint_type=text "
-        f"++max_concurrent_requests=8 "
-        f"++inference.temperature=0.3 "
-        f"++inference.top_p=0.9 "
+        f"++max_concurrent_requests={concurrent_requests} "
+        f"++inference.temperature={TEMPERATURE} "
+        f"++inference.top_p={TOP_P} "
     ),
     cluster=cluster,
     input_file=input_file,
