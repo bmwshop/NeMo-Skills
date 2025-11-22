@@ -8,7 +8,9 @@ parser.add_argument('--template', type=str, help='Template configuration to use'
 parser.add_argument('--category', type=str, help='Category of input file', required=True)
 parser.add_argument('--servers', type=int, help='Number of servers', default=1)
 parser.add_argument('--jobs', type=int, help='Number of jobs', default=3)
-parser.add_argument('--concurrent_requests', type=int, help='Number of concurrent requests', default=8)
+parser.add_argument('--concurrent_requests', type=int, help='Number of concurrent requests', default=16)
+parser.add_argument('--data_chunk_size', type=int, help='Size of data chunk', default=16384)
+parser.add_argument('--data_maxlength', type=int, help='Maximum length of data', default=130000)
 args = parser.parse_args()
 
 MAX_SEQ_LEN = 524288
@@ -16,11 +18,18 @@ TEMPERATURE = 0.3
 TOP_P = 0.9
 template = args.template
 category = args.category
-if category == "sec":
-    input_file = "/workspace/DATA/lc/lcrqagen_v4/sec-16384-130000.jsonl"
-    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}"
+if args.data_chunk_size != 16384 or args.data_maxlength != 130000:
+    output_suffix = f"-{args.data_chunk_size}-{args.data_maxlength}"
 else:
-    input_file = "/workspace/DATA/lcr_docs/acgilms-16384-130000.jsonl"
+    output_suffix = ""
+    
+print(f"Output suffix: {output_suffix}")
+
+if category == "sec":
+    input_file = f"/workspace/DATA/lc/lcrqagen_v4/sec-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
+    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}{output_suffix}"
+else:
+    input_file = f"/workspace/DATA/lcr_docs/acgilms-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
     output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/{template}"
 
 cluster = "hsg"
