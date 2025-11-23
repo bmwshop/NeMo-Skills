@@ -1,0 +1,94 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical or quantitative reasoning.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires calculating,
+    comparing, or extracting a quantitative value across multiple documents.
+  - The question must require combining at least two pieces of numerical
+    information (e.g., percentages, margins, counts, totals, rates).
+  - The answer must be a short numeric value or range (1–15 tokens).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - The question must:
+         • require locating ≥2 numerical values,
+         • require performing at least one comparison, selection, or computation,
+         • be answerable strictly from the given documents.
+     - Avoid trivial single-document lookups.
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning; reference document IDs (e.g., "D4").
+     - Show:
+         • how the relevant metrics were located,
+         • how the comparison/computation was performed,
+         • how the correct numerical answer was chosen.
+
+  3) Question
+     - Natural, precise, and unambiguous.
+     - Must require selecting or computing a **specific quantitative outcome**.
+     - Examples of permitted operations:
+         • Identify which time period had the highest/lowest metric.
+         • Compute the difference or increase/decrease between values.
+         • Extract the value associated with a described entity or context.
+
+  4) Answer
+     - Short, numeric output only (e.g., "18%", "4.2 million", "12.4").
+     - If multiple numbers are needed, separate with commas.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow the requested output structure exactly.
+     - Return only the extracted/calculated numeric values.
+
+  6) Citations
+     - Include all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  8) Example Question Types (for this archetype)
+     - Which quarter reported the largest year-over-year increase in a metric?
+     - What is the difference between two reported percentages?
+     - What was the total count of events across multiple documents?
+     - Which entity had the smallest reported value for a given metric?
+     - What was the margin/rate/percentage under a specific condition?
+
+  9) Question Types to Avoid
+     - Qualitative viewpoint-matching questions.
+     - Pure extraction with no comparison or computation.
+     - Single-document or trivially obvious numerical lookups.
+
+  ---
+  EXAMPLE
+  Question: "Across all climate monitoring stations referenced in the documents,
+            which station recorded the highest average winter temperature,
+            and what was that temperature?"
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires numerical comparison or computation ✔
+  - Output is a single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

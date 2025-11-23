@@ -1,0 +1,97 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning
+  across multiple documents containing quantitative information.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • identifying two or more time periods, categories, or entities that satisfy a
+        numerically defined condition (e.g., a threshold increase/decrease, matching value,
+        or specific computed property), and
+      • computing a secondary quantitative value (percentage change, difference, ratio,
+        delta, etc.) based solely on the documents.
+  - The question must require referencing ≥2 numerical fields across ≥5 documents.
+
+  <think limit=8192>
+  Keep visible thinking concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - All numerical conditions must be explicitly verifiable from the documents.
+     - The question must involve:
+         • identifying qualifying records using a numerical filter/condition, then
+         • computing a derived metric about those same records.
+     - Avoid questions where the answer is found directly in a single line.
+
+  2) Reasoning Trace
+     - Provide a short, step-by-step chain of thought (cite doc IDs, e.g., "D4"):
+         • how the qualifying entries were identified,
+         • how the numerical comparison/condition was applied,
+         • how the final derived number was calculated.
+
+  3) Question
+     - Must be natural, precise, and require:
+         • filtering using a numerical criterion, AND
+         • performing one additional quantitative computation.
+     - Do NOT ask for definitions, summaries, or descriptive interpretations.
+
+  4) Answer
+     - A single numeric value (or numeric pair) formatted clearly.
+     - Round only if explicitly required and specify the rounding rule.
+     - If the condition cannot be satisfied (e.g., only one qualifying entry),
+       return: "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow the requested output JSON object format strictly:
+       {
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "...",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  6) Citations
+     - Include all document IDs used in filtering or computation.
+
+  7) Output Constraints
+     - Produce exactly ONE JSON object.
+     - Do not embed external knowledge.
+
+  8) Example Question Types (for this archetype)
+     - "Among the years where CO₂ emissions fell by more than 5%, what was the
+       corresponding percentage change in methane output?"
+     - "For the products whose defect rate dropped by at least 2 percentage points,
+       what was the change in average processing time?"
+     - "Between the geographic regions that experienced a ≥10% decline in rainfall,
+       what was the change in average watershed flow?"
+
+  9) Question Types to Avoid
+     - Single-document questions.
+     - Qualitative or interpretive-only questions.
+     - Questions without a numerical filter.
+     - Questions where no computation beyond a lookup is required.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires numerical filtering + derived computation ✔
+  - Answer strictly document-grounded ✔
+  - Output is a single JSON object ✔
+
+  ---
+  Example Question:
+    "Across environmental monitoring sites where particulate matter (PM2.5) levels
+     decreased by at least 4% year-over-year, what was the corresponding average
+     percentage change in nitrogen dioxide (NO₂) levels? Provide one number rounded
+     to one decimal place."
+
+  ---
+  DOCUMENTS:
+  {docs}

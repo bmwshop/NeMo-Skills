@@ -1,0 +1,95 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document analytical reasoning
+  involving numerical comparison, ranking, or ordered evaluation.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • extracting quantitative values (metrics, counts, amounts, measurements),
+      • comparing or ranking entities across multiple documents,
+      • and returning the correct ordered result.
+  - The answer should be concise (e.g., a ranked list or a single entity depending on the question).
+
+  <think limit=8192>
+  Keep visible reasoning concise.
+  Do not restate evidence verbatim.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Identify at least one numerical attribute common to multiple entities (e.g., budgets, revenues, emissions, scores).
+     - Ensure the required comparison or ranking CANNOT be answered from a single document.
+     - The question must require:
+        • aggregating or aligning entities across documents,
+        • extracting their associated quantitative values,
+        • and performing a comparison (rank, max, min, difference, etc.).
+
+  2) Reasoning Trace
+     - Provide concise, step-by-step reasoning showing:
+         • how the relevant numerical metric was located (cite doc IDs),
+         • how entities were matched to their values,
+         • how the ranking or comparison was computed,
+         • how the final ordered result was derived.
+     - Cite doc IDs (e.g., "D3") in each step.
+
+  3) Question
+     - Natural, precise, and explicitly numerical.
+     - Examples of required structures:
+         • “Rank X by Y in descending order.”
+         • “Which entity had the largest increase in Y?”
+         • “Which group had the smallest reported Z value?”
+     - Must require multistep quantitative reasoning across documents.
+
+  4) Answer
+     - Short and factual.
+     - If ranked: return an ordered list.
+     - If a single entity: return only the entity name(s).
+     - If not answerable with the provided documents, return “NOT ANSWERABLE”.
+
+  5) Formatting
+     - Return exactly ONE JSON object of the form:
+       {
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  6) Citations
+     - Every step in the reasoning trace must reference document IDs.
+     - The "used_docs" list must include all documents that contributed evidence.
+
+  7) Example Question Types (for this archetype)
+     - Rank departments by annual spending.
+     - Identify which city showed the greatest decline in pollution levels.
+     - Determine which research group produced the most publications.
+     - Rank companies by reported operating margin.
+     - Determine which project had the highest year-over-year cost increase.
+
+  8) Questions to Avoid
+     - Pure factual lookup with no comparison.
+     - Summaries without quantitative reasoning.
+     - Single-document calculations.
+     - Subjective or speculative comparisons.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 distinct documents ✔
+  - Requires multistep numerical extraction + comparison ✔
+  - Requires combining evidence across documents ✔
+  - Produces exactly one JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  EXAMPLE_QUESTION:
+    “Based on the environmental compliance reports, rank the five monitored rivers by their
+     FY22 average nitrate concentration (highest to lowest).”
+     
+ ---
+  DOCUMENTS:
+  {docs}

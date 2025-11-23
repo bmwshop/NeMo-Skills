@@ -1,0 +1,76 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-step analytical reasoning across multiple documents.
+  All facts must be grounded strictly in the provided documents—no external knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      1) Identifying a category/group defined by having an extremal property 
+         (e.g., lowest value, highest value, smallest count, least usage).
+      2) Comparing numerical metrics for that category across multiple time periods,
+         locations, or scenarios.
+      3) Determining which period/location/scenario exhibits the largest change,
+         increase, decrease, divergence, or growth.
+
+  <think limit=8192>
+  Keep your visible thinking concise and strictly tied to document content.
+  Do not restate evidence verbatim.
+  Stop immediately if you hit the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - The question must require:
+         • identifying a specific category based on a defined extremal criterion,
+         • retrieving its associated quantitative values from ≥2 documents,
+         • performing a comparison across periods/regions/entities,
+         • and determining which context exhibits the greatest change.
+     - No question may be answerable by a simple lookup.
+
+  2) Reasoning Trace (for the generated answer)
+     - Provide short, step-by-step reasoning referencing doc IDs (e.g., "D2").
+     - Must explicitly show:
+         • how the target category was identified,
+         • how the relevant numerical values were retrieved,
+         • how the largest change was computed.
+
+  3) Question
+     - Must explicitly ask **which period/location/entity shows the largest change**.
+     - Should involve filtering → retrieving → comparing.
+     - Must be natural, concise, and grounded in the document set.
+
+  4) Answer
+     - Short and factual (e.g., “Q4 2021 – Region B”).
+     - If unresolvable, answer "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return exactly one JSON object with the following fields:
+       {
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  6) Example Question Types (for this archetype)
+     - Which quarter shows the greatest increase in revenue for the segment with the lowest sales?
+     - Which department saw the largest improvement in compliance rates among those with the lowest baseline?
+     - Which region recorded the biggest drop in incidents within the group with the smallest population?
+     - Which year exhibits the greatest growth in funding for the category with the lowest initial allocation?
+
+  7) Question Types to Avoid
+     - Pure lookups with no comparison.
+     - Questions requiring only a single document.
+     - Questions that do not require identifying a category based on an extremal property.
+     - Questions requiring external datasets or assumptions.
+
+  ---
+  EXAMPLE QUESTION
+  "For the hospital department with the lowest patient volume in the baseline year, which subsequent month shows the largest increase in average treatment time?"
+
+  ---
+  DOCUMENTS:
+  {docs}

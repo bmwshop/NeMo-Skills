@@ -1,0 +1,90 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical reasoning across multiple documents.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+user: |-
+  ---
+  TASK
+  - Create exactly one question whose answer requires:
+      • identifying which entity, item, period, or case matches a *numerical or quantitative condition* observed across multiple documents,
+      • then extracting a secondary metric from that same entity/item/period.
+  - The question must require multi-document comparison, filtering, and conditional reasoning.
+  - The final answer should be short (1–10 tokens when numeric; 1–5 words when textual).
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Base all steps on explicit numeric or quantitative values in the documents (e.g., percentages, counts, deltas, ratios).
+     - Require identifying:
+         • the item/period/entity whose metric satisfies a specific threshold or change,
+           AND
+         • an associated value (secondary metric) reported for that same item/period/entity.
+
+  2) Reasoning Trace
+     - Provide concise step-by-step reasoning.
+     - Reference doc IDs explicitly (e.g., "D3").
+     - The reasoning must demonstrate:
+         • how the triggering numeric condition was identified,
+         • how the correct entity/period/item was selected,
+         • how the associated secondary metric was retrieved.
+
+  3) Question
+     - Natural and precise.
+     - Must require conditional numeric filtering across multiple documents.
+     - Must NOT be answerable from a single document.
+     - Avoid trivial numeric lookups (e.g., "What was revenue in Q2?" — not permitted).
+
+  4) Answer
+     - Short, factual, and unambiguous.
+     - If numeric, provide the numeric value exactly as written.
+     - If not answerable, return: "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow specified formats exactly.
+     - No external knowledge or assumptions.
+
+  6) Citations
+     - List all used document IDs in "used_docs".
+
+  7) Output Format
+     - Return exactly ONE JSON object:
+       {
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  8) Example Question Types (for this archetype)
+     - Identify the time period with the largest percentage decline and report a related metric from that same period.
+     - Identify which country had the smallest year-over-year change and report its population figure.
+     - Identify the product with the largest drop in sales and report its inventory level.
+     - Identify the experiment with the highest error rate and report its runtime.
+
+  9) Example Question
+     - “Across all regional climate reports, which region experienced the **second largest month-over-month temperature increase**, and what was the **reported precipitation level** for that same month?”
+
+  10) Question Types to Avoid
+      - Single-document numeric extraction.
+      - Vague or speculative trends.
+      - Questions requiring outside domain knowledge or assumptions.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires conditional numeric comparison ✔
+  - Requires retrieving a secondary metric ✔
+  - Requires multi-step reasoning ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

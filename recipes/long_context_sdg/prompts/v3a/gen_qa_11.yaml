@@ -65,7 +65,7 @@ user: |-
      - Identify which survey sample shows a given percentage, then compute the delta relative to another sample.
      - Identify which region had a given measurement threshold, then compute the ranking among all regions.
 
-  8) Example (Different Domain)
+  8) Example
      - “In the astronomy observation logs, during which observation window did the measured luminosity equal 4.2×10⁵ units, and by what percentage did this differ from the luminosity recorded in the preceding observation window? Report the final difference to two decimal places.”
 
   ---

@@ -61,12 +61,12 @@ user: |-
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
        }}
 
-  8) Example Question Types (for this comparison archetype)
+  8) Example Question Types (for this archetype)
      - "What is the percentage difference between Metric A in Document X and Metric B in Document Y?"
      - "Which value is larger: the proportion of Group A in Doc X or the share of Outcome B in Doc Y?"
      - "By how many units does the reported count in Doc X exceed the corresponding count in Doc Y?"
 
-  9) Example from a completely different domain
+  9) Example
      - Documents:
          • Doc A reports the average annual rainfall in Region M.
          • Doc B reports the percentage of farms in Region N experiencing drought.

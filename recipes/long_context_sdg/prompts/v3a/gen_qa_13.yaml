@@ -67,7 +67,7 @@ user: |-
      - Identify the experiment run where a measurement matches a target number,
        then return the corresponding p-value.
 
-  7) Example (Different Domain)
+  7) Example
      - “For the telescope log entry where observed luminosity was 4.2×10⁵ units,
         what was the recorded spectral width during that same observation window?”
 
