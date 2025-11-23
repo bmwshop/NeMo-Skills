@@ -11,6 +11,7 @@ parser.add_argument('--jobs', type=int, help='Number of jobs', default=3)
 parser.add_argument('--concurrent_requests', type=int, help='Number of concurrent requests', default=16)
 parser.add_argument('--data_chunk_size', type=int, help='Size of data chunk', default=16384)
 parser.add_argument('--data_maxlength', type=int, help='Maximum length of data', default=130000)
+parser.add_argument('--tokens_to_generate', type=int, help='Number of tokens to generate', default=32768)
 args = parser.parse_args()
 
 MAX_SEQ_LEN = 524288
@@ -52,7 +53,7 @@ generate(
     ctx=wrap_arguments(
         f"++skip_filled=True "
         f"++prompt_config={prompt_config} "
-        f"++inference.tokens_to_generate=32768 "
+        f"++inference.tokens_to_generate={args.tokens_to_generate} "
         f"++inference.endpoint_type=text "
         f"++max_concurrent_requests={concurrent_requests} "
         f"++inference.temperature={TEMPERATURE} "

@@ -12,7 +12,7 @@ parser.add_argument('--jobs', type=int, help='Number of jobs', default=3)
 parser.add_argument('--concurrent_requests', type=int, help='Number of concurrent requests', default=16)
 parser.add_argument('--data_chunk_size', type=int, help='Size of data chunk', default=16384)
 parser.add_argument('--data_maxlength', type=int, help='Maximum length of data', default=130000)
-parser.add_argument('--tokens_to_generate', type=int, help='Number of tokens to generate', default=32768)
+parser.add_argument('--tokens_to_generate', type=int, help='Number of tokens to generate', default=65536)
 
 args = parser.parse_args()
 
@@ -20,14 +20,14 @@ template = args.template
 category = args.category
 if category == "sec":
     input_file = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}-{args.data_chunk_size}-{args.data_maxlength}/intermediate_p.jsonl"
-    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}-{args.data_chunk_size}-{args.data_maxlength}/traces"
+    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/sec/{template}-{args.data_chunk_size}-{args.data_maxlength}/critiques"
 else:
     input_file = f"/workspace/DATA/lc/lcrqagen_v3a/{template}-{args.data_chunk_size}-{args.data_maxlength}/intermediate_p.jsonl"
-    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/{template}-{args.data_chunk_size}-{args.data_maxlength}/traces"
+    output_dir = f"/workspace/DATA/lc/lcrqagen_v3a/{template}-{args.data_chunk_size}-{args.data_maxlength}/critiques"
 
 
 # prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace.yaml"
-prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/gen_trace_1a.yaml"
+prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/v3a/critique.yaml"
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
@@ -56,7 +56,7 @@ generate(
     server_args=f"--context-len {MAX_SEQ_LEN} --ep-size 8",
     num_chunks=num_servers,
     dependent_jobs=dependent_jobs,
-    postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_trace.py --input {output_dir}/output.jsonl --output {output_dir}/trace.jsonl",
+    postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_qa.py {output_dir}/output.jsonl {output_dir}/critique.jsonl",
     server_gpus=4,
     server_nodes=2,
 )
