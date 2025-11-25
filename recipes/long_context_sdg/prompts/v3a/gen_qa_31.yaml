@@ -50,12 +50,12 @@ user: |-
 
   5) Formatting
      - Follow the requested output JSON object format strictly:
-       {
+       {{
          "question": "...",
          "answer": "...",
          "reasoning_trace": "...",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
 
   6) Citations
      - Include all document IDs used in filtering or computation.

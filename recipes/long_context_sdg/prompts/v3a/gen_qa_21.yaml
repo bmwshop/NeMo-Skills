@@ -57,12 +57,12 @@ user: |-
 
   7) Output Format
      - Return exactly ONE JSON object:
-       {
+       {{
          "question": "...",
          "answer": "...",
          "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
 
   8) Example Question Types (for this archetype)
      - Which quarter reported the largest year-over-year increase in a metric?

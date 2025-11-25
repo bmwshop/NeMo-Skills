@@ -54,7 +54,7 @@ user: |-
          "answer": "...",
          "reasoning_trace": "1) ... (D#) 2) ... (D#)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
 
   6) Citations
      - List only the IDs of documents you used.

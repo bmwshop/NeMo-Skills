@@ -55,12 +55,12 @@ user: |-
 
   7) Output Format
      - Return exactly ONE JSON object:
-       {
+       {{
          "question": "...",
          "answer": "...",
          "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
 
   8) Example Question Types (for this archetype)
      - Identify the time period with the largest percentage decline and report a related metric from that same period.

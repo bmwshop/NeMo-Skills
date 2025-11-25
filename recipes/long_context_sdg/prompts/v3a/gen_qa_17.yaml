@@ -48,12 +48,12 @@ user: |-
 
   5) Formatting
      - Return exactly one JSON object with the following fields:
-       {
+       {{
          "question": "...",
          "answer": "...",
          "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
 
   6) Example Question Types (for this archetype)
      - Which quarter shows the greatest increase in revenue for the segment with the lowest sales?
