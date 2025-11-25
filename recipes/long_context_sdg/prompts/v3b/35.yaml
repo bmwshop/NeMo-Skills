@@ -1,0 +1,94 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving extraction, comparison, and identification
+  of the largest value.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - You MUST keep visible thinking extremely short and compressed.
+    - HARD LIMITS:
+        * Do NOT exceed ~1500 tokens inside <think>.
+        * Use exactly 3–5 short reasoning steps.
+        * Each step must be 1–2 sentences maximum.
+        * Do NOT restate document text or numerical tables.
+        * Summarize only the necessary comparative reasoning.
+    - If you approach the limit, STOP thinking and output the JSON immediately.
+    - Never include <think> inside JSON.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one question requiring:
+        • extracting a comparable count-like metric (e.g., number of deals, customers,
+          cases, events, items, applications) from multiple documents,
+        • comparing the extracted values,
+        • and determining which entity/period/category has the **largest** value.
+    - THEN compute the correct final answer yourself using the documents.
+
+  <think limit=1500>
+  Keep thinking extremely concise.
+  Use 3–5 short steps:
+    1) Identify the count-like metric across ≥5 documents.
+    2) Extract only the necessary values (summarized, no quoting).
+    3) Compare all extracted values.
+    4) Determine which entity/period/category has the largest value.
+    5) Stop if near limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - The metric MUST appear in multiple documents.
+     - The comparison MUST require combining evidence across documents.
+     - No single-document answers.
+
+  2) Reasoning Trace
+     - Provide a concise, numbered reasoning trace (3–5 steps).
+     - Each step MUST cite document IDs (e.g., "(D3)").
+     - Show:
+         • where the metric was located,
+         • what values were extracted,
+         • how the comparison was performed,
+         • how the final answer was determined.
+
+  3) Question
+     - Must explicitly ask: **“Which X had the largest number of Y?”**
+     - Must require multi-document extraction and comparison.
+     - Must be natural, precise, and grounded entirely in the documents.
+
+  4) Answer (MANDATORY)
+     - Provide the correct single entity/period/category (1–5 tokens).
+     - If tied, list all tied entities comma-separated.
+     - If not answerable, return "NOT ANSWERABLE".
+
+  5) JSON Output Format
+     Return exactly ONE JSON object:
+
+       {
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  6) Citations
+     - Every reasoning step must cite at least one document ID.
+     - "used_docs" must include all documents used as evidence.
+
+  ---
+  VALIDATION CHECK
+    - Uses ≥5 documents ✔
+    - Requires extraction + comparison of counts ✔
+    - Requires identifying the maximum ✔
+    - Computes correct answer ✔
+    - Produces one JSON object ✔
+    - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

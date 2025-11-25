@@ -1,0 +1,123 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question requiring multi-document analytical reasoning.
+  The question must identify an entity based on a behavior/policy/action in one document,
+  then extract a quantitative metric for that same entity from other documents.
+  You must also extract all atomic facts used to derive the answer, each tied to a document.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward the token limit.
+    - HARD LIMIT: ~1500 tokens inside <think>.
+    - Use exactly 3–5 short steps, each 1–2 sentences.
+    - Do NOT restate large text blocks; summarize minimally.
+    - If you near the limit, STOP and output JSON immediately.
+    - Never include <think> inside the JSON.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one question requiring:
+        • detecting a behavior/strategy/policy/action associated with an entity
+          (e.g., adopting a framework, disclosing a policy, implementing a program),
+        • identifying that same entity across the corpus,
+        • retrieving a numeric metric for that entity from another document,
+        • and computing the correct final answer.
+
+    - THEN:
+        1. Extract all minimal atomic facts needed to answer the question.
+        2. Assign each fact a unique fact ID (fid1, fid2, fid3, ...).
+        3. Compute the correct final answer using ONLY these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  Steps:
+    1) Identify the specific behavior/strategy and its entity (no quoting).
+    2) Locate the same entity in other docs and extract numeric metric(s).
+    3) Build a minimal list of atomic facts with correct doc IDs.
+    4) Use ONLY these facts to compute the answer.
+    5) Stop early if close to limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract ≥3 atomic facts (each tied to exactly one document).
+     - All facts must be explicitly stated (no inference).
+     - Behavior and metric must be in different documents/sections.
+     - Multi-document linkage is required to identify the entity + metric.
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts, each with:
+         • "fid": a unique fact ID string (e.g., "fid1"),
+         • "doc": document ID (e.g., "D3"),
+         • "fact": the minimal explicit fact used.
+     - Every reasoning step must reference these fact IDs.
+
+  3) Reasoning Trace
+     - 3–5 numbered steps.
+     - Must reference fact IDs (fid#) and doc IDs.
+     - Must show:
+         • how the behavior was matched to the entity,
+         • how the metric was located,
+         • how the final answer was derived from facts_used.
+
+  4) Question
+     - Must combine:
+         • identification of “the entity that does X”, and
+         • retrieval of a metric (“what was its Y value?”).
+     - Must NOT be solvable from a single document.
+     - Must be grounded, precise, and non-trivial.
+
+  5) Answer (MANDATORY)
+     - Compute the answer using ONLY the extracted facts.
+     - Must be a single numeric value or short range.
+     - If the documents do not contain the necessary facts → "NOT ANSWERABLE".
+
+  6) Output Format (JSON ONLY)
+     Return exactly ONE JSON object:
+
+       {
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {"fid": "fid1", "doc": "D#", "fact": "..."},
+           {"fid": "fid2", "doc": "D#", "fact": "..."},
+           {"fid": "fid3", "doc": "D#", "fact": "..."}
+         ],
+         "reasoning_trace": "1) ... (fid1, D#) 2) ... (fid2, D#) 3) ... (fid3, D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  7) Citations
+     - used_docs must include every document referenced in facts_used.
+     - Reasoning trace must not introduce new facts not listed in facts_used.
+
+  8) Example Question Types
+     - “For the entity that reports implementing an emissions-reduction framework,
+        what was its 2022 operating margin?”
+     - “Among organizations disclosing a cybersecurity policy,
+        what was the one-year change in its compliance score?”
+     - “For the manufacturer that reports a hedging strategy,
+        what was its 2021 cost-of-goods-sold?”
+
+  9) Questions to Avoid
+     - Single-document lookups.
+     - Behavior + metric found in the same paragraph.
+     - External financial knowledge.
+     - Hypothetical or unstated assumptions.
+
+  ---
+  VALIDATION CHECK
+    - Uses ≥5 documents ✔
+    - Extracts ≥3 atomic facts ✔
+    - Facts, reasoning, and answer aligned ✔
+    - Multi-document linkage ✔
+    - Single valid JSON object ✔
+    - Correct answer computed ✔
+    - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

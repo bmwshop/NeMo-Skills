@@ -1,0 +1,104 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning about uniqueness or variability of repeated values.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward the token limit.
+    - You MUST keep your visible thinking extremely short and compressed.
+    - HARD LIMITS:
+        * Do NOT exceed ~1500 tokens inside <think>.
+        * Use exactly 3–5 concise reasoning steps.
+        * Each step must be ≤2 sentences.
+        * Do NOT restate long tables or passages; summarize only minimal facts.
+    - If the limit is approached, STOP thinking and immediately output the JSON.
+    - Never include <think> tags inside the JSON.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one question whose answer requires:
+        • extracting repeated quantitative or categorical values across multiple documents,
+        • computing uniqueness, variability, or count of distinct values,
+        • and identifying which item/entity/category shows the *greatest diversity* of values.
+    - THEN compute the correct final answer yourself.
+
+  <think limit=1500>
+  Keep the visible reasoning extremely concise.
+  Use 3–5 steps:
+    1) Identify the variable(s) repeated across ≥5 documents.
+    2) Extract only the minimal distinct values per item/entity (do not quote).
+    3) Compute uniqueness/variability counts.
+    4) Identify which item has the highest count.
+    5) Stop if near the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - The question must:
+         • assemble a list of comparable values across documents,
+         • compute uniqueness/variability,
+         • identify the highest-variability item.
+     - Must NOT be answerable from one document.
+
+  2) Reasoning Trace
+     - Provide a compact, numbered reasoning trace.
+     - Each step must cite document IDs (e.g., “(D3)”).
+     - Must show:
+         • how comparable variables were identified,
+         • how distinct values were extracted,
+         • how uniqueness was computed,
+         • how the final selection was made.
+
+  3) Question
+     - Natural and precise.
+     - Must explicitly ask **which item has the most distinct values** (or analogous measure).
+     - Must require multi-document aggregation and comparison.
+
+  4) Answer
+     - Short factual output (1–5 tokens).
+     - If multiple items tie, return a comma-separated list.
+     - If not answerable, output "NOT ANSWERABLE".
+
+  5) Formatting
+     - Follow the exact JSON schema below.
+
+  6) Citations
+     - Include all used document IDs in "used_docs".
+
+  7) Output Format
+     Return exactly ONE JSON object:
+       {
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  8) Example Question Types
+     - “Across quarterly operational metrics, which department shows the highest number of distinct defect categories?”
+     - “Across all weekly climate summaries, which station recorded the most unique humidity ranges?”
+     - “Across supplier audit logs, which defect code has the broadest range of assigned severity levels?”
+     - “Across monthly attendance reports, which gallery displays the greatest diversity of visitor counts?”
+
+  9) Avoid
+     - Single-document questions.
+     - Summations instead of uniqueness.
+     - Trend questions without countable variability.
+     - Anything requiring external knowledge.
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Requires uniqueness/variability computation ✔
+     - Multi-document reasoning ✔
+     - One JSON object ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

@@ -1,0 +1,110 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional/analytical
+  reasoning across multiple documents.
+  All facts must be explicitly grounded in the provided documents—no external knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - Content inside <think>...</think> is visible; keep it extremely concise.
+    - Do NOT exceed ~1500 tokens.
+    - Use 3–5 short steps.
+    - Never restate large passages; summarize only what is necessary.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one question whose answer requires:
+        • identifying which entity/period/item satisfies a numerical or quantitative condition
+          observed across multiple documents, AND
+        • extracting a secondary metric about that same entity/period/item from another document.
+    - You MUST compute the correct answer yourself.
+    - You MUST extract ≥3 explicit facts from the documents and return them in the JSON.
+
+  <think limit=1500>
+  1) Identify numeric condition used for filtering (cite doc IDs).
+  2) Identify candidate entity/period/item satisfying that condition (cite doc IDs).
+  3) Extract secondary metric from another document.
+  4) Compute final answer, ensure grounding, stop early if near limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - All steps must use explicit numeric or quantitative values (percentages, counts, ratios, deltas).
+     - Required:
+         • A numerical filter/threshold/change condition,
+         • AND a secondary metric from the same matched entity/item/period,
+         • AND multi-document linkage.
+
+  2) Facts (MANDATORY)
+     - Extract ≥3 explicit facts.
+     - Each fact must include:
+         - the text (paraphrased minimally),
+         - the doc ID it came from,
+         - a unique fact_id ("F1", "F2", ...).
+     - Reasoning must reference these fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered chain of reasoning referencing:
+         • doc IDs, and
+         • fact IDs (e.g., “F2 from D3”).
+     - Show:
+         • how the numeric condition was identified,
+         • how the correct entity/period/item was selected,
+         • how the secondary metric was retrieved,
+         • how the final answer was derived.
+
+  4) Question
+     - Natural, precise, conditional, and explicitly numerical.
+     - Must require multi-document filtering + metric extraction.
+     - Must not be answerable from one document.
+
+  5) Answer
+     - Short, factual, and directly grounded.
+     - Use exact numbers/units as written unless question specifies formatting.
+     - If unanswerable, return "NOT ANSWERABLE".
+
+  6) Output Format (MANDATORY)
+     Return exactly one JSON object:
+       {
+         "question": "...",
+         "answer": "...",
+         "facts": [
+           {"fact_id": "F1", "fact_text": "...", "source_doc": "D#"},
+           {"fact_id": "F2", "fact_text": "...", "source_doc": "D#"},
+           {"fact_id": "F3", "fact_text": "...", "source_doc": "D#"}
+         ],
+         "reasoning_trace": "1) ... (D#/F#) 2) ... (D#/F#) 3) ... (D#/F#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  7) Citations
+     - "used_docs" must contain all documents contributing evidence.
+     - Reasoning trace must cite doc IDs AND fact IDs.
+
+  8) Example Question Types (archetype)
+     - Time period with largest/smallest change → report associated metric.
+     - Product with largest drop → report inventory or cost metric.
+     - Region with smallest YOY change → report related statistic.
+     - Category with numeric threshold → retrieve contextual metric.
+
+  9) Questions to Avoid
+     - Pure single-document lookups.
+     - Non-numeric or qualitative-only questions.
+     - Speculative or domain-inference questions.
+
+  ---
+  VALIDATION CHECK
+    - Uses ≥5 documents ✔
+    - Conditional numeric filtering across documents ✔
+    - Secondary metric retrieval ✔
+    - ≥3 explicit facts with doc IDs ✔
+    - Multi-step reasoning ✔
+    - Single JSON object ✔
+    - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

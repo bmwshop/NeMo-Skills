@@ -1,0 +1,118 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question requiring multi-step analytical reasoning across multiple documents.
+  You MUST extract all atomic facts needed to derive the answer, each tied to a unique fact ID and correct document ID.
+  All facts must be grounded strictly in the supplied documents—no external knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - You MUST keep the visible thinking extremely short and compressed.
+    - HARD LIMITS:
+        * Do NOT exceed ~1500 tokens.
+        * Use exactly 3–5 concise steps.
+        * Each step must be 1–2 sentences maximum.
+        * NEVER restate long passages or tables—summaries only.
+    - If near the limit, STOP THINKING and output the JSON.
+    - Never include <think> inside JSON.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one question whose answer requires:
+        (1) Identifying a category/group that meets an extremal criterion
+            (e.g., lowest value, highest value, smallest count, least usage).
+        (2) Retrieving quantitative values for that category across multiple
+            periods/regions/scenarios from other documents.
+        (3) Determining which period/region/scenario exhibits the **largest change**
+            (increase, decrease, divergence, or growth).
+    - THEN:
+        • Extract all atomic facts required to derive the answer.
+        • Assign each fact a unique ID (e.g., F1, F2, F3…).
+        • For each fact, provide the correct document ID.
+        • Compute the correct answer strictly from these facts.
+
+  <think limit=1500>
+  Use 3–5 very short steps:
+    1) Identify the extremal category/group. (No quoting.)
+    2) Extract minimal atomic facts with doc IDs.
+    3) Retrieve its values across scenarios/periods.
+    4) Compute which scenario shows the largest change.
+    5) Stop early if approaching the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract ≥5 atomic facts (each from an explicit statement).
+     - Every fact must map to exactly one document.
+     - The synergy must require:
+         • identifying an extremal category,
+         • retrieving its quantitative metrics across ≥2 documents,
+         • comparing those changes,
+         • determining which context shows the largest change.
+
+  2) Facts Used (MANDATORY)
+     - Produce a list of atomic facts with the schema:
+         {"id": "F#", "doc": "D#", "fact": "..."}
+     - Facts MUST be:
+         • explicit,
+         • atomic (single claim),
+         • correctly attributed to the source document,
+         • exactly the set needed for computing the answer (no extras).
+
+  3) Reasoning Trace
+     - Provide a short, numbered reasoning chain (3–5 steps).
+     - Each step must cite fact IDs AND document IDs:
+         e.g., "Using F2 (from D3) ..."
+     - The reasoning MUST use ONLY the facts in facts_used.
+
+  4) Question
+     - Must explicitly ask **which period/location/entity shows the largest change**.
+     - Must involve filtering → retrieving → comparing.
+     - Must NOT be answerable from a single document.
+
+  5) Answer (MANDATORY)
+     - Must be derived only from the facts_used list.
+     - Short and factual (e.g., “Q2 2021”, “Region B”, “FY24–Q4”).
+     - If unanswerable → "NOT ANSWERABLE".
+
+  6) Output Format (JSON Only)
+     - Return exactly ONE JSON object:
+
+       {
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {"id": "F1", "doc": "D#", "fact": "..."},
+           {"id": "F2", "doc": "D#", "fact": "..."}
+         ],
+         "reasoning_trace": "1) ... (F#, D#) 2) ... (F#, D#) 3) ... (F#, D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  7) Citations
+     - Every fact must reference a single document.
+     - Every reasoning step must reference fact IDs.
+     - used_docs must include all documents appearing in facts_used.
+
+  8) Example Question Types
+     - Which quarter shows the greatest increase in revenue for the lowest-selling segment?
+     - Which region had the biggest drop in incidents within the group with the smallest population?
+     - Which year shows the most growth in funding for the least-funded program?
+     - Which department saw the largest improvement in compliance among those with the lowest baseline?
+
+  9) Question Types to Avoid
+     - Pure lookups.
+     - Single-document questions.
+     - Questions without an extremal criterion.
+     - Questions requiring domain expertise not expressed in text.
+
+  ---
+  EXAMPLE QUESTION
+  "For the department with the lowest patient volume in the baseline year, which subsequent month shows the largest increase in average treatment time?"
+
+  ---
+  END INSTRUCTIONS

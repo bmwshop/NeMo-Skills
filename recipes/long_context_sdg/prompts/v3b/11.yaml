@@ -1,0 +1,119 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question requiring multi-document, multi-step numerical reasoning.
+  You MUST extract all atomic facts needed to derive the answer, each tied to its source document with a fact_id.
+  The answer must be computed strictly from these documents—no outside knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens inside <think>.
+    - Use exactly 3–5 concise steps.
+    - Each step must be 1–2 sentences maximum.
+    - Summaries only; NEVER restate passages or tables.
+    - If you approach the limit, STOP thinking and output the final JSON immediately.
+    - Never include <think> tags inside the JSON.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question requiring the following:
+        1. Identify a specific numerical value explicitly stated in one or more documents.
+        2. Find which entity, time period, or event is associated with that value.
+        3. Perform a SECOND computation (difference, percent change, delta, margin, comparison, etc.) using information from other documents.
+    - The question MUST enforce two sequential reasoning steps:
+        (1) numeric lookup + entity/period identification,
+        (2) derived computation from evidence in other documents.
+    - THEN extract all needed atomic facts and compute the final answer.
+
+  <think limit=1500>
+  1) Identify the numeric value and the associated entity/period/event.
+  2) Extract minimal atomic numeric facts from ≥5 documents.
+  3) Perform the required computation using only those atomic facts.
+  4) Derive the final answer.
+  5) Stop early if near the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - MUST use ≥5 distinct documents.
+     - The target numerical value MUST appear explicitly.
+     - The same or related metric MUST appear in multiple places across documents.
+     - The problem MUST require multi-document lookup + derived numeric computation.
+     - NO fact may be inferred; all must be explicitly stated.
+
+  2) Facts Used (MANDATORY)
+     - Output a list of atomic facts, each with:
+         • "fact_id": unique identifier ("F1", "F2", ...),
+         • "doc": the document ID (e.g., "D3"),
+         • "fact": the minimal atomic claim.
+     - MINIMUM number of extracted facts: **≥5 facts**.
+     - Every fact must correspond to ONE document only.
+     - No merged or compound facts.
+
+  3) Reasoning Trace (MANDATORY)
+     - Provide 3–5 concise steps.
+     - Each step must:
+         • cite fact_ids rather than re-quoting facts,
+         • cite doc IDs when referencing evidence,
+         • show numeric lookup → entity identification → derived computation.
+     - The reasoning may ONLY use facts listed in facts_used.
+
+  4) Question
+     - Natural, precise, explicitly numerical.
+     - MUST require:
+         • finding a reported numerical value,
+         • identifying its associated entity/period/event,
+         • computing an additional derived quantity from another document.
+     - MUST require ≥2 steps; MUST NOT be answerable from a single document.
+
+  5) Answer (MANDATORY)
+     - Compute the correct answer using ONLY the extracted facts.
+     - Short, factual numeric result and any required entity/period names.
+     - If the answer is not derivable: return "NOT ANSWERABLE".
+
+  6) JSON Output Format
+     Return EXACTLY one JSON object:
+
+       {
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+            {"fact_id": "F1", "doc": "D#", "fact": "..."},
+            {"fact_id": "F2", "doc": "D#", "fact": "..."}
+         ],
+         "reasoning_trace": "1) ... (F1, D#) 2) ... (F3, D#) 3) ... (F4, D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+     - used_docs MUST include all unique doc IDs referenced in facts_used or reasoning_trace.
+
+  7) Citations
+     - Use "F1", "F2", etc. when referencing facts.
+     - Use "D1", "D2", etc. for documents.
+     - No other identifiers allowed.
+
+  8) Example Archetypes (Allowed)
+     - Identify the month when a metric equals X; compute % change from previous month.
+     - Identify which product has metric Y; compute the delta relative to another model.
+     - Identify which survey entry reports value V; compute difference vs. another period.
+     - Identify which region hits a threshold; compute its ranking or margin.
+
+  9) Example
+     - “In which reporting quarter did emissions equal 7.4 tons, and by how much did this differ from the emissions recorded in the prior quarter? Report the difference to two decimal places.”
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used each cite a document and contain atomic claims ✔
+     - Reasoning only uses facts_used ✔
+     - Correct derived numeric answer ✔
+     - Multi-step reasoning ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

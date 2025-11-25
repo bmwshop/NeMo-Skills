@@ -1,0 +1,114 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires combining explicit facts from MULTIPLE documents.
+    - The question must require:
+        • locating an event/attribute/data point in several documents,
+        • locating an associated entity/value/property in OTHER documents,
+        • integrating these facts into a single multi-hop query.
+    - THEN:
+        1. Extract all minimal atomic facts needed to compute the answer.
+        2. Assign each fact a unique fact ID ("F1", "F2", ...).
+        3. Provide the correct document ID for each fact.
+        4. Compute the correct final answer strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the triggering fact(s) across documents.
+  2) Identify linked fact(s) needed to answer the question.
+  3) Extract atomic facts (assign fact IDs + document IDs).
+  4) Combine extracted facts to compute the answer.
+  5) Stop early if near the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every extracted fact MUST come directly from an explicit statement in its source document.
+     - The question MUST require multi-document linkage (cannot be answered from a single document).
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered sequence (3–5 steps).
+     - Each step MUST reference fact IDs (F1, F2...) and document IDs.
+     - The reasoning must show:
+         • how facts relate,
+         • how they combine to determine the answer,
+         • why the answer follows logically from the extracted facts.
+
+  4) Question
+     - Natural, precise, grounded entirely in the documents.
+     - Must require multi-document linkage and synthesis.
+     - MUST NOT be solvable using a single document.
+
+  5) Answer (MANDATORY)
+     - Compute the answer strictly from the extracted facts.
+     - Short, factual, minimal (entity, number, date, location, or short phrase).
+     - If the answer cannot be derived → return "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
+
+       {
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {"id": "F1", "doc": "D#", "fact": "..."},
+           {"id": "F2", "doc": "D#", "fact": "..."},
+           {"id": "F3", "doc": "D#", "fact": "..."},
+           {"id": "F4", "doc": "D#", "fact": "..."},
+           {"id": "F5", "doc": "D#", "fact": "..."}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  7) Citations
+     - Every reasoning step must reference fact IDs.
+     - Every used_docs entry must correspond to at least one fact in facts_used.
+     - used_docs MUST include ALL documents used as evidence.
+
+  8) Prohibited Question Types
+     - Summaries
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - Multi-document linkage required ✔
+     - Answer derived strictly from facts ✔
+     - JSON correct ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

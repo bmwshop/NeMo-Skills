@@ -1,0 +1,127 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question requiring multi-document analytical reasoning.
+  The question must require identifying a definition/criterion in one document,
+  locating a corresponding value/instance in another document,
+  and determining whether the second document supplies a complete, grounded answer.
+  All content must come strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique fact_id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible.
+    - HARD LIMIT: ~1500 tokens.
+    - Use exactly 3–5 concise steps.
+    - Each step must be 1–2 sentences.
+    - Never restate long passages; summarize minimal facts only.
+    - If near the limit, STOP and immediately output the JSON.
+    - Never place <think> inside the JSON.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one question whose answer requires:
+        • identifying a metric, definition, or procedural rule in one document,
+        • locating the corresponding value/instance in another document,
+        • and determining whether the documents contain a complete answer.
+    - THEN:
+        1. Extract all atomic facts needed to derive the answer (minimum: 5 facts).
+        2. Assign each fact a unique fact_id ("F1", "F2", ...).
+        3. Tie each fact to the exact document where it appears.
+        4. Compute the correct answer strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep thinking extremely concise.
+  Use 3–5 steps:
+    1) Identify the metric/definition from one document (no verbatim quoting).
+    2) Find the corresponding reported value/instance in other documents.
+    3) Extract minimal atomic facts + assign fact_ids + assign doc_ids.
+    4) Combine extracted facts to compute the correct final answer.
+    5) Stop immediately if near limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract ≥5 atomic facts (one claim each).
+     - All facts must be explicitly stated; no invented details.
+     - The question MUST require:
+         • extracting a criterion/definition from Document A,
+         • mapping it to a value/instance in Document B,
+         • and determining whether a complete answer is present.
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts:
+         • each with "fact_id", "doc", and "fact".
+         • each fact must correspond to exactly one document.
+         • reasoning_trace may use ONLY these facts.
+
+  3) Reasoning Trace
+     - Concise, numbered (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
+     - Must show:
+         • how the definition/criterion was found,
+         • how the corresponding value was located,
+         • how the answer was derived strictly from facts.
+
+  4) Question
+     - Natural and precise.
+     - Requires definition → value mapping across multiple documents.
+     - Not solvable from a single document.
+     - No speculation or external knowledge.
+
+  5) Answer
+     - A short factual value (e.g., “$667,804 thousand”, “March 2019”, “ISO Category 3”).
+     - If the documents do not provide the value → answer “NOT ANSWERABLE”.
+
+  6) JSON Output Format
+     Return exactly ONE JSON object:
+
+       {
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+            {"fact_id": "F1", "doc": "D#", "fact": "..."},
+            {"fact_id": "F2", "doc": "D#", "fact": "..."},
+            ...
+         ],
+         "reasoning_trace": "1) ... (F#)(D#) 2) ... (F#)(D#) 3) ... (F#)(D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+     - "used_docs" must include all documents referenced in facts_used.
+
+  7) Citations
+     - Every reasoning step must reference fact IDs AND doc IDs.
+     - facts_used must include all facts required for the final answer.
+
+  8) Example Question Types (domain-agnostic)
+     - A law in Document A defines a “priority action.” Document B lists actions. According to the definition, what is the count?
+     - Document A defines “Level-II incident.” Document D reports incidents. How many events qualify?
+     - Document C defines a biological category. Document F lists specimens. What is the count?
+     - Document A defines “Adjusted Harvest Yield.” What is the reported value for Region 4 in Document E?
+
+  9) Questions to Avoid
+     - Single-document lookups.
+     - Opinion/summarization questions.
+     - External world knowledge or inferred meaning.
+     - Unverifiable mappings.
+
+  ---
+  VALIDATION CHECK
+     - ≥5 documents ✔
+     - ≥5 atomic facts ✔
+     - Correct definition → value mapping ✔
+     - Answer derivable solely from facts_used ✔
+     - Clean JSON ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

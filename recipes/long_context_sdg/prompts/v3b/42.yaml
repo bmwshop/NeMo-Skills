@@ -1,0 +1,104 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning. All facts must be grounded strictly in the supplied
+  documents—no outside knowledge.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one question requiring:
+        • extraction of a specific quantitative metric across ≥5 documents,
+        • comparison of that metric across two time periods (e.g., year-over-year),
+        • calculation of the numerical difference for each document,
+        • ranking those differences,
+        • identifying the item with the **second-largest** difference,
+        • reporting:  
+            (a) the item,  
+            (b) the magnitude of change,  
+            (c) ALL basic facts used, with fact IDs and doc IDs.
+    - The question must require **cross-document numerical comparison**, not a single-document lookup.
+
+  <think limit=8192>
+  Keep your visible thinking extremely concise.
+  Do not restate evidence verbatim.
+  Stop immediately if you reach the limit.
+  </think>
+
+  REQUIREMENTS
+    1) Evidence & Scope
+       - Use ≥5 distinct documents.
+       - The metric must be explicitly present in each document (e.g., operating margin, rainfall, revenue, mortality rate).
+       - Extract:
+           • value_A (e.g., FY2024),
+           • value_B (e.g., FY2023),
+         then compute Δ = value_A − value_B for each document.
+
+    2) Reasoning Trace
+       - Provide concise step-by-step reasoning; cite doc IDs (e.g., "D3").
+       - Must include:
+           • how the metric was located,
+           • how values for two periods were paired,
+           • how each difference was computed,
+           • how the ranking was determined,
+           • how the second-largest difference was selected.
+
+    3) Basic Facts (MANDATORY)
+       - Provide a list of **atomic facts** extracted from the documents.
+       - Each fact must include:
+           • fact_id: F1, F2, F3, …
+           • doc_id: the document it was sourced from
+           • value: the short extracted fact
+       - Only include facts actually used in reasoning.
+
+    4) Question
+       - Natural, precise, ranking-based.
+       - Must ask:
+           • which entity/time/category had the **second-largest year-over-year difference**, and
+           • what that difference was.
+
+    5) Answer
+       - Short and factual (1–10 tokens for entity + numeric value).
+       - Format example: "Q2, +6%" or "Region B, −12 units".
+       - If ties exist, return all tied entities comma-separated.
+       - If not answerable, output "NOT ANSWERABLE".
+
+    6) JSON Output Format
+       - Return exactly ONE JSON object encoded inside YAML:
+         ```
+         {
+           "question": "...",
+           "answer": "...",
+           "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ...",
+           "facts_used": [
+             {"fact_id": "F1", "doc_id": "D2", "value": "..."},
+             {"fact_id": "F2", "doc_id": "D5", "value": "..."}
+           ],
+           "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+         }
+         ```
+
+    7) Citations
+       - "used_docs" must include every document referenced in reasoning or facts.
+
+  ---
+  EXAMPLE QUESTION TYPES
+    - Across all regions, which region shows the **second-largest YOY increase** in average temperature, and what was the increase?
+    - Which department had the **second-largest YOY enrollment change**, and by how much?
+    - Which ward recorded the **second-largest YOY drop** in infection rate?
+    - Which product had the **second-largest YOY revenue increase**, and what was the gain?
+
+  EXAMPLE QUESTION
+    - “Across all country-level agricultural reports, which crop category had the **second-largest year-over-year change** in yield, and what was the change?”
+
+  VALIDATION CHECK
+    - Uses ≥5 documents ✔
+    - Requires year-pair extraction ✔
+    - Requires numerical difference and ranking ✔
+    - Requires second-largest change ✔
+    - Requires facts list ✔
+    - Produces one JSON object ✔
+    - No external knowledge ✔

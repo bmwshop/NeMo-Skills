@@ -1,0 +1,113 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving numerical comparison, ranking, or ordered evaluation.
+  Ground EVERYTHING strictly in the supplied documents — no external knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is VISIBLE and counts toward token limits.
+    - You MUST keep visible reasoning extremely short and compressed.
+    - HARD LIMITS:
+        * Maximum ≈1500 tokens inside <think>.
+        * Use ONLY 3–5 short steps.
+        * Each step must be 1–2 concise sentences.
+        * DO NOT restate document passages, tables, or long numeric lists.
+        * Summarize minimal facts; stop early when near the limit.
+    - Never include <think> tags inside the JSON.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly **one** question whose answer requires:
+        • extracting quantitative values (metrics, counts, amounts, measurements),
+        • comparing or ranking entities across multiple documents,
+        • performing a numeric ordering (rank, max, min, delta ranking),
+        • and deriving the correct final ranked or selected result.
+    - THEN compute the correct answer yourself using the document set.
+
+  <think limit=1500>
+  Use 3–5 extremely concise steps:
+    1) Identify the numeric metric and matching entities across ≥5 documents.
+    2) Extract only the minimal values needed (do NOT restate).
+    3) Perform comparison/ranking.
+    4) Derive the correct final ordered answer.
+    5) Stop if approaching the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use **≥5 distinct documents**.
+     - The metric must appear **across multiple entities/documents**.
+     - The comparison/ranking must require **cross-document alignment**.
+     - The question MUST NOT be answerable using a single document.
+     - All facts must be explicit and searchable inside the provided docs.
+
+  2) Reasoning Trace
+     - Provide a concise, numbered reasoning trace **outside** the <think> block.
+     - Each step MUST:
+         • mention the metric extracted,
+         • cite document IDs (e.g., "(D4)"),
+         • show how values were matched to entities,
+         • show how the ranking/comparison was computed,
+         • present the final ordered result.
+
+  3) Question
+     - Natural, precise, and explicitly numeric.
+     - Must require:
+         • extraction → alignment → comparison → ranked/selected result.
+     - Allowed question structures:
+         • “Rank X by Y in descending order.”
+         • “Which entity had the largest increase in Y?”
+         • “Which category has the smallest reported Z?”
+     - Only generate *non-trivial*, multi-document quantitative questions.
+
+  4) Answer (MANDATORY)
+     - Compute the correct answer directly from the documents.
+     - Must be short and factual:
+         • ordered list, or
+         • single entity/value.
+     - If not answerable: return “NOT ANSWERABLE”.
+
+  5) Formatting (STRICT)
+     - Return exactly **one** JSON object:
+       {{
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+
+  6) Citations
+     - Every reasoning step must cite doc IDs.
+     - "used_docs" must list all documents contributing evidence.
+     - No invented citations; use IDs exactly as they appear.
+
+  7) Example Allowed Archetypes
+     - Rank departments by spending.
+     - Rank regions by incident counts or growth rates.
+     - Identify which company has the largest operating margin.
+     - Determine which project shows the biggest year-over-year increase.
+     - Rank sites by measured pollutant concentration.
+
+  8) Forbidden Question Types
+     - Anything answerable from one document.
+     - Qualitative or viewpoint-based questions.
+     - Trend-only or speculative questions.
+     - Domain-knowledge assumptions not stated in documents.
+     - Pure definitional lookup.
+
+  ---
+  VALIDATION CHECKLIST
+    - Uses ≥5 documents ✔
+    - Requires multi-step numerical extraction + comparison ✔
+    - Requires cross-document reasoning ✔
+    - Computes correct final answer ✔
+    - Returns exactly one JSON object ✔
+    - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

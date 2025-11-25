@@ -1,0 +1,120 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving:
+    • numerical filtering,
+    • conditional selection,
+    • and a derived quantitative computation.
+  Ground everything strictly in the supplied documents—no external knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - You MUST keep visible thinking extremely short and compressed.
+    - HARD LIMITS:
+        * Do NOT exceed ~1500 tokens inside <think>.
+        * Use 3–5 concise reasoning steps only.
+        * Each step must be at most 1–2 sentences.
+        * Do NOT restate document passages; summarize only.
+    - If you approach the limit, STOP thinking and immediately output the JSON.
+    - Never include <think> tags inside the JSON.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one question whose answer requires:
+        • identifying two or more periods, categories, or entities that satisfy a
+          *numerical condition* (e.g., threshold change, matching value, minimum/maximum criterion),
+        • and computing a *derived quantitative value* (e.g., difference, delta,
+          percentage change, ratio) using only the documents.
+
+    - The question MUST:
+        • reference ≥2 distinct numerical fields,
+        • require ≥5 distinct documents,
+        • and NOT be solvable from a single document.
+
+  <think limit=1500>
+  Use 3–5 short steps:
+    1) Identify the numerical filter and where it appears (cite docs).
+    2) Select qualifying entities/periods/items using explicit values.
+    3) Retrieve the secondary metric(s) needed.
+    4) Compute the required derived value.
+    5) Stop early if near the token limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Numerical condition MUST be explicitly derivable from document text.
+     - Derived computation MUST involve ≥2 numerical values extracted from ≥2 documents.
+     - Avoid trivial lookups.
+
+  2) Reasoning Trace
+     - Provide concise step-by-step reasoning.
+     - Must show:
+         • how the filter was applied,
+         • how qualifying records were found,
+         • how the derived computation was performed.
+     - Cite doc IDs in every step (e.g., "(D3)").
+
+  3) Question
+     - Natural and precise.
+     - Must contain BOTH:
+         • a numerical filter/condition, AND
+         • a derived computation requirement.
+     - Acceptable derived computations include:
+         • differences
+         • percentage changes
+         • ratio comparisons
+         • deltas across periods
+         • growth/decline magnitudes
+
+  4) Answer
+     - Short numeric value (or small tuple of numbers).
+     - Round only if your question explicitly specifies a rule.
+     - If the condition yields fewer than two qualifying records or
+       cannot be computed → return "NOT ANSWERABLE".
+
+  5) Formatting
+     - Return exactly ONE JSON object:
+       {
+         "question": "...",
+         "answer": "...",
+         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  6) Citations
+     - "used_docs" must list all documents used in filtering or computation.
+
+  7) Output Constraints
+     - Output ONLY the JSON object.
+     - No external world knowledge or assumptions.
+
+  8) Example Question Types (allowed)
+     - “Among the months where unemployment fell by ≥0.5 points, what was the
+        percentage change in job openings for those same months?”
+     - “For the regions reporting a ≥10% increase in water usage, what was the
+        corresponding change in reservoir levels?”
+     - “Across the years where emissions dropped by more than 4%, what was the
+        year-over-year delta in particulate levels?”
+
+  9) Question Types to Avoid
+     - Pure lookups.
+     - Single-document queries.
+     - Non-numerical or qualitative questions.
+     - Ambiguous conditions not explicitly grounded in numerical fields.
+
+  ---
+  VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Requires numerical filtering ✔
+  - Requires derived computation ✔
+  - Single JSON object ✔
+  - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}

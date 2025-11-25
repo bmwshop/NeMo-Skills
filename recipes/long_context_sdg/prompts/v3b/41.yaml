@@ -1,0 +1,90 @@
+DOCUMENTS:
+{docs}
+
+---
+TASK
+  - Create exactly one question whose answer requires:
+      • extracting quantitative values (metrics, counts, amounts, measurements),
+      • comparing or ranking these values across multiple documents,
+      • identifying which entity/time period/category corresponds to the SECOND-HIGHEST value.
+  - The answer must be short (1–10 tokens).
+
+<think limit=1500>
+Use 3–5 short steps:
+  1) Identify the metric and list the relevant values across ≥5 documents.
+  2) Summarize the extracted values (no quotes or long text).
+  3) Rank the values and determine the second-highest.
+  4) Identify the entity/time/category associated with that value.
+  5) Stop early if approaching the limit.
+</think>
+
+REQUIREMENTS
+1) Evidence & Scope
+   - Use ≥5 distinct documents.
+   - Values must be explicitly stated; no inference.
+   - Ranking must require cross-document integration.
+   - Question MUST NOT be solvable using a single document.
+
+2) Reasoning Trace
+   - Provide a concise, step-by-step reasoning trace referencing doc IDs.
+   - Must show:
+       • how the metric was located,
+       • how values were extracted,
+       • how the ranking was computed,
+       • how the second-highest was identified.
+
+3) Facts Extraction (MANDATORY)
+   - Extract all atomic facts used in reasoning.
+   - Provide them as a list of objects:
+       { "fact_id": "F#", "text": "...", "doc_id": "D#" }
+   - Only include facts actually used for reasoning or answer derivation.
+   - 3–8 facts is typical.
+
+4) Question
+   - Natural, precise, explicitly numerical and rank-based.
+   - Must ask for the entity/time/category with the SECOND-HIGHEST (or analogous) value.
+   - Must involve multi-document comparison.
+
+5) Answer
+   - Short factual string (1–10 tokens).
+   - MUST correspond exactly to document wording.
+   - If not answerable, return "NOT ANSWERABLE".
+
+6) Output Format (MANDATORY)
+   Return exactly ONE JSON object:
+   {{
+     "question": "...",
+     "answer": "...",
+     "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+     "facts": [
+        {{"fact_id": "F1", "text": "...", "doc_id": "D#"}},
+        {{"fact_id": "F2", "text": "...", "doc_id": "D#"}},
+        {{"fact_id": "F3", "text": "...", "doc_id": "D#"}}
+     ],
+     "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+   }}
+
+7) Example Question Types
+   - "Across all fiscal-year summaries, which region reported the **second-highest** total revenue?"
+   - "Based on the compliance reports, which department had the **second-highest** number of violations?"
+   - "Across all product categories, which product recorded the **second-highest** defect rate?"
+
+8) Questions to Avoid
+   - Single-document lookups.
+   - Comparisons without ranking.
+   - Qualitative or speculative comparisons.
+   - Any question not requiring ≥5 documents.
+
+---
+VALIDATION CHECK
+  - Uses ≥5 documents ✔
+  - Extracts & ranks numeric values ✔
+  - Computes second-highest ✔
+  - Includes reasoning trace ✔
+  - Includes extracted facts ✔
+  - Produces one JSON object ✔
+  - No external knowledge ✔
+
+---
+DOCUMENTS:
+{docs}

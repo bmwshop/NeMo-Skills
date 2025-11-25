@@ -1,0 +1,123 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical or quantitative reasoning.
+  Every fact, step, and answer MUST be grounded strictly in the supplied documents—no outside knowledge.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward the token limit.
+    - You MUST keep the visible thinking extremely short and compressed.
+    - HARD LIMITS:
+        * Do NOT exceed ~1500 tokens inside <think>.
+        * Use exactly 3–5 concise steps.
+        * Each step must be 1–2 sentences maximum.
+        * Never restate long passages; summarize minimal facts only.
+    - If you approach the limit, STOP thinking and output the JSON.
+    - Never include <think> inside the JSON output.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one quantitative reasoning question requiring multi-document linkage.
+    - The question must require locating ≥2 numerical values across documents and
+      performing at least one comparison, computation, or selection.
+    - THEN:
+        1. Extract all minimal atomic facts used in your reasoning (≥3 facts).
+        2. For each fact, assign a unique "fact_id" (F1, F2, F3, ...).
+        3. For each fact, record the correct "doc" ID.
+        4. Compute the correct numerical answer using ONLY these facts.
+
+  <think limit=1500>
+  Produce 3–5 short steps:
+    1) Identify necessary numerical facts across ≥5 docs.
+    2) Extract the minimal atomic facts (no long quotes).
+    3) Perform comparison/calculation.
+    4) Derive the correct final numeric answer.
+    5) Stop early if near the token limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract ≥3 atomic facts, each from a single document.
+     - The question must require:
+         • locating numerical values across multiple documents,
+         • combining or comparing them,
+         • deriving a quantitative result strictly from these facts.
+     - Avoid trivial or single-document lookups.
+
+  2) Facts Used (MANDATORY)
+     - List each fact as:
+         { "fact_id": "F#", "doc": "D#", "fact": "..." }
+     - Each fact must be:
+         • atomic (exactly one claim),
+         • explicit in the referenced document,
+         • directly used in reasoning or answer derivation.
+     - No invented facts allowed.
+
+  3) Reasoning Trace
+     - Must reference fact_ids (preferred) and/or doc IDs.
+     - Must show:
+         • how the required numerical values were identified (via F# references),
+         • how comparison/computation was performed,
+         • how the answer follows from facts_used.
+     - MUST only use facts listed in facts_used.
+
+  4) Question
+     - Natural, precise, unambiguous.
+     - Must require computing or selecting a specific quantitative outcome.
+     - Must require using multiple documents.
+
+  5) Answer
+     - Short numeric text (e.g., "12.4", "18%", "4.2 million").
+     - If multiple numbers: use comma-separated clean formatting.
+     - If not answerable: return "NOT ANSWERABLE".
+     - The answer MUST be derivable solely from facts_used.
+
+  6) JSON Output Format
+     Return exactly ONE JSON object:
+
+       {
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           { "fact_id": "F1", "doc": "D#", "fact": "..." },
+           { "fact_id": "F2", "doc": "D#", "fact": "..." },
+           { "fact_id": "F3", "doc": "D#", "fact": "..." }
+         ],
+         "reasoning_trace": "1) ... (F1, D#) 2) ... (F2, D#) 3) ... (F3, D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }
+
+  7) Citations
+     - Every fact must cite one document ID.
+     - reasoning_trace must reference fact_ids (F1, F2, ...).
+     - used_docs must include every doc referenced in facts_used.
+
+  8) Example Allowed Archetypes
+     - Identify which quarter had the highest growth and compute the delta to another value.
+     - Compute difference between two metrics reported in separate documents.
+     - Determine which entity has the minimum/maximum metric and compute a derived quantity.
+     - Identify a time period associated with a key value and compare it to another period.
+
+  9) Disallowed
+     - Single-document numeric lookup.
+     - Qualitative or viewpoint questions.
+     - Questions requiring external domain knowledge.
+     - Questions without calculations or comparisons.
+
+  ---
+  VALIDATION CHECK
+    - ≥5 documents used ✔
+    - ≥3 atomic facts extracted ✔
+    - Multi-document numeric reasoning ✔
+    - Answer derivable solely from facts_used ✔
+    - Single JSON object ✔
+    - No external knowledge ✔
+
+  ---
+  DOCUMENTS:
+  {docs}
