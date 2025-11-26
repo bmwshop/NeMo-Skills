@@ -108,10 +108,10 @@ user: |-
      - Questions requiring external world knowledge
 
   8) Example Question Types (domain-agnostic)
-     - “Across all reports from 2020–2023, what is the net number of housing units added (new units built minus units demolished)?”
-     - “Considering all university budget documents from FY21–FY24, what is the net change in tenure-track faculty (hires minus departures)?”
-     - “Across all conservation area surveys, what is the net wildlife population change (births + migrations in − deaths − migrations out)?”
-     - “Across excavation reports from 2018–2022, what is the net number of catalogued artifacts added to the museum collection after accounting for new finds minus confirmed losses?”
+     - Across all reports from 2020–2023, what is the net number of housing units added (new units built minus units demolished)?
+     - Considering all university budget documents from FY21–FY24, what is the net change in tenure-track faculty (hires minus departures)?
+     - Across all conservation area surveys, what is the net wildlife population change (births + migrations in − deaths − migrations out)?
+     - Across excavation reports from 2018–2022, what is the net number of catalogued artifacts added to the museum collection after accounting for new finds minus confirmed losses?
 
 
 

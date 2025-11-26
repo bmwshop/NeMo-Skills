@@ -103,10 +103,10 @@ user: |-
 
 
   8) Example Question Types (domain-agnostic)
-     - “Across quarterly operational metrics, which department shows the highest number of distinct defect categories?”
-     - “Across all weekly climate summaries, which station recorded the most unique humidity ranges?”
-     - “Across supplier audit logs, which defect code has the broadest range of assigned severity levels?”
-     - “Across monthly attendance reports, which gallery displays the greatest diversity of visitor counts?”
+     - Across quarterly operational metrics, which department shows the highest number of distinct defect categories?
+     - Across all weekly climate summaries, which station recorded the most unique humidity ranges?
+     - Across supplier audit logs, which defect code has the broadest range of assigned severity levels?
+     - Across monthly attendance reports, which gallery displays the greatest diversity of visitor counts?
 
   ---
   VALIDATION CHECK

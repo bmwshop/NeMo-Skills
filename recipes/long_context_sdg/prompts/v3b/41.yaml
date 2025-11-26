@@ -99,9 +99,9 @@ user: |-
      - Questions requiring external world knowledge
 
    8) Example Question Types (domain-agnostic)
-       - "Across all fiscal reports, which region had the **second-highest** operating margin?"
-       - "Across all departments, who recorded the **third-highest** number of violations?"
-       - "Across all sensor logs, which sensor shows the **highest** temperature reading?"
+       - Across all fiscal reports, which region had the **second-highest** operating margin?
+       - Across all departments, who recorded the **third-highest** number of violations?
+       - Across all sensor logs, which sensor shows the **highest** temperature reading?
 
   ---
   VALIDATION CHECK

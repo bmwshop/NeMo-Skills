@@ -106,9 +106,9 @@ user: |-
      - Questions requiring external world knowledge
 
   8) Example Question Types (domain-agnostic)
-     - “What is the total number of regulatory complaints filed in the past 18 months across all agencies?”
-     - “Across all 2021–2023 survey waves, what is the combined number of respondents who selected Option C?”
-     - “Summing all fossil discoveries dated after 10,000 BCE across sites, how many specimens were identified?”
+     - What is the total number of regulatory complaints filed in the past 18 months across all agencies?
+     - Across all 2021–2023 survey waves, what is the combined number of respondents who selected Option C?
+     - Summing all fossil discoveries dated after 10,000 BCE across sites, how many specimens were identified?
 
 
 
