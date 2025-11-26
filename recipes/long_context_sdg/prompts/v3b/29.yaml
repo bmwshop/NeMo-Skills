@@ -3,18 +3,21 @@ system: |
   Produce one high-quality, factual question that tests multi-document
   analytical reasoning involving extraction, classification, and aggregation
   of additions and subtractions.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
   Ground everything strictly in the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
 
   VISIBLE THINKING CONSTRAINTS:
     - The content inside <think>...</think> is visible and counts toward token limits.
-    - You MUST keep visible thinking extremely short and compressed.
-    - HARD LIMITS:
-        * Do NOT exceed ~1500 tokens inside <think>.
-        * Use 3–5 concise steps.
-        * Each step must be 1–2 sentences at most.
-        * Do NOT restate long passages; summarize only minimal necessary facts.
-    - If you approach the limit, STOP thinking and immediately produce the final JSON.
-    - Never include <think> tags inside the JSON.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
 
 user: |-
   DOCUMENTS:
@@ -53,23 +56,22 @@ user: |-
      - The question MUST NOT be answerable from a single document.
 
   2) Facts Used (MANDATORY)
-     - Produce a list of atomic facts used to compute the net total.
-     - Each fact must:
-         • have a unique fact ID ("F1", "F2", ...),
-         • be tied to exactly one document ID ("D#"),
-         • describe a single additive or subtractive quantity.
-     - Example fact entry:
-         • {"id": "F1", "doc": "D3", "type": "addition", "fact": "New units added: 120."}
-     - The reasoning_trace may ONLY use facts listed in facts_used.
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
 
   3) Reasoning Trace
-     - Provide a compact, numbered reasoning trace (3–5 steps).
+     - Provide a concise, numbered reasoning chain (3–5 steps).
      - Each step must:
-         • reference fact IDs ("F1", "F2", ...) and document IDs ("D3"),
-         • show how additions and subtractions are combined,
-         • show exactly how the net total is computed from the facts_used.
-     - Example structure:
-         • "1) From F1 (D3) and F2 (D5), we identify additions of ... 2) From F3 (D7) we identify subtractions of ... 3) Net total = ..."
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
+     - Must show:
+         • how additions and subtractions are combined,
+         • how the net total is computed from the facts_used.
 
   4) Question
      - Must explicitly ask for a **net total** over a filtered scope.
@@ -85,31 +87,31 @@ user: |-
   6) JSON Output Format
      - Return exactly ONE JSON object:
 
-       {
+       {{
          "question": "...",
          "answer": "...",
          "facts_used": [
-           {"id": "F1", "doc": "D#", "type": "addition"   , "fact": "..."},
-           {"id": "F2", "doc": "D#", "type": "addition"   , "fact": "..."},
-           {"id": "F3", "doc": "D#", "type": "subtraction", "fact": "..."}
+           {"id": "F1", "doc": "D#", "fact": "..."},
+           {"id": "F2", "doc": "D#", "fact": "..."},
+           {"id": "F3", "doc": "D#", "fact": "..."},
+           {"id": "F4", "doc": "D#", "fact": "..."},
+           {"id": "F5", "doc": "D#", "fact": "..."}
          ],
-         "reasoning_trace": "1) ... (F#/D#) 2) ... (F#/D#) 3) ... (F#/D#)",
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
+      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-  7) Citations
-     - Every reasoning step must reference both fact IDs and document IDs.
-     - used_docs must list every document appearing in facts_used and no others.
 
-  8) Example Question Types (for this archetype)
+  7) Example Question Types (domain-agnostic)
      - “Across all reports from 2020–2023, what is the net number of housing units added (new units built minus units demolished)?”
      - “Considering all university budget documents from FY21–FY24, what is the net change in tenure-track faculty (hires minus departures)?”
      - “Across all conservation area surveys, what is the net wildlife population change (births + migrations in − deaths − migrations out)?”
 
-  9) Example Question
+  8) Example Question (domain-agnostic)
      - “Across excavation reports from 2018–2022, what is the net number of catalogued artifacts added to the museum collection after accounting for new finds minus confirmed losses?”
 
-  10) Question Types to Avoid
+  9) Questions to Avoid
       - Single-document lookup questions.
       - Questions requiring only addition or only subtraction.
       - Subjective or evaluative questions (“Why did they gain land?”).

@@ -5,18 +5,21 @@ system: |
     • numerical filtering,
     • conditional selection,
     • and a derived quantitative computation.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
   Ground everything strictly in the supplied documents—no external knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
 
   VISIBLE THINKING CONSTRAINTS:
     - The content inside <think>...</think> is visible and counts toward token limits.
-    - You MUST keep visible thinking extremely short and compressed.
-    - HARD LIMITS:
-        * Do NOT exceed ~1500 tokens inside <think>.
-        * Use 3–5 concise reasoning steps only.
-        * Each step must be at most 1–2 sentences.
-        * Do NOT restate document passages; summarize only.
-    - If you approach the limit, STOP thinking and immediately output the JSON.
-    - Never include <think> tags inside the JSON.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
 
 user: |-
   DOCUMENTS:
@@ -51,15 +54,26 @@ user: |-
      - Derived computation MUST involve ≥2 numerical values extracted from ≥2 documents.
      - Avoid trivial lookups.
 
-  2) Reasoning Trace
-     - Provide concise step-by-step reasoning.
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
      - Must show:
          • how the filter was applied,
          • how qualifying records were found,
          • how the derived computation was performed.
-     - Cite doc IDs in every step (e.g., "(D3)").
 
-  3) Question
+  4) Question
      - Natural and precise.
      - Must contain BOTH:
          • a numerical filter/condition, AND
@@ -71,29 +85,35 @@ user: |-
          • deltas across periods
          • growth/decline magnitudes
 
-  4) Answer
+  5) Answer
      - Short numeric value (or small tuple of numbers).
      - Round only if your question explicitly specifies a rule.
      - If the condition yields fewer than two qualifying records or
        cannot be computed → return "NOT ANSWERABLE".
 
-  5) Formatting
+  6) Formatting
      - Return exactly ONE JSON object:
-       {
+       {{
          "question": "...",
          "answer": "...",
-         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "facts_used": [
+           {"id": "F1", "doc": "D#", "fact": "..."},
+           {"id": "F2", "doc": "D#", "fact": "..."},
+           {"id": "F3", "doc": "D#", "fact": "..."},
+           {"id": "F4", "doc": "D#", "fact": "..."},
+           {"id": "F5", "doc": "D#", "fact": "..."}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
+      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-  6) Citations
-     - "used_docs" must list all documents used in filtering or computation.
 
   7) Output Constraints
      - Output ONLY the JSON object.
      - No external world knowledge or assumptions.
 
-  8) Example Question Types (allowed)
+  8) Example Question (domain-agnostic)
      - “Among the months where unemployment fell by ≥0.5 points, what was the
         percentage change in job openings for those same months?”
      - “For the regions reporting a ≥10% increase in water usage, what was the
@@ -101,7 +121,7 @@ user: |-
      - “Across the years where emissions dropped by more than 4%, what was the
         year-over-year delta in particulate levels?”
 
-  9) Question Types to Avoid
+  9) Questions to Avoid
      - Pure lookups.
      - Single-document queries.
      - Non-numerical or qualitative questions.
@@ -116,5 +136,4 @@ user: |-
   - No external knowledge ✔
 
   ---
-  DOCUMENTS:
-  {docs}
+  END INSTRUCTIONS

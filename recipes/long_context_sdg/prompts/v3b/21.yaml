@@ -2,18 +2,21 @@ system: |
   You are an expert question-generation and reasoning model.
   Produce one high-quality, factual question that tests multi-document
   analytical or quantitative reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
   Every fact, step, and answer MUST be grounded strictly in the supplied documents—no outside knowledge.
 
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+    
   VISIBLE THINKING CONSTRAINTS:
-    - The content inside <think>...</think> is visible and counts toward the token limit.
-    - You MUST keep the visible thinking extremely short and compressed.
-    - HARD LIMITS:
-        * Do NOT exceed ~1500 tokens inside <think>.
-        * Use exactly 3–5 concise steps.
-        * Each step must be 1–2 sentences maximum.
-        * Never restate long passages; summarize minimal facts only.
-    - If you approach the limit, STOP thinking and output the JSON.
-    - Never include <think> inside the JSON output.
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
 
 user: |-
   DOCUMENTS:
@@ -50,21 +53,23 @@ user: |-
      - Avoid trivial or single-document lookups.
 
   2) Facts Used (MANDATORY)
-     - List each fact as:
-         { "fact_id": "F#", "doc": "D#", "fact": "..." }
-     - Each fact must be:
-         • atomic (exactly one claim),
-         • explicit in the referenced document,
-         • directly used in reasoning or answer derivation.
-     - No invented facts allowed.
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
 
   3) Reasoning Trace
-     - Must reference fact_ids (preferred) and/or doc IDs.
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
      - Must show:
-         • how the required numerical values were identified (via F# references),
+         • how the required numerical values were identified,
          • how comparison/computation was performed,
          • how the answer follows from facts_used.
-     - MUST only use facts listed in facts_used.
 
   4) Question
      - Natural, precise, unambiguous.
@@ -80,30 +85,30 @@ user: |-
   6) JSON Output Format
      Return exactly ONE JSON object:
 
-       {
+       {{
          "question": "...",
          "answer": "...",
          "facts_used": [
-           { "fact_id": "F1", "doc": "D#", "fact": "..." },
-           { "fact_id": "F2", "doc": "D#", "fact": "..." },
-           { "fact_id": "F3", "doc": "D#", "fact": "..." }
+           {"id": "F1", "doc": "D#", "fact": "..."},
+           {"id": "F2", "doc": "D#", "fact": "..."},
+           {"id": "F3", "doc": "D#", "fact": "..."},
+           {"id": "F4", "doc": "D#", "fact": "..."},
+           {"id": "F5", "doc": "D#", "fact": "..."}
          ],
-         "reasoning_trace": "1) ... (F1, D#) 2) ... (F2, D#) 3) ... (F3, D#)",
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
 
-  7) Citations
-     - Every fact must cite one document ID.
-     - reasoning_trace must reference fact_ids (F1, F2, ...).
-     - used_docs must include every doc referenced in facts_used.
+      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-  8) Example Allowed Archetypes
+
+  7) Example Question Types (domain-agnostic)
      - Identify which quarter had the highest growth and compute the delta to another value.
      - Compute difference between two metrics reported in separate documents.
      - Determine which entity has the minimum/maximum metric and compute a derived quantity.
      - Identify a time period associated with a key value and compare it to another period.
 
-  9) Disallowed
+   8) Questions to Avoid
      - Single-document numeric lookup.
      - Qualitative or viewpoint questions.
      - Questions requiring external domain knowledge.
@@ -119,5 +124,4 @@ user: |-
     - No external knowledge ✔
 
   ---
-  DOCUMENTS:
-  {docs}
+  END INSTRUCTIONS

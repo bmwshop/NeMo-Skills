@@ -4,6 +4,10 @@ system: |
   You MUST extract all atomic facts required to derive the answer, each tied to its source document.
   The final answer must be computed strictly from the supplied documents—no outside knowledge.
 
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
   VISIBLE THINKING CONSTRAINTS:
     - The content inside <think>...</think> is visible and counts toward token limits.
     - HARD LIMIT: ~1500 tokens total inside <think>.
@@ -56,12 +60,14 @@ user: |-
      - Reasoning_trace may ONLY use these fact IDs.
 
   3) Reasoning Trace
-     - Provide a concise, numbered sequence (3–5 steps).
-     - Each step MUST reference fact IDs (F1, F2...) and document IDs.
-     - The reasoning must show:
-         • how facts relate,
-         • how they combine to determine the answer,
-         • why the answer follows logically from the extracted facts.
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
+     - Must show:
+         • how the definition/criterion was found,
+         • how the corresponding value was located,
+         • how the answer was derived strictly from facts.
 
   4) Question
      - Natural, precise, grounded entirely in the documents.
@@ -76,7 +82,7 @@ user: |-
   6) Formatting — JSON Only
      Return exactly ONE JSON object:
 
-       {
+       {{
          "question": "...",
          "answer": "...",
          "facts_used": [
@@ -88,15 +94,10 @@ user: |-
          ],
          "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
+      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-  7) Citations
-     - Every reasoning step must reference fact IDs.
-     - Every used_docs entry must correspond to at least one fact in facts_used.
-     - used_docs MUST include ALL documents used as evidence.
-
-  8) Prohibited Question Types
-     - Summaries
+  7) Prohibited Question Types
      - Single-document lookups
      - Hypothetical or speculative questions
      - Questions requiring external world knowledge

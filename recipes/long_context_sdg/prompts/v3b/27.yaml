@@ -2,15 +2,20 @@ system: |
   You are an expert question-generation and reasoning model.
   Produce one high-quality, factual question that tests multi-document,
   conditional analytical reasoning involving extraction → filtering → computation.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
   All facts must be explicitly grounded in the provided documents—no external knowledge.
 
-  VISIBLE THINKING RULES:
-    - Content inside <think>...</think> is visible and counts toward output tokens.
-    - HARD LIMIT: ~1500 tokens inside <think>.
-    - Use exactly 3–5 concise steps.
-    - Each step must be 1–2 sentences maximum.
-    - Summarize facts; never quote long passages.
-    - If the limit is approached, STOP thinking and output the JSON immediately.
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
     - Never include <think> inside the JSON object.
 
 user: |-
@@ -48,15 +53,19 @@ user: |-
      - Filtering + computation MUST require multi-document linkage.
 
   2) Facts Used (MANDATORY)
-     - Produce a list of atomic facts in the format:
-         {"fid": "F#", "doc": "D#", "fact": "..."}
-     - All reasoning must reference FIDs (e.g., "(F2)").
-     - No invented or speculative facts.
-     - No multi-claim facts (atomic only).
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
 
   3) Reasoning Trace
-     - Concise, 3–5 steps.
-     - Use fact IDs, not raw document text.
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
      - Must show:
          • how facts meeting the filter were identified (via FIDs),
          • how values were extracted,
@@ -75,21 +84,23 @@ user: |-
   6) Formatting (JSON ONLY)
      Return exactly ONE JSON object:
 
-       {
+       {{
          "question": "...",
          "answer": "...",
          "facts_used": [
-           {"fid": "F1", "doc": "D#", "fact": "..."},
-           {"fid": "F2", "doc": "D#", "fact": "..."},
-           {"fid": "F3", "doc": "D#", "fact": "..."}
+           {"id": "F1", "doc": "D#", "fact": "..."},
+           {"id": "F2", "doc": "D#", "fact": "..."},
+           {"id": "F3", "doc": "D#", "fact": "..."},
+           {"id": "F4", "doc": "D#", "fact": "..."},
+           {"id": "F5", "doc": "D#", "fact": "..."}
          ],
-         "reasoning_trace": "1) ... (F1) 2) ... (F2) 3) ... (F3)",
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
 
-     - used_docs must exactly equal the unique set of doc IDs appearing in facts_used.
+     - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-  7) Example Question Types
+  7) Example Question Types (domain-agnostic)
      - “What is the total number of regulatory complaints filed in the past 18 months across all agencies?”
      - “Across all 2021–2023 survey waves, what is the combined number of respondents who selected Option C?”
      - “Summing all fossil discoveries dated after 10,000 BCE across sites, how many specimens were identified?”

@@ -3,19 +3,21 @@ system: |
   Produce one high-quality, factual question that tests multi-document
   analytical reasoning involving extraction, comparison, and identification
   of the largest value.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
   Ground everything strictly in the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
 
   VISIBLE THINKING CONSTRAINTS:
     - The content inside <think>...</think> is visible and counts toward token limits.
-    - You MUST keep visible thinking extremely short and compressed.
-    - HARD LIMITS:
-        * Do NOT exceed ~1500 tokens inside <think>.
-        * Use exactly 3–5 short reasoning steps.
-        * Each step must be 1–2 sentences maximum.
-        * Do NOT restate document text or numerical tables.
-        * Summarize only the necessary comparative reasoning.
-    - If you approach the limit, STOP thinking and output the JSON immediately.
-    - Never include <think> inside JSON.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
 
 user: |-
   DOCUMENTS:
@@ -47,9 +49,20 @@ user: |-
      - The comparison MUST require combining evidence across documents.
      - No single-document answers.
 
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
+
   2) Reasoning Trace
      - Provide a concise, numbered reasoning trace (3–5 steps).
-     - Each step MUST cite document IDs (e.g., "(D3)").
+     - Each step must:
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
      - Show:
          • where the metric was located,
          • what values were extracted,
@@ -69,16 +82,21 @@ user: |-
   5) JSON Output Format
      Return exactly ONE JSON object:
 
-       {
+       {{
          "question": "...",
          "answer": "...",
-         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "facts_used": [
+           {"id": "F1", "doc": "D#", "fact": "..."},
+           {"id": "F2", "doc": "D#", "fact": "..."},
+           {"id": "F3", "doc": "D#", "fact": "..."},
+           {"id": "F4", "doc": "D#", "fact": "..."},
+           {"id": "F5", "doc": "D#", "fact": "..."}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }
+       }}
+       - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-  6) Citations
-     - Every reasoning step must cite at least one document ID.
-     - "used_docs" must include all documents used as evidence.
 
   ---
   VALIDATION CHECK
@@ -90,5 +108,4 @@ user: |-
     - No external knowledge ✔
 
   ---
-  DOCUMENTS:
-  {docs}
+  END INSTRUCTIONS

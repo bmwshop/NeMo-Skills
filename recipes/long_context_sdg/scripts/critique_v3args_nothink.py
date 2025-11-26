@@ -56,7 +56,7 @@ generate(
     server_args=f"--context-len {MAX_SEQ_LEN} --ep-size 8",
     num_chunks=num_servers,
     dependent_jobs=dependent_jobs,
-    postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_qa.py {output_dir}/output.jsonl {output_dir}/critique.jsonl",
+    postprocess_cmd=f"python /nemo_run/code/recipes/long_context_sdg/scripts/postprocess_qa.py --input {output_dir}/output.jsonl --output {output_dir}/critique.jsonl",
     server_gpus=4,
     server_nodes=2,
 )

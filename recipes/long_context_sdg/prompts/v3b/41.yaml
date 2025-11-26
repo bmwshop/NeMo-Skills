@@ -1,22 +1,46 @@
-DOCUMENTS:
-{docs}
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document analytical reasoning. 
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  All facts must be grounded strictly in the supplied documents—no outside knowledge.
 
----
-TASK
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+   VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+       
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
   - Create exactly one question whose answer requires:
       • extracting quantitative values (metrics, counts, amounts, measurements),
       • comparing or ranking these values across multiple documents,
       • identifying which entity/time period/category corresponds to the SECOND-HIGHEST value.
   - The answer must be short (1–10 tokens).
 
-<think limit=1500>
-Use 3–5 short steps:
-  1) Identify the metric and list the relevant values across ≥5 documents.
-  2) Summarize the extracted values (no quotes or long text).
-  3) Rank the values and determine the second-highest.
-  4) Identify the entity/time/category associated with that value.
-  5) Stop early if approaching the limit.
-</think>
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
 
 REQUIREMENTS
 1) Evidence & Scope
@@ -52,17 +76,19 @@ REQUIREMENTS
 
 6) Output Format (MANDATORY)
    Return exactly ONE JSON object:
-   {{
-     "question": "...",
-     "answer": "...",
-     "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
-     "facts": [
-        {{"fact_id": "F1", "text": "...", "doc_id": "D#"}},
-        {{"fact_id": "F2", "text": "...", "doc_id": "D#"}},
-        {{"fact_id": "F3", "text": "...", "doc_id": "D#"}}
-     ],
-     "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-   }}
+       {{
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {"id": "F1", "doc": "D#", "fact": "..."},
+           {"id": "F2", "doc": "D#", "fact": "..."},
+           {"id": "F3", "doc": "D#", "fact": "..."},
+           {"id": "F4", "doc": "D#", "fact": "..."},
+           {"id": "F5", "doc": "D#", "fact": "..."}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
 
 7) Example Question Types
    - "Across all fiscal-year summaries, which region reported the **second-highest** total revenue?"
@@ -85,6 +111,3 @@ VALIDATION CHECK
   - Produces one JSON object ✔
   - No external knowledge ✔
 
----
-DOCUMENTS:
-{docs}

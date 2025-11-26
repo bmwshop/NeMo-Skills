@@ -2,18 +2,21 @@ system: |
   You are an expert question-generation and reasoning model.
   Produce one high-quality, factual question that tests multi-document
   analytical reasoning involving numerical comparison, ranking, or ordered evaluation.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
   Ground EVERYTHING strictly in the supplied documents — no external knowledge.
 
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
   VISIBLE THINKING CONSTRAINTS:
-    - The content inside <think>...</think> is VISIBLE and counts toward token limits.
-    - You MUST keep visible reasoning extremely short and compressed.
-    - HARD LIMITS:
-        * Maximum ≈1500 tokens inside <think>.
-        * Use ONLY 3–5 short steps.
-        * Each step must be 1–2 concise sentences.
-        * DO NOT restate document passages, tables, or long numeric lists.
-        * Summarize minimal facts; stop early when near the limit.
-    - Never include <think> tags inside the JSON.
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
 
 user: |-
   DOCUMENTS:
@@ -29,12 +32,12 @@ user: |-
     - THEN compute the correct answer yourself using the document set.
 
   <think limit=1500>
-  Use 3–5 extremely concise steps:
-    1) Identify the numeric metric and matching entities across ≥5 documents.
-    2) Extract only the minimal values needed (do NOT restate).
-    3) Perform comparison/ranking.
-    4) Derive the correct final ordered answer.
-    5) Stop if approaching the limit.
+  Keep visible thinking extremely concise.
+  1) Identify the triggering fact(s) across documents.
+  2) Identify linked fact(s) needed to answer the question.
+  3) Extract atomic facts (assign fact IDs + document IDs).
+  4) Combine extracted facts to compute the answer.
+  5) Stop early if near the limit.
   </think>
 
   REQUIREMENTS
@@ -45,14 +48,25 @@ user: |-
      - The question MUST NOT be answerable using a single document.
      - All facts must be explicit and searchable inside the provided docs.
 
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
+
   2) Reasoning Trace
-     - Provide a concise, numbered reasoning trace **outside** the <think> block.
+     - Provide a concise, numbered reasoning chain (3–5 steps).
      - Each step MUST:
-         • mention the metric extracted,
-         • cite document IDs (e.g., "(D4)"),
-         • show how values were matched to entities,
-         • show how the ranking/comparison was computed,
-         • present the final ordered result.
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
+     - Must show:
+         • how the metric was extracted,
+         • how values were matched to entities,
+         • how the ranking/comparison was computed,
+         • how the final ordered result was derived.
 
   3) Question
      - Natural, precise, and explicitly numeric.
@@ -76,23 +90,28 @@ user: |-
        {{
          "question": "...",
          "answer": "...",
-         "reasoning_trace": "1) ... (D#) 2) ... (D#) 3) ... (D#)",
+         "facts_used": [
+           {"id": "F1", "doc": "D#", "fact": "..."},
+           {"id": "F2", "doc": "D#", "fact": "..."},
+           {"id": "F3", "doc": "D#", "fact": "..."},
+           {"id": "F4", "doc": "D#", "fact": "..."},
+           {"id": "F5", "doc": "D#", "fact": "..."}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
        }}
 
-  6) Citations
-     - Every reasoning step must cite doc IDs.
-     - "used_docs" must list all documents contributing evidence.
-     - No invented citations; use IDs exactly as they appear.
+     - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-  7) Example Allowed Archetypes
+
+  6) Example Question Types (domain-agnostic)
      - Rank departments by spending.
      - Rank regions by incident counts or growth rates.
      - Identify which company has the largest operating margin.
      - Determine which project shows the biggest year-over-year increase.
      - Rank sites by measured pollutant concentration.
 
-  8) Forbidden Question Types
+  7) Questions to Avoid
      - Anything answerable from one document.
      - Qualitative or viewpoint-based questions.
      - Trend-only or speculative questions.
@@ -109,5 +128,4 @@ user: |-
     - No external knowledge ✔
 
   ---
-  DOCUMENTS:
-  {docs}
+  END INSTRUCTIONS
