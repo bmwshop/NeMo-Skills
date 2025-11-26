@@ -81,7 +81,7 @@ user: |-
      - Provide only the computed final result (numeric or categorical).
      - If not answerable → "NOT ANSWERABLE".
 
-  6) Formatting (JSON ONLY)
+  6) Formatting — JSON Only
      Return exactly ONE JSON object:
 
        {{
@@ -100,16 +100,17 @@ user: |-
 
      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-  7) Example Question Types (domain-agnostic)
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
+
+  8) Example Question Types (domain-agnostic)
      - “What is the total number of regulatory complaints filed in the past 18 months across all agencies?”
      - “Across all 2021–2023 survey waves, what is the combined number of respondents who selected Option C?”
      - “Summing all fossil discoveries dated after 10,000 BCE across sites, how many specimens were identified?”
 
-  8) Question Types to Avoid
-     - Anything answerable from a single document.
-     - Questions without computation.
-     - Non-quantitative or purely definitional questions.
-     - Questions requiring outside assumptions.
+
 
   ---
   VALIDATION CHECK

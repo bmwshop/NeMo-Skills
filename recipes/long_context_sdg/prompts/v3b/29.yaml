@@ -84,8 +84,8 @@ user: |-
      - Answer MUST be exactly derivable from the facts_used list.
      - If the required information is not present in the documents, answer "NOT ANSWERABLE".
 
-  6) JSON Output Format
-     - Return exactly ONE JSON object:
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
 
        {{
          "question": "...",
@@ -102,19 +102,18 @@ user: |-
        }}
       - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
-  7) Example Question Types (domain-agnostic)
+  8) Example Question Types (domain-agnostic)
      - “Across all reports from 2020–2023, what is the net number of housing units added (new units built minus units demolished)?”
      - “Considering all university budget documents from FY21–FY24, what is the net change in tenure-track faculty (hires minus departures)?”
      - “Across all conservation area surveys, what is the net wildlife population change (births + migrations in − deaths − migrations out)?”
-
-  8) Example Question (domain-agnostic)
      - “Across excavation reports from 2018–2022, what is the net number of catalogued artifacts added to the museum collection after accounting for new finds minus confirmed losses?”
 
-  9) Questions to Avoid
-      - Single-document lookup questions.
-      - Questions requiring only addition or only subtraction.
-      - Subjective or evaluative questions (“Why did they gain land?”).
+
 
   ---
   VALIDATION CHECK

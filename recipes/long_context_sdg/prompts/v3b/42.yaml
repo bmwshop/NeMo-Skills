@@ -45,15 +45,15 @@ user: |-
   </think>
 
   REQUIREMENTS
-    1) Evidence & Scope
-       - Use ≥5 distinct documents.
-       - The metric must be explicitly present in each document (e.g., operating margin, rainfall, revenue, mortality rate).
-       - Extract:
+  1) Evidence & Scope
+      - Use ≥5 distinct documents.
+      - The metric must be explicitly present in each document (e.g., operating margin, rainfall, revenue, mortality rate).
+      - Extract:
            • value_A (e.g., FY2024),
            • value_B (e.g., FY2023),
          then compute Δ = value_A − value_B for each document.
 
-    2) Facts Used (MANDATORY)
+  2) Facts Used (MANDATORY)
        - Provide a list of atomic facts under "facts_used".
        - Each fact entry MUST include:
          • "id": a short unique ID (F1, F2, …)
@@ -62,7 +62,7 @@ user: |-
        - No hallucinated or composite facts.
        - Reasoning_trace may ONLY use these fact IDs.
 
-    3) Reasoning Trace
+  3) Reasoning Trace
      - Provide a concise, numbered reasoning chain (3–5 steps).
      - Each step must:
          • reference fact IDs (e.g., "(F2)")
@@ -74,20 +74,20 @@ user: |-
            • how the ranking was determined,
            • how the second-largest difference was selected.
 
-    4) Question
+  4) Question
        - Natural, precise, ranking-based.
        - Must ask:
            • which entity/time/category had the **second-largest year-over-year difference**, and
            • what that difference was.
 
-    5) Answer
+  5) Answer
        - Short and factual (1–10 tokens for entity + numeric value).
        - Format example: "Q2, +6%" or "Region B, −12 units".
        - If ties exist, return all tied entities comma-separated.
        - If not answerable, output "NOT ANSWERABLE".
 
-    6) JSON Output Format
-       - Return exactly ONE JSON object encoded inside YAML:
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
        {{
          "question": "...",
          "answer": "...",
@@ -104,15 +104,18 @@ user: |-
 
        - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
-    7) Example Question Types (domain-agnostic)
+  8) Example Question Types (domain-agnostic)
     - Across all regions, which region shows the **second-largest YOY increase** in average temperature, and what was the increase?
     - Which department had the **second-largest YOY enrollment change**, and by how much?
     - Which ward recorded the **second-largest YOY drop** in infection rate?
     - Which product had the **second-largest YOY revenue increase**, and what was the gain?
+    - Across all country-level agricultural reports, which crop category had the **second-largest year-over-year change** in yield, and what was the change?
 
-    8) Example Question (domain-agnostic)
-    - “Across all country-level agricultural reports, which crop category had the **second-largest year-over-year change** in yield, and what was the change?”
 
   VALIDATION CHECK
     - Uses ≥5 documents ✔

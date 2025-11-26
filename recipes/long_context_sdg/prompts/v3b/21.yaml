@@ -82,7 +82,7 @@ user: |-
      - If not answerable: return "NOT ANSWERABLE".
      - The answer MUST be derivable solely from facts_used.
 
-  6) JSON Output Format
+  6) Formatting — JSON Only
      Return exactly ONE JSON object:
 
        {{
@@ -101,18 +101,16 @@ user: |-
 
       - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
-  7) Example Question Types (domain-agnostic)
+  8) Example Question Types (domain-agnostic)
      - Identify which quarter had the highest growth and compute the delta to another value.
      - Compute difference between two metrics reported in separate documents.
      - Determine which entity has the minimum/maximum metric and compute a derived quantity.
      - Identify a time period associated with a key value and compare it to another period.
-
-   8) Questions to Avoid
-     - Single-document numeric lookup.
-     - Qualitative or viewpoint questions.
-     - Questions requiring external domain knowledge.
-     - Questions without calculations or comparisons.
 
   ---
   VALIDATION CHECK

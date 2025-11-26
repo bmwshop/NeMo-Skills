@@ -85,8 +85,8 @@ user: |-
          • single entity/value.
      - If not answerable: return “NOT ANSWERABLE”.
 
-  5) Formatting (STRICT)
-     - Return exactly **one** JSON object:
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
        {{
          "question": "...",
          "answer": "...",
@@ -103,29 +103,29 @@ user: |-
 
      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
-  6) Example Question Types (domain-agnostic)
+  8) Example Question Types (domain-agnostic)
      - Rank departments by spending.
      - Rank regions by incident counts or growth rates.
      - Identify which company has the largest operating margin.
      - Determine which project shows the biggest year-over-year increase.
      - Rank sites by measured pollutant concentration.
 
-  7) Questions to Avoid
-     - Anything answerable from one document.
-     - Qualitative or viewpoint-based questions.
-     - Trend-only or speculative questions.
-     - Domain-knowledge assumptions not stated in documents.
-     - Pure definitional lookup.
 
   ---
-  VALIDATION CHECKLIST
-    - Uses ≥5 documents ✔
-    - Requires multi-step numerical extraction + comparison ✔
-    - Requires cross-document reasoning ✔
-    - Computes correct final answer ✔
-    - Returns exactly one JSON object ✔
-    - No external knowledge ✔
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used each cite a document and contain atomic claims ✔
+     - Reasoning only uses facts_used ✔
+     - Correct derived answer ✔
+     - Multi-step reasoning ✔
+     - JSON valid ✔
+     - No external knowledge ✔
 
   ---
   END INSTRUCTIONS

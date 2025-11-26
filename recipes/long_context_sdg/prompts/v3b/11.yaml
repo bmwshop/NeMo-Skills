@@ -80,8 +80,8 @@ user: |-
      - Short, factual numeric result and any required entity/period names.
      - If the answer is not derivable: return "NOT ANSWERABLE".
 
-  6) JSON Output Format
-     Return EXACTLY one JSON object:
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
 
        {{
          "question": "...",
@@ -99,14 +99,18 @@ user: |-
 
      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
-  7) Example Question Types (domain-agnostic)
+  8) Example Question Types (domain-agnostic)
      - Identify the month when a metric equals X; compute % change from previous month.
      - Identify which product has metric Y; compute the delta relative to another model.
      - Identify which survey entry reports value V; compute difference vs. another period.
      - Identify which region hits a threshold; compute its ranking or margin.
 
-  8) Example
+  9) Example
      - “In which reporting quarter did emissions equal 7.4 tons, and by how much did this differ from the emissions recorded in the prior quarter? Report the difference to two decimal places.”
 
   ---
@@ -115,7 +119,7 @@ user: |-
      - Extracts ≥5 atomic facts ✔
      - facts_used each cite a document and contain atomic claims ✔
      - Reasoning only uses facts_used ✔
-     - Correct derived numeric answer ✔
+     - Correct derived answer ✔
      - Multi-step reasoning ✔
      - JSON valid ✔
      - No external knowledge ✔

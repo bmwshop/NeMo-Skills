@@ -85,7 +85,7 @@ user: |-
      - A short factual value (e.g., “$667,804 thousand”, “March 2019”, “ISO Category 3”).
      - If the documents do not provide the value → answer “NOT ANSWERABLE”.
 
-  6) JSON Output Format
+  6) Formatting — JSON Only
      Return exactly ONE JSON object:
 
        {{
@@ -104,24 +104,26 @@ user: |-
 
       - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-  7) Example Question Types (domain-agnostic)
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
+
+  8) Example Question Types (domain-agnostic)
      - A law in Document A defines a “priority action.” Document B lists actions. According to the definition, what is the count?
      - Document A defines “Level-II incident.” Document D reports incidents. How many events qualify?
      - Document C defines a biological category. Document F lists specimens. What is the count?
      - Document A defines “Adjusted Harvest Yield.” What is the reported value for Region 4 in Document E?
 
-  8) Prohibited Question Types
-     - Single-document lookups
-     - Hypothetical or speculative questions
-     - Questions requiring external world knowledge
-
   ---
   VALIDATION CHECK
-     - ≥5 documents ✔
-     - ≥5 atomic facts ✔
-     - Correct definition → value mapping ✔
-     - Answer derivable solely from facts_used ✔
-     - Clean JSON ✔
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used each cite a document and contain atomic claims ✔
+     - Reasoning only uses facts_used ✔
+     - Correct derived answer ✔
+     - Multi-step reasoning ✔
+     - JSON valid ✔
      - No external knowledge ✔
 
   ---

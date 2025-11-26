@@ -77,8 +77,8 @@ user: |-
      - Use exact numbers/units as written unless question specifies formatting.
      - If unanswerable, return "NOT ANSWERABLE".
 
-  6) Output Format (MANDATORY)
-     Return exactly one JSON object:
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
        {{
          "question": "...",
          "answer": "...",
@@ -95,16 +95,17 @@ user: |-
 
      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-  7) Example Question Types (domain-agnostic)
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
+
+  8) Example Question Types (domain-agnostic)
      - Time period with largest/smallest change → report associated metric.
      - Product with largest drop → report inventory or cost metric.
      - Region with smallest YOY change → report related statistic.
      - Category with numeric threshold → retrieve contextual metric.
 
-  8) Questions to Avoid
-     - Pure single-document lookups.
-     - Non-numeric or qualitative-only questions.
-     - Speculative or domain-inference questions.
 
   ---
   VALIDATION CHECK

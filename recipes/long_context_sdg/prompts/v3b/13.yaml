@@ -86,7 +86,7 @@ user: |-
      - Must be derivable solely from facts_used.
      - If not answerable → return "NOT ANSWERABLE".
 
-  6) JSON Output Format
+  6) Formatting — JSON Only
      Return exactly ONE JSON object:
 
        {{
@@ -102,8 +102,13 @@ user: |-
          "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
        }}
+
       - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
   ---
   VALIDATION CHECK

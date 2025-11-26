@@ -91,8 +91,8 @@ user: |-
      - If the condition yields fewer than two qualifying records or
        cannot be computed → return "NOT ANSWERABLE".
 
-  6) Formatting
-     - Return exactly ONE JSON object:
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
        {{
          "question": "...",
          "answer": "...",
@@ -108,12 +108,12 @@ user: |-
        }}
       - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
-  7) Output Constraints
-     - Output ONLY the JSON object.
-     - No external world knowledge or assumptions.
-
-  8) Example Question (domain-agnostic)
+  8) Example Question Types (domain-agnostic)
      - “Among the months where unemployment fell by ≥0.5 points, what was the
         percentage change in job openings for those same months?”
      - “For the regions reporting a ≥10% increase in water usage, what was the
@@ -121,11 +121,6 @@ user: |-
      - “Across the years where emissions dropped by more than 4%, what was the
         year-over-year delta in particulate levels?”
 
-  9) Questions to Avoid
-     - Pure lookups.
-     - Single-document queries.
-     - Non-numerical or qualitative questions.
-     - Ambiguous conditions not explicitly grounded in numerical fields.
 
   ---
   VALIDATION CHECK

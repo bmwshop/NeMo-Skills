@@ -69,20 +69,17 @@ user: |-
          • how uniqueness was computed,
          • how the final selection was made.
 
-  3) Question
+  4) Question
      - Natural and precise.
      - Must explicitly ask **which item has the most distinct values** (or analogous measure).
      - Must require multi-document aggregation and comparison.
 
-  4) Answer
+  5) Answer
      - Short factual output (1–5 tokens).
      - If multiple items tie, return a comma-separated list.
      - If not answerable, output "NOT ANSWERABLE".
 
-  5) Formatting
-     - Follow the exact JSON schema below.
-
-  7) Output Format
+  6) Formatting — JSON Only
      Return exactly ONE JSON object:
        {{
          "question": "...",
@@ -99,17 +96,17 @@ user: |-
        }}
        - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
+
+
   8) Example Question Types (domain-agnostic)
      - “Across quarterly operational metrics, which department shows the highest number of distinct defect categories?”
      - “Across all weekly climate summaries, which station recorded the most unique humidity ranges?”
      - “Across supplier audit logs, which defect code has the broadest range of assigned severity levels?”
      - “Across monthly attendance reports, which gallery displays the greatest diversity of visitor counts?”
-
-  9) Avoid
-     - Single-document questions.
-     - Summations instead of uniqueness.
-     - Trend questions without countable variability.
-     - Anything requiring external knowledge.
 
   ---
   VALIDATION CHECK

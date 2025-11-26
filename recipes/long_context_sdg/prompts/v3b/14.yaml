@@ -85,7 +85,7 @@ user: |-
      - Must be a single numeric value or short range.
      - If the documents do not contain the necessary facts → "NOT ANSWERABLE".
 
-  6) Output Format (JSON ONLY)
+  6) Formatting — JSON Only
      Return exactly ONE JSON object:
 
        {{
@@ -101,10 +101,16 @@ user: |-
          "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
        }}
+
       - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
-  7) Example Question Types (domain-agnostic)
+
+  8) Example Question Types (domain-agnostic)
      - “For the entity that reports implementing an emissions-reduction framework,
         what was its 2022 operating margin?”
      - “Among organizations disclosing a cybersecurity policy,
@@ -112,21 +118,16 @@ user: |-
      - “For the manufacturer that reports a hedging strategy,
         what was its 2021 cost-of-goods-sold?”
 
-  8) Questions to Avoid
-     - Single-document lookups.
-     - Behavior + metric found in the same paragraph.
-     - External financial knowledge.
-     - Hypothetical or unstated assumptions.
-
   ---
   VALIDATION CHECK
-    - Uses ≥5 documents ✔
-    - Extracts ≥3 atomic facts ✔
-    - Facts, reasoning, and answer aligned ✔
-    - Multi-document linkage ✔
-    - Single valid JSON object ✔
-    - Correct answer computed ✔
-    - No external knowledge ✔
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used each cite a document and contain atomic claims ✔
+     - Reasoning only uses facts_used ✔
+     - Correct derived answer ✔
+     - Multi-step reasoning ✔
+     - JSON valid ✔
+     - No external knowledge ✔
 
   ---
   END INSTRUCTIONS

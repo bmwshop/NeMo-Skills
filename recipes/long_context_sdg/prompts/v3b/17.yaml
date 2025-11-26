@@ -82,8 +82,8 @@ user: |-
      - Short and factual (e.g., “Q2 2021”, “Region B”, “FY24–Q4”).
      - If unanswerable → "NOT ANSWERABLE".
 
-  6) Output Format (JSON Only)
-     - Return exactly ONE JSON object:
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
 
        {{
          "question": "...",
@@ -98,24 +98,34 @@ user: |-
          "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
        }}
+
       - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
-  7) Example Question Types (domain-agnostic)
+  8) Example Question Types (domain-agnostic)
      - Which quarter shows the greatest increase in revenue for the lowest-selling segment?
      - Which region had the biggest drop in incidents within the group with the smallest population?
      - Which year shows the most growth in funding for the least-funded program?
      - Which department saw the largest improvement in compliance among those with the lowest baseline?
 
-  8) Question Types to Avoid
-     - Pure lookups.
-     - Single-document questions.
-     - Questions without an extremal criterion.
-     - Questions requiring domain expertise not expressed in text.
 
   ---
   EXAMPLE QUESTION
   "For the department with the lowest patient volume in the baseline year, which subsequent month shows the largest increase in average treatment time?"
 
   ---
+    VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used each cite a document and contain atomic claims ✔
+     - Reasoning only uses facts_used ✔
+     - Correct derived answer ✔
+     - Multi-step reasoning ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+     
   END INSTRUCTIONS

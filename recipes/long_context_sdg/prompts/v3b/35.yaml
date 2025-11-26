@@ -58,7 +58,7 @@ user: |-
      - No hallucinated or composite facts.
      - Reasoning_trace may ONLY use these fact IDs.
 
-  2) Reasoning Trace
+  3) Reasoning Trace
      - Provide a concise, numbered reasoning trace (3–5 steps).
      - Each step must:
          • reference fact IDs (e.g., "(F2)")
@@ -69,17 +69,17 @@ user: |-
          • how the comparison was performed,
          • how the final answer was determined.
 
-  3) Question
+  4) Question
      - Must explicitly ask: **“Which X had the largest number of Y?”**
      - Must require multi-document extraction and comparison.
      - Must be natural, precise, and grounded entirely in the documents.
 
-  4) Answer (MANDATORY)
+  5) Answer (MANDATORY)
      - Provide the correct single entity/period/category (1–5 tokens).
      - If tied, list all tied entities comma-separated.
      - If not answerable, return "NOT ANSWERABLE".
 
-  5) JSON Output Format
+  6) Formatting — JSON Only
      Return exactly ONE JSON object:
 
        {{
@@ -97,6 +97,10 @@ user: |-
        }}
        - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
   ---
   VALIDATION CHECK
