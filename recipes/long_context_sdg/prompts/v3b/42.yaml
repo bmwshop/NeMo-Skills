@@ -28,7 +28,7 @@ user: |-
         • comparison of that metric across two time periods (e.g., year-over-year),
         • calculation of the numerical difference for each document,
         • ranking those differences,
-        • identifying the item with the **second-largest** difference,
+        • identifying the item with the **n-th largest** difference,
         • reporting:  
             (a) the item,  
             (b) the magnitude of change,  
@@ -72,12 +72,12 @@ user: |-
            • how values for two periods were paired,
            • how each difference was computed,
            • how the ranking was determined,
-           • how the second-largest difference was selected.
+           • how the n-th largest difference was selected.
 
   4) Question
        - Natural, precise, ranking-based.
        - Must ask:
-           • which entity/time/category had the **second-largest year-over-year difference**, and
+           • which entity/time/category had the **n-th largest year-over-year difference**, and
            • what that difference was.
 
   5) Answer
@@ -111,17 +111,17 @@ user: |-
 
   8) Example Question Types (domain-agnostic)
     - Across all regions, which region shows the **second-largest YOY increase** in average temperature, and what was the increase?
-    - Which department had the **second-largest YOY enrollment change**, and by how much?
-    - Which ward recorded the **second-largest YOY drop** in infection rate?
-    - Which product had the **second-largest YOY revenue increase**, and what was the gain?
-    - Across all country-level agricultural reports, which crop category had the **second-largest year-over-year change** in yield, and what was the change?
+    - Which department had the **third-largest YOY enrollment change**, and by how much?
+    - Which ward recorded the **fourth-largest YOY drop** in infection rate?
+    - Which product had the **fifth-largest YOY revenue increase**, and what was the gain?
+    - Across all country-level agricultural reports, which crop category had the **largest year-over-year change** in yield, and what was the change?
 
 
   VALIDATION CHECK
     - Uses ≥5 documents ✔
     - Requires year-pair extraction ✔
     - Requires numerical difference and ranking ✔
-    - Requires second-largest change ✔
+    - Requires n-th largest change ✔
     - Requires facts list ✔
     - Produces one JSON object ✔
     - No external knowledge ✔
