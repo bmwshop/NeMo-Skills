@@ -111,12 +111,9 @@ user: |-
 
 
   8) Example Question Types (domain-agnostic)
-     - “For the entity that reports implementing an emissions-reduction framework,
-        what was its 2022 operating margin?”
-     - “Among organizations disclosing a cybersecurity policy,
-        what was the one-year change in its compliance score?”
-     - “For the manufacturer that reports a hedging strategy,
-        what was its 2021 cost-of-goods-sold?”
+     - For the entity that reports implementing an emissions-reduction framework, what was its 2022 operating margin?
+     - Among organizations disclosing a cybersecurity policy, what was the one-year change in its compliance score?
+     - For the manufacturer that reports a hedging strategy, what was its 2021 cost-of-goods-sold?
 
   ---
   VALIDATION CHECK

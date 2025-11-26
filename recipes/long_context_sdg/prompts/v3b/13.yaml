@@ -110,6 +110,14 @@ user: |-
      - Hypothetical or speculative questions
      - Questions requiring external world knowledge
 
+  8) Example Question Types (varied domains)
+     - For the experiment and trial where the recorded reaction yield was 62.5%, what was the measured activation energy?
+     - For the school and semester where total enrollment reached 12,400 students, what was the average faculty-to-student ratio?
+     - For the monitoring station and month where atmospheric CO₂ concentration reached 418 ppm, what was the recorded methane level for that same period?
+     - For the transit system and quarter where passenger volume reached 87 million rides, what was the operating surplus (or deficit) per rider during that quarter?
+     - For the hospital and reporting period where the total number of admissions was 34,200, what was the mortality rate recorded for that period?
+
+
   ---
   VALIDATION CHECK
     - Uses ≥5 documents ✔

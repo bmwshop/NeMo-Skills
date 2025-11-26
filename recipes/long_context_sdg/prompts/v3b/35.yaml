@@ -102,6 +102,11 @@ user: |-
      - Hypothetical or speculative questions
      - Questions requiring external world knowledge
 
+  8) Example Question Types (domain-agnostic)
+     - Across Fall 2021, Spring 2022, Fall 2022, Spring 2023, and Fall 2023; which term recorded the highest number of new student enrollments?
+     - Across the five seasonal wildlife surveys, which survey recorded the highest number of observed nesting pairs?
+     - Across the last five tournament rounds, which round saw the highest number of goals scored?
+     - Across the five most recent monthly security logs, which month reported the highest number of intrusion attempts?
   ---
   VALIDATION CHECK
     - Uses ≥5 documents ✔

@@ -114,12 +114,9 @@ user: |-
      - Questions requiring external world knowledge
 
   8) Example Question Types (domain-agnostic)
-     - “Among the months where unemployment fell by ≥0.5 points, what was the
-        percentage change in job openings for those same months?”
-     - “For the regions reporting a ≥10% increase in water usage, what was the
-        corresponding change in reservoir levels?”
-     - “Across the years where emissions dropped by more than 4%, what was the
-        year-over-year delta in particulate levels?”
+     - “Among the months where unemployment fell by ≥0.5 points, what was the percentage change in job openings for those same months?”
+     - “For the regions reporting a ≥10% increase in water usage, what was the corresponding change in reservoir levels?”
+     - “Across the years where emissions dropped by more than 4%, what was the year-over-year delta in particulate levels?”
 
 
   ---

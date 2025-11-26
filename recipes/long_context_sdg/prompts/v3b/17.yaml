@@ -111,11 +111,7 @@ user: |-
      - Which region had the biggest drop in incidents within the group with the smallest population?
      - Which year shows the most growth in funding for the least-funded program?
      - Which department saw the largest improvement in compliance among those with the lowest baseline?
-
-
-  ---
-  EXAMPLE QUESTION
-  "For the department with the lowest patient volume in the baseline year, which subsequent month shows the largest increase in average treatment time?"
+     - For the department with the lowest patient volume in the baseline year, which subsequent month shows the largest increase in average treatment time?
 
   ---
     VALIDATION CHECK
@@ -127,5 +123,5 @@ user: |-
      - Multi-step reasoning ✔
      - JSON valid ✔
      - No external knowledge ✔
-     
+
   END INSTRUCTIONS

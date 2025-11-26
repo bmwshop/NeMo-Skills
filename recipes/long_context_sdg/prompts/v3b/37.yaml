@@ -57,7 +57,7 @@ user: |-
      - No hallucinated or composite facts.
      - Reasoning_trace may ONLY use these fact IDs.
 
-  2) Reasoning Trace
+  3) Reasoning Trace
      - Provide a concise, numbered reasoning chain (3–5 steps).
      - Each step MUST:
          • reference fact IDs (e.g., "(F2)")
@@ -68,7 +68,7 @@ user: |-
          • how the ranking/comparison was computed,
          • how the final ordered result was derived.
 
-  3) Question
+  4) Question
      - Natural, precise, and explicitly numeric.
      - Must require:
          • extraction → alignment → comparison → ranked/selected result.
@@ -78,7 +78,7 @@ user: |-
          • “Which category has the smallest reported Z?”
      - Only generate *non-trivial*, multi-document quantitative questions.
 
-  4) Answer (MANDATORY)
+  5) Answer (MANDATORY)
      - Compute the correct answer directly from the documents.
      - Must be short and factual:
          • ordered list, or

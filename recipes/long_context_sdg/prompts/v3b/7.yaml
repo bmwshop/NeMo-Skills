@@ -103,6 +103,12 @@ user: |-
      - Hypothetical or speculative questions
      - Questions requiring external world knowledge
 
+  8) Example Questions (varied domains)
+     - One study in the documents reported its results on March 12, 2019. Only one organism in the corpus has an explicit mention of its genome being fully sequenced. According to the documents, which sequencing platform was used for that organism? 
+     - One weather station in the documents submitted a report on August 5, 2021. Only one location explicitly states which atmospheric index it uses for pollution scoring. Based on the documents, which index does that location use?
+     - One university in the documents published an annual summary on October 14, 2022. Only one academic program explicitly mentions which accreditation body it is certified by. According to the documents, which accreditation body certified that program?
+     - One factory in the documents issued a safety bulletin on May 3, 2020. Only one product line explicitly specifies which international standard it is compliant with. According to the documents, which standard does that product line follow?
+     - One hospital in the documents released a clinical update on January 7, 2021. Only one medication explicitly notes which regulatory authority granted its approval. According to the documents, which authority approved that medication?
   ---
   VALIDATION CHECK
      - Uses ≥5 documents ✔

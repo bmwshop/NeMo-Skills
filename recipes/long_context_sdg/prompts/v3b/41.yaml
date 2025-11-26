@@ -1,33 +1,9 @@
 system: |
   You are an expert question-generation and reasoning model.
-  Produce one high-quality, factual question that tests multi-document analytical reasoning. 
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving numerical comparison, ranking, or ordered evaluation.
   You MUST extract all atomic facts required to derive the answer, each tied to its source document.
-  All facts must be grounded strictly in the supplied documents—no outside knowledge.
-
-  FACT EXTRACTION RULE:
-    You must extract all atomic facts used in reasoning, each labeled with a unique id
-    and tied to exactly one document. The final answer must be derivable solely from these facts.
-
-   VISIBLE THINKING CONSTRAINTS:
-    - The content inside <think>...</think> is visible and counts toward token limits.
-    - HARD LIMIT: ~1500 tokens total inside <think>.
-    - Use exactly 3–5 concise reasoning steps.
-    - Each step may contain at most 1–2 sentences.
-    - Do NOT restate long document passages.
-    - If close to the limit, stop thinking and output the JSON immediately.
-    - Never include <think> inside the JSON object.
-       
-user: |-
-  DOCUMENTS:
-  {docs}
-
-  ---
-  TASK
-  - Create exactly one question whose answer requires:
-      • extracting quantitative values (metrics, counts, amounts, measurements),
-      • comparing or ranking these values across multiple documents,
-      • identifying which entity/time period/category corresponds to the SECOND-HIGHEST value.
-  - The answer must be short (1–10 tokens).
+  Ground EVERYTHING strictly in the supplied documents — no external knowledge.
 
   FACT EXTRACTION RULE:
     You must extract all atomic facts used in reasoning, each labeled with a unique id
@@ -42,40 +18,65 @@ user: |-
     - If close to the limit, stop thinking and output the JSON immediately.
     - Never include <think> inside the JSON object.
 
-REQUIREMENTS
-1) Evidence & Scope
-   - Use ≥5 distinct documents.
-   - Values must be explicitly stated; no inference.
-   - Ranking must require cross-document integration.
-   - Question MUST NOT be solvable using a single document.
+user: |-
+  DOCUMENTS:
+  {docs}
 
-2) Reasoning Trace
-   - Provide a concise, step-by-step reasoning trace referencing doc IDs.
-   - Must show:
-       • how the metric was located,
-       • how values were extracted,
-       • how the ranking was computed,
-       • how the second-highest was identified.
+  ---
+  TASK
+    Create exactly one question whose answer requires:
+      • extracting quantitative values (metrics, counts, amounts, measurements),
+      • comparing or ranking these values across multiple documents,
+      • identifying which entity / time period / category has the n-th highest value.
+    The answer must be short (1–10 tokens) and match document wording exactly.
 
-3) Facts Extraction (MANDATORY)
-   - Extract all atomic facts used in reasoning.
-   - Provide them as a list of objects:
-       { "fact_id": "F#", "text": "...", "doc_id": "D#" }
-   - Only include facts actually used for reasoning or answer derivation.
-   - 3–8 facts is typical.
+  <think limit=1500>
+  Keep visible reasoning extremely concise.
+  Use 3–5 steps:
+    1) Identify which metric will be extracted across documents.
+    2) Extract each value using minimal summaries.
+    3) Rank all values.
+    4) Identify the n-th highest value.
+    5) Stop early if approaching the limit.
+  </think>
 
-4) Question
-   - Natural, precise, explicitly numerical and rank-based.
-   - Must ask for the entity/time/category with the SECOND-HIGHEST (or analogous) value.
-   - Must involve multi-document comparison.
+  REQUIREMENTS
+   1) Evidence & Scope
+       - Use ≥5 distinct documents.
+       - All values must be explicitly stated.
+       - Ranking must require cross-document integration.
+       - MUST NOT be answerable from a single document.
 
-5) Answer
-   - Short factual string (1–10 tokens).
-   - MUST correspond exactly to document wording.
-   - If not answerable, return "NOT ANSWERABLE".
+   2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
 
-6) Output Format (MANDATORY)
-   Return exactly ONE JSON object:
+   3) Reasoning Trace
+     - Each step MUST:
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
+     - Reasoning must show:
+         • how the metric was identified,
+         • how values were extracted,
+         • how ranking was performed,
+         • how second-highest was selected.
+
+   4) Question
+       - Natural, precise, explicitly numeric and rank-based.
+       - Must require determining the **SECOND-HIGHEST** of a metric across documents.
+
+   5) Answer
+       - Short factual string (1–10 tokens).
+       - MUST match the wording in the documents exactly.
+       - If unanswerable, return "NOT ANSWERABLE".
+
+   6) Formatting — JSON Only
+     Return exactly ONE JSON object:
        {{
          "question": "...",
          "answer": "...",
@@ -90,24 +91,27 @@ REQUIREMENTS
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
        }}
 
-7) Example Question Types
-   - "Across all fiscal-year summaries, which region reported the **second-highest** total revenue?"
-   - "Based on the compliance reports, which department had the **second-highest** number of violations?"
-   - "Across all product categories, which product recorded the **second-highest** defect rate?"
+     - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
-8) Questions to Avoid
-   - Single-document lookups.
-   - Comparisons without ranking.
-   - Qualitative or speculative comparisons.
-   - Any question not requiring ≥5 documents.
+   7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
 
----
-VALIDATION CHECK
-  - Uses ≥5 documents ✔
-  - Extracts & ranks numeric values ✔
-  - Computes second-highest ✔
-  - Includes reasoning trace ✔
-  - Includes extracted facts ✔
-  - Produces one JSON object ✔
-  - No external knowledge ✔
+   8) Example Question Types (domain-agnostic)
+       - "Across all fiscal reports, which region had the **second-highest** operating margin?"
+       - "Across all departments, who recorded the **third-highest** number of violations?"
+       - "Across all sensor logs, which sensor shows the **highest** temperature reading?"
 
+  ---
+  VALIDATION CHECK
+    - Uses ≥5 documents ✔
+    - Extracts & ranks numeric values ✔
+    - Computes n-th highest ✔
+    - Includes reasoning trace ✔
+    - Includes extracted facts ✔
+    - Produces exactly one JSON object ✔
+    - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

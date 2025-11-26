@@ -109,9 +109,7 @@ user: |-
      - Identify which product has metric Y; compute the delta relative to another model.
      - Identify which survey entry reports value V; compute difference vs. another period.
      - Identify which region hits a threshold; compute its ranking or margin.
-
-  9) Example
-     - “In which reporting quarter did emissions equal 7.4 tons, and by how much did this differ from the emissions recorded in the prior quarter? Report the difference to two decimal places.”
+     - In which reporting quarter did emissions equal 7.4 tons, and by how much did this differ from the emissions recorded in the prior quarter? Report the difference to two decimal places.
 
   ---
   VALIDATION CHECK
