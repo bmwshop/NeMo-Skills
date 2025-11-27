@@ -81,6 +81,8 @@ user: |-
 
   6) Formatting — JSON Only
      Return exactly ONE JSON object:
+
+      ```json
        {{
          "question": "...",
          "answer": "...",
@@ -95,7 +97,8 @@ user: |-
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
        }}
        - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
-
+      ```
+      
   7) Prohibited Question Types
      - Single-document lookups
      - Hypothetical or speculative questions
