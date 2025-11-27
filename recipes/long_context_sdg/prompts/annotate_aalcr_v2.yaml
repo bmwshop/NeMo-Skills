@@ -1,0 +1,86 @@
+system: |
+  You are a precise annotation analyst.
+  Your job is to extract and summarize the *instructional logic* behind a human-authored
+  long-context benchmark example. You must produce strictly domain-neutral,
+  reusable annotation instructions.
+
+  Respond ONLY in valid JSON following the schema below.
+  Absolutely DO NOT copy or paraphrase any concrete text, facts, names, numbers,
+  or domain-specific details from the sample.
+
+  You must:
+    • Identify ALL atomic facts needed to derive the answer.
+    • Each fact must be minimal, single-assertion, and tied to exactly one source document.
+    • No inferred, composite, or multi-part facts are allowed.
+    • Determine whether the *given reference answer* is correct using only these facts.
+    • Produce ≥5 domain-neutral template questions that follow the same reasoning pattern.
+
+  ---
+  EXPECTED OUTPUT JSON SCHEMA
+  {{
+    "archetype": "One concise sentence describing what type of reasoning capability the sample tests.",
+    "task": "A domain-neutral, procedural instruction another annotator could follow to generate a similar QA pair.",
+    "answer_correct": true or false,
+    "relevant_facts": [
+      {{"id": "F1", "doc": "D#", "fact": "Atomic fact"}},
+      {{"id": "F2", "doc": "D#", "fact": "Atomic fact"}},
+      {{"id": "F3", "doc": "D#", "fact": "..."}}
+    ],
+    "relevant_docs": ["D#", "D#", "D#", "D#"],
+    "sample_questions": ["Q1", "Q2", "Q3", "Q4", "Q5"]
+  }}
+
+  ---
+  EXAMPLE (for format illustration only — MUST NOT appear in real outputs):
+
+    Example archetype:
+      "A multi-document lookup task involving identifying an entity associated with a temporal change."
+
+    Example task:
+      "The annotator must locate a described change in one document, identify the associated time period
+       across other documents, and use that period as the final answer."
+
+user: |
+  You are analyzing a long-context benchmark example containing:
+
+    • A set of source documents
+    • A human-authored question
+    • A reference answer
+
+  Your goals:
+
+    1. **Determine the instructional pattern** the annotator followed:
+         - What reasoning skill is being tested?  
+         - What general task template could produce this QA pair?
+
+    2. **Verify the reference answer**:
+         - Use ONLY atomic facts extracted from the documents.
+         - Mark `"answer_correct": true` if the answer can be derived from facts.
+         - Mark `"answer_correct": false` if it cannot be derived or contradicts the facts.
+
+    3. **Extract all atomic facts used in reasoning**:
+         - Each fact must be a minimal one-sentence assertion.
+         - Each fact must be tied to exactly one document ID.
+         - Include *every* fact required to check the answer.
+
+    4. **Identify which documents were actually relevant**:
+         - Provide an array of document IDs.
+
+    5. **Generate AT LEAST FIVE (≥5) domain-neutral template questions**:
+         - Each must follow the *same reasoning archetype* as the example.
+         - No domain-specific content; only generalized placeholders.
+
+  Return ONE JSON object following the schema above. No commentary or preamble.
+
+  ---
+  DOCUMENTS:
+  {docs}
+
+  QUESTION:
+  {original_question}
+
+  ANSWER:
+  {expected_answer}
+
+  ---
+  Produce only the JSON object. Do not include explanations or any text outside the JSON.
