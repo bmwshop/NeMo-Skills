@@ -1,0 +1,128 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires combining explicit facts from MULTIPLE documents.
+    - The question MUST require:
+        • identifying a group/entity described in one document (via statistic, claim, behavior, definition, etc.),
+        • locating a broader group/category/classification to which that same entity belongs in a DIFFERENT document,
+        • integrating these facts into a single multi-hop query.
+    - THEN:
+        1. Extract all minimal atomic facts needed to compute the answer.
+        2. Assign each fact a unique ID ("F1", "F2", …).
+        3. Provide the correct document ID for each fact.
+        4. Compute the answer strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the entity/group referenced in one document.
+  2) Identify the broader group/category that document B assigns to the same entity.
+  3) Extract minimal atomic facts with fact IDs + document IDs.
+  4) Combine facts to compute the final answer.
+  5) Stop early if near the token limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every extracted fact MUST be directly from the documents (no inference).
+     - MUST require multi-document linkage: group identification AND broader classification must be in different documents.
+     - MUST NOT be solvable from a single document.
+
+  2) Facts Used (MANDATORY)
+     - Provide under "facts_used" a list of all atomic facts.
+     - Each entry MUST include:
+         • "id": unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D3")
+         • "fact": minimal, single-statement fact
+     - No hallucinations. No composites.
+     - reasoning_trace may ONLY reference fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise 3–5 step reasoning chain.
+     - Each step MUST:
+         • reference fact IDs (F#),
+         • reference doc IDs (D#).
+     - Must show:
+         • how the referenced group was identified,
+         • how the broader category was located,
+         • how the final answer follows strictly from the extracted facts.
+
+  4) Question
+     - Natural, precise, grounded entirely in the documents.
+     - Must ask: **“This group is a subset of which broader group?”** or equivalent wording.
+     - Must require multi-document linkage and hierarchical classification.
+     - Avoid trivial or single-document lookups.
+
+  5) Answer (MANDATORY)
+     - Compute strictly from the extracted facts.
+     - Provide the minimal name of the broader group/category.
+     - If the answer cannot be derived → return "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+      Return exactly ONE JSON object:
+
+      ```json
+       {{
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {{"id": "F1", "doc": "D#", "fact": "..."}},
+           {{"id": "F2", "doc": "D#", "fact": "..."}},
+           {{"id": "F3", "doc": "D#", "fact": "..."}},
+           {{"id": "F4", "doc": "D#", "fact": "..."}},
+           {{"id": "F5", "doc": "D#", "fact": "..."}}
+         ],
+         "reasoning_trace": "1) ... (F1, D#) 2) ... (F2, D#) 3) ... (F3, F4, D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+      ```
+      - "used_docs" MUST include ALL unique doc IDs referenced anywhere.
+
+  7) Prohibited Question Types
+     - Single-document classification questions.
+     - Hypothetical or speculative groupings.
+     - Questions requiring external taxonomies or world knowledge.
+     - Summaries or definitional questions without multi-hop linkage.
+
+  8) Example Questions (varied domains)
+     - One document reports that a specific species exhibits a rare behavior. Another document states that this species belongs to a larger biological class. According to the documents, which class is it part of?
+     - One document states that a particular programming language is used for data pipelines. Another categorizes it as part of a broader family of languages. According to the documents, which family is it?
+     - One report mentions that a certain mineral is used in batteries. Another document classifies this mineral as part of a broader geological group. Which group?
+     - One document notes that a region follows a particular cultural practice. Another document identifies that region as belonging to a larger cultural area. Which area?
+     - One document states that a chemical is used in a specific industrial process. Another document categorizes that chemical as part of a broader compound class. Which class?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - All facts tied to document IDs ✔
+     - Reasoning trace uses only extracted facts ✔
+     - Requires multi-hop linkage ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

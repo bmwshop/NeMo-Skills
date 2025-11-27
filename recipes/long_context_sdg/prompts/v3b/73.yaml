@@ -1,0 +1,125 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires determining **which of two conflicting interpretations is most correct**
+      based strictly on explicit evidence found across MULTIPLE documents.
+    - The question must involve:
+        • two individuals, organizations, or viewpoints expressing contradictory or partially conflicting claims,
+        • an issue discussed across the corpus (e.g., whether something is regulated, permitted, required, prohibited, in scope, etc.),
+        • resolution of the conflict by synthesizing facts from multiple documents.
+    - THEN:
+        1. Extract all minimal atomic facts needed to determine which interpretation is better supported.
+        2. Assign each fact a unique ID ("F1", "F2", ...).
+        3. Provide the correct document ID for each fact.
+        4. Compute the final answer strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the conflicting claims.
+  2) Locate evidence in multiple documents addressing the issue.
+  3) Extract atomic facts (assign fact IDs + document IDs).
+  4) Combine these facts to determine whose interpretation is more correct.
+  5) Stop early if near the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every atomic fact MUST be directly stated in its source document.
+     - The question MUST require resolving a disagreement using multi-document evidence.
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id" (F1, F2, …)
+         • "doc" (document ID, e.g., "D4")
+         • "fact" (a minimal, self-contained factual statement)
+     - No composite, speculative, or inferred facts.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "F2")
+         • reference doc IDs (e.g., "D4")
+     - Must show explicitly:
+         • how each claim was located,
+         • how evidence was compared or weighted,
+         • how the conclusion (who is more correct) follows strictly from the facts.
+
+  4) Question
+     - Natural, precise, and grounded entirely in the documents.
+     - Must present a scenario in which two viewpoints conflict.
+     - Must ask explicitly: **“Who is most correct?”** or **“Which interpretation is more accurate?”**
+     - MUST require multi-document synthesis.
+
+  5) Answer (MANDATORY)
+     - Compute the answer strictly from the extracted facts.
+     - Provide a short, factual answer (1–10 tokens).
+     - If the answer cannot be derived → return "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
+
+      ```json
+       {{
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {{"id": "F1", "doc": "D#", "fact": "..."}},
+           {{"id": "F2", "doc": "D#", "fact": "..."}},
+           {{"id": "F3", "doc": "D#", "fact": "..."}},
+           {{"id": "F4", "doc": "D#", "fact": "..."}},
+           {{"id": "F5", "doc": "D#", "fact": "..."}}
+         ],
+         "reasoning_trace": "1) ... (F1, F2; D#) 2) ... (F3; D#) 3) ... (F4, F5; D#)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+      ```
+
+  7) Prohibited Question Types
+     - Single-document questions.
+     - Hypothetical or speculative contradictions not grounded in text.
+     - Questions resolved without comparing conflicting claims.
+     - Questions requiring external world knowledge.
+
+  8) Example Question Archetypes (Domain-Agnostic)
+     - Two analysts disagree about whether a practice is regulated—who is most correct?
+     - Two researchers dispute whether a concept is defined in the corpus—whose interpretation matches the documents?
+     - Two organizations claim different obligations apply—whose view is supported by the text?
+     - Two experts interpret a policy requirement differently—identify which interpretation is correct.
+     - Two parties argue about whether a rule applies implicitly or explicitly—who is most supported?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used correspond to explicit statements ✔
+     - Multi-hop reasoning required ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

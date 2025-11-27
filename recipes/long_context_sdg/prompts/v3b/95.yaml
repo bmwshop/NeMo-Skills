@@ -1,0 +1,129 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires combining explicit facts from MULTIPLE documents.
+    - The question MUST require:
+        • locating two or more explicit numerical estimates (percentages, rates, counts, scores, etc.) 
+          referring to the SAME underlying metric/topic across different documents,
+        • comparing the values (e.g., determining which is larger, smaller, higher, or lower),
+        • deriving the correct comparative answer strictly by linking facts from multiple documents.
+    - THEN:
+        1. Extract all minimal atomic facts required to compute the answer.
+        2. Assign each fact a unique fact ID ("F1", "F2", …).
+        3. Provide the correct document ID for each fact.
+        4. Compute the final answer strictly from the extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the metric/topic appearing in multiple documents.
+  2) Extract the numerical estimates related to this shared metric.
+  3) Extract atomic facts (assign fact IDs + document IDs).
+  4) Compare the extracted values to compute the answer.
+  5) Stop early if approaching the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every extracted fact MUST come directly from an explicit statement in its source document.
+     - The question MUST require multi-document linkage (cannot be answered from a single document).
+     - The compared values MUST refer to the SAME conceptual measurement.
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact MUST include:
+         • "id": unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or inferred facts.
+     - Reasoning_trace may ONLY reference these fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise numbered reasoning chain (3–5 steps).
+     - Each step MUST:
+         • reference fact IDs (e.g., "F2"),
+         • reference doc IDs (e.g., "D4").
+     - Must show:
+         • how the common metric/value type was identified,
+         • how each numerical estimate was extracted,
+         • how the comparative answer was derived.
+
+  4) Question
+     - Natural and precise.
+     - Must explicitly ask for a numerical comparison (e.g., “Which estimate is higher?”).
+     - Must require values from MULTIPLE documents.
+     - Must NOT be solvable from a single document.
+
+  5) Answer (MANDATORY)
+     - Compute the answer strictly from the extracted facts.
+     - Short, factual, minimal (numerical value or percentage only).
+     - If the answer cannot be derived → return "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+      Return exactly ONE JSON object:
+
+      ```json
+       {{
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {{"id": "F1", "doc": "D#", "fact": "..."}},
+           {{"id": "F2", "doc": "D#", "fact": "..."}},
+           {{"id": "F3", "doc": "D#", "fact": "..."}},
+           {{"id": "F4", "doc": "D#", "fact": "..."}},
+           {{"id": "F5", "doc": "D#", "fact": "..."}}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+      ```
+      - "used_docs" MUST include all unique document IDs referenced.
+
+  7) Prohibited Question Types
+     - Single-document numerical lookup.
+     - Hypothetical comparisons (“assume…”, “estimate…”).
+     - Questions requiring external world knowledge.
+     - Vague or non-comparable metrics.
+
+  8) Example Questions (varied domains)
+     - Two documents report different failure percentages for a component. Which percentage is higher?
+     - Two studies give different growth-rate estimates for the same species. Which is larger?
+     - Two market reports predict different adoption rates for the same technology. Which forecast is higher?
+     - Two weather stations record humidity percentages on the same day. Which station reported the higher humidity?
+     - Two financial reports list revenue growth for the same quarter. Which is greater?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - Facts each cite a document and contain atomic claims ✔
+     - Reasoning uses ONLY extracted facts ✔
+     - Correct final answer derivable ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

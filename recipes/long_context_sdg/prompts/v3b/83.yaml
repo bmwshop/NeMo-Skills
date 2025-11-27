@@ -1,0 +1,125 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires combining explicit facts from MULTIPLE documents.
+    - The question must require:
+        • identifying a starting event/date/version in one document,
+        • identifying a category of recurring events (e.g., revisions, updates, inspections, approvals),
+        • counting how many such events occurred across TWO OR MORE groups of documents,
+        • aggregating the totals into a single final count.
+    - THEN:
+        1. Extract all minimal atomic facts needed to compute the count.
+        2. Assign each fact a unique fact ID ("F1", "F2", ...).
+        3. Provide the correct document ID for each fact.
+        4. Compute the correct total strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the triggering event/date/version.
+  2) Locate all documents listing relevant recurring events.
+  3) Extract atomic facts representing each counted event.
+  4) Add the counts together to compute the final number.
+  5) Stop early if near the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every extracted fact MUST come directly from an explicit statement in its source document.
+     - The question MUST require multi-document linkage and aggregation.
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
+     - Reasoning must demonstrate:
+         • how the starting point was identified,
+         • how the events were collected from multiple documents,
+         • how the total count was computed.
+
+  4) Question
+     - Natural, precise, grounded entirely in the documents.
+     - Must require multi-document aggregation of a recurring event type.
+     - MUST NOT be solvable using a single document.
+
+  5) Answer (MANDATORY)
+     - Compute the answer strictly from the extracted facts.
+     - Answer must be short and factual (integer only).
+     - If the answer cannot be derived → return "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
+
+      ```json
+       {{
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {{"id": "F1", "doc": "D#", "fact": "..."}},
+           {{"id": "F2", "doc": "D#", "fact": "..."}},
+           {{"id": "F3", "doc": "D#", "fact": "..."}},
+           {{"id": "F4", "doc": "D#", "fact": "..."}},
+           {{"id": "F5", "doc": "D#", "fact": "..."}}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+      ```
+      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
+
+  7) Prohibited Question Types
+     - Single-document counts
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
+     - Counting events not explicitly documented
+
+  8) Example Questions (varied domains)
+     - After the initial project kickoff date, how many total design revisions were recorded across all engineering logs?
+     - Following the first published safety alert, how many additional inspection reports were issued across the facility’s records?
+     - After the original software release, how many patches and hotfixes were released across both repositories?
+     - After the first quality audit, how many noncompliance notices were filed across the regional compliance reports?
+     - After the initial research protocol submission, how many amendments were logged across the full regulatory correspondence set?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - Multi-step aggregation reasoning ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

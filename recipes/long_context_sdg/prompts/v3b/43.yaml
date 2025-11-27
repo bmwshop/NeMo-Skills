@@ -1,0 +1,127 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires:
+        • extracting sets of entities from MULTIPLE documents,
+        • determining which entities appear in **only one** document (i.e., not appearing in any others),
+        • and then sorting these entities **alphabetically by last name**, using **first name as a tie-breaker**.
+    - THEN:
+        1. Extract all minimal atomic facts needed to compute the answer.
+        2. Assign each fact a unique ID ("F1", "F2", ...).
+        3. Provide the correct document ID for each fact.
+        4. Compute and list the final entities strictly from these facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify entity lists across documents.
+  2) Determine which entities appear in exactly one document.
+  3) Extract atomic facts identifying each entity + its associated document.
+  4) Apply alphabetical sorting by last name (tie-breaker: first name).
+  5) Stop early if near the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every fact MUST come directly from an explicit statement in its source document.
+     - The question MUST require multi-document entity comparison (not answerable from one doc).
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D3")
+         • "fact": minimal single-statement fact (e.g., “Entity X appears in D3”)
+     - No composite facts. No inferred facts. No omissions.
+     - The reasoning_trace may ONLY reference fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must reference fact IDs (e.g., "(F2)") and document IDs where relevant.
+     - Must show:
+         • extraction of entity sets,
+         • filtering to those appearing in only one document,
+         • application of alphabetical sorting by last name.
+
+  4) Question
+     - Natural, precise, grounded entirely in the documents.
+     - Must require:
+         • multi-document entity comparison
+         • identifying entities appearing in ONLY ONE document
+         • sorting alphabetically by last name (tie-breaker: first name)
+
+  5) Answer (MANDATORY)
+     - A list of the properly sorted entity names.
+     - If no such entities exist → "NONE".
+     - If insufficient evidence → "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+      Return exactly ONE JSON object:
+
+      ```json
+      {{
+        "question": "...",
+        "answer": "...",
+        "facts_used": [
+          {{"id": "F1", "doc": "D#", "fact": "..."}},
+          {{"id": "F2", "doc": "D#", "fact": "..."}},
+          {{"id": "F3", "doc": "D#", "fact": "..."}},
+          {{"id": "F4", "doc": "D#", "fact": "..."}},
+          {{"id": "F5", "doc": "D#", "fact": "..."}}
+        ],
+        "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
+        "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+      }}
+      ```
+
+      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
+
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Counting-only questions
+     - Hypothetical, counterfactual, or speculative questions
+     - Questions requiring external world knowledge
+     - Questions asking for entities appearing in ALL documents (different archetype)
+
+  8) Example Questions (varied domains)
+     - Across the field reports, which species is mentioned in exactly one region? Sort alphabetically by species name.
+     - Among the conference programs, which presenters appear in only one program? Sort by last name.
+     - Across archival lists, which artifacts occur in only one catalog? Sort alphabetically.
+     - In the lab notebooks, which chemical compounds are used in exactly one experiment? Sort by compound name.
+     - Across the manuscripts, which co-authors appear in only one document version? Sort alphabetically by surname.
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used each cite a doc and contain atomic claims ✔
+     - Multi-document symmetric difference reasoning ✔
+     - Sorting rule application ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

@@ -1,0 +1,123 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires:
+        • identifying a **structural pattern** shared across MULTIPLE documents
+          (e.g., how a specific section consistently begins),
+        • comparing this pattern to several **candidate statements** (A, B, C, optionally D),
+        • determining which candidate does **NOT** match the structural pattern.
+    - THEN:
+        1. Extract all minimal atomic facts needed to determine the shared pattern.
+        2. Assign each fact a unique ID ("F1", "F2", ...).
+        3. Provide the correct document ID for each fact.
+        4. Compute which option does NOT match, strictly from these facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the structural pattern shared across documents.
+  2) Extract atomic facts describing that pattern.
+  3) Compare each option (A/B/C/…) to the extracted pattern.
+  4) Identify the option that does NOT match.
+  5) Stop early if near limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts describing the structural pattern.
+     - Every fact MUST come directly from explicit statements in its source document.
+     - The question MUST require recognizing a pattern across multiple documents
+       (cannot be answered from a single document).
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": (F1, F2, …)
+         • "doc": document ID (e.g., "D4")
+         • "fact": minimal single-statement fact describing the structural feature
+           of that document’s section.
+     - No inferred, heuristic, or composite facts.
+     - Reasoning_trace may ONLY reference fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must reference fact IDs and document IDs.
+     - The reasoning must show:
+         • how the recurring structural pattern was extracted,
+         • how each candidate option aligns or fails to align with that pattern,
+         • how the incorrect option was determined.
+
+  4) Question
+     - Natural, precise, and fully document-grounded.
+     - Must ask: **“Which of the following is NOT a shared similarity?”**
+     - Must present labeled answer choices A, B, C (and optionally D).
+
+  5) Answer (MANDATORY)
+     - Must contain both the correct letter AND the statement text (e.g. "B: …").
+     - If multiple options fail or all match, answer:
+       "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+      Return exactly ONE JSON object:
+
+      ```json
+      {{
+        "question": "...",
+        "answer": "B: ...",
+        "facts_used": [
+          {{"id": "F1", "doc": "D#", "fact": "..."}},
+          {{"id": "F2", "doc": "D#", "fact": "..."}},
+          {{"id": "F3", "doc": "D#", "fact": "..."}},
+          {{"id": "F4", "doc": "D#", "fact": "..."}},
+          {{"id": "F5", "doc": "D#", "fact": "..."}}
+        ],
+        "reasoning_trace": "1) ... (F1,F2) 2) ... (F3) 3) ... (F4,F5)",
+        "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+      }}
+      ```
+
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Content-oriented comparisons (must focus on **structure**, not content)
+     - Hypotheticals or external world-knowledge
+     - Pure fact-retrieval without cross-document pattern analysis
+
+  8) Example Questions (domain-agnostic)
+     - Which of the following statements is NOT a shared feature of how the documents begin their introduction sections?
+     - Which option does NOT match the recurring structure of the “Summary” section headers across the documents?
+     - Which item is NOT a consistent part of the opening disclaimer format in all documents?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic pattern-facts ✔
+     - facts_used each cite a doc + contain atomic structural features ✔
+     - Multi-document pattern comparison ✔
+     - MCQ with exactly one incorrect option ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

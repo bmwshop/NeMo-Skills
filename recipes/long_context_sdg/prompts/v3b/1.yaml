@@ -1,0 +1,135 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question requiring multi-document analytical reasoning.
+  The question must require extracting a quantitative or ordinal metric in one or more documents,
+  comparing or ranking entities across documents, and applying at least one explicit constraint
+  (e.g., exclusion of an entity or category).
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  All content must come strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one question whose answer requires:
+        • extracting a numerical metric reported for multiple explicitly named entities,
+        • ranking or ordering those entities by that metric,
+        • and applying at least one constraint (e.g., exclude one entity/category).
+    - THEN:
+        1. Extract all atomic facts needed to derive the answer (minimum: 5 facts).
+        2. Assign each fact a unique fact_id ("F1", "F2", ...).
+        3. Tie each fact to the exact document where it appears.
+        4. Compute the correct ordered list strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep thinking extremely concise.
+  Use 3–5 steps:
+    1) Identify which metric is used for ranking (e.g., counts, frequencies).
+    2) Locate the metric values for each explicitly named entity.
+    3) Extract atomic facts (assign fact IDs + document IDs).
+    4) Apply the constraint (e.g., exclude one entity).
+    5) Rank remaining entities strictly using the extracted facts.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract ≥5 atomic facts (one claim each).
+     - All facts must be explicitly stated.
+     - The question MUST require:
+         • extracting a metric across several entities,
+         • applying a filtering/exclusion requirement,
+         • performing a comparison and producing a ranked output.
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No invented or composite facts.
+     - reasoning_trace may ONLY reference these fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
+     - Must show:
+         • how the metric was identified,
+         • how values were extracted across documents,
+         • how constraints were applied,
+         • how the ranking was derived.
+
+  4) Question
+     - Natural and precise.
+     - Requires ranking or comparison across multiple documents.
+     - Requires at least one constraint (e.g., excluding a category).
+     - Not solvable from a single document.
+
+     Example question formed from this archetype:
+       “Based on the provided documents, identify and rank the entities explicitly mentioned
+        according to their reported metric values. Exclude any entity classified as ‘X’.”
+
+  5) Answer
+     - Short, factual ordered list (e.g., "Industry A, Industry B, Industry C").
+     - If the documents do not provide complete values → answer “NOT ANSWERABLE”.
+
+  6) Formatting — JSON Only
+      ```json
+       {{
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {{"id": "F1", "doc": "D#", "fact": "..."}},
+           {{"id": "F2", "doc": "D#", "fact": "..."}},
+           {{"id": "F3", "doc": "D#", "fact": "..."}},
+           {{"id": "F4", "doc": "D#", "fact": "..."}},
+           {{"id": "F5", "doc": "D#", "fact": "..."}}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+      ```
+      - "used_docs" MUST include every unique document cited.
+
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative ranking
+     - Ranking requiring external knowledge
+     - Questions lacking a filtering/exclusion condition
+
+  8) Example Question Types (domain-agnostic)
+     - Rank countries by the number of reported incidents; exclude countries marked “inactive.”
+     - Identify products with the highest failure counts; exclude discontinued products.
+     - Rank regions by the frequency of specified events; exclude provisional regions.
+     - Compare organizations by number of citations or violations; exclude those flagged “non-operational.”
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used each cite a document and contain atomic claims ✔
+     - Reasoning only uses facts_used ✔
+     - Ranking applied correctly ✔
+     - Contains constraint (exclusion) ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

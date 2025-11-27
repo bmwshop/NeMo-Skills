@@ -1,0 +1,132 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires combining explicit facts from MULTIPLE documents.
+    - The question MUST require:
+        • locating a quantity, rate, average, unit value, or measurable attribute in one document,
+        • locating a related count, population size, or scalar quantity in OTHER documents,
+        • integrating these values into a single computed final answer (e.g., total, estimate, projection).
+    - THEN:
+        1. Extract all minimal atomic facts needed to compute the answer.
+        2. Assign each fact a unique fact ID ("F1", "F2", ...).
+        3. Provide the correct document ID for each fact.
+        4. Compute the correct final answer strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the documents that contain a per-unit, per-capita, per-item, or average figure.
+  2) Identify the documents that contain a corresponding population, count, or multiplier.
+  3) Extract atomic facts (assign fact IDs + doc IDs).
+  4) Multiply or combine the required values to compute the answer.
+  5) Stop early if near the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every extracted fact MUST come directly from an explicit statement in its source document.
+     - The question MUST require multi-document linkage (cannot be answered from a single document).
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F3)")
+         • reference doc IDs (e.g., "(D4)")
+     - Must show:
+         • how the relevant quantitative attributes were located,
+         • how the corresponding population/multiplier values were found,
+         • how the final computed value is derived strictly from the atomic facts.
+
+  4) Question
+     - Natural, precise, grounded entirely in the documents.
+     - Must require combining values from different documents into a computed result.
+     - MUST NOT be solvable using a single document.
+
+  5) Answer (MANDATORY)
+     - Compute the answer strictly from the extracted facts.
+     - Short, factual, numeric (with units if applicable).
+     - If the answer cannot be derived → return "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
+
+      ```json
+       {{
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {{"id": "F1", "doc": "D#", "fact": "..."}},
+           {{"id": "F2", "doc": "D#", "fact": "..."}},
+           {{"id": "F3", "doc": "D#", "fact": "..."}},
+           {{"id": "F4", "doc": "D#", "fact": "..."}},
+           {{"id": "F5", "doc": "D#", "fact": "..."}}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+      ```
+      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
+
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Questions requiring speculation, projection, or outside assumptions
+     - Qualitative or opinion questions
+     - Hypotheticals unrelated to factual numeric integration
+
+  8) Example Question Archetypes (NON-DOMAIN-SPECIFIC)
+     - One document provides an average value per unit; another provides the total number of units.
+       According to the documents, what is the total quantity/value?
+     - One report gives an annual per-capita figure; another shows the size of the relevant population.
+       Based on the documents, what is the estimated total?
+     - One study lists a per-item cost; another lists the number of such items purchased.
+       What is the total cost according to the documents?
+     - One document reports the average output per facility; another gives the number of facilities.
+       What is the total output based on the documents?
+     - One document states the per-transaction fee; another states the number of transactions.
+       What is the total amount collected?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used each cite a document and contain atomic claims ✔
+     - Reasoning only uses facts_used ✔
+     - Correct derived answer ✔
+     - Multi-step reasoning ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

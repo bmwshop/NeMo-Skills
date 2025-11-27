@@ -1,0 +1,126 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires:
+        • extracting two related quantitative values for several entities across multiple documents,
+        • computing a derived metric (e.g., difference, delta, change, ratio),
+        • and ranking those entities based on that computed metric.
+    - The question must explicitly require cross-document value matching (e.g., same entity across two different periods).
+    - The answer must be a ranked list (descending or ascending), composed of entity names or labels.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the entities to be compared.
+  2) Identify the values tied to each entity across documents.
+  3) Extract atomic facts (assign fact IDs + document IDs).
+  4) Compute the ranking strictly from extracted facts.
+  5) Stop early if near the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every extracted fact MUST be a minimal, explicit statement from exactly one document.
+     - The question MUST require linking values for each entity across multiple documents.
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D2")
+         • "fact": minimal single-statement fact conveying the numeric value or entity linkage
+     - No interpretation or multi-part facts.
+     - Reasoning_trace may ONLY reference fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F3)")
+         • reference doc IDs (e.g., "(D7)")
+     - Must show:
+         • where each value came from,
+         • how the computed metric was derived,
+         • how the ranking was produced.
+
+  4) Question
+     - Natural, precise, and explicitly comparative.
+     - Must identify:
+         • the set of entities (e.g., regions, labs, years, divisions),
+         • the two values being compared,
+         • what computation (difference, change, etc.) is required,
+         • what order to rank the results in.
+     - MUST NOT be solvable using a single document.
+
+  5) Answer (MANDATORY)
+     - Short, factual, minimal (ranked list).
+     - If the ranking cannot be computed due to missing values → return "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
+
+      ```json
+       {{
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {{"id": "F1", "doc": "D#", "fact": "..."}},
+           {{"id": "F2", "doc": "D#", "fact": "..."}},
+           {{"id": "F3", "doc": "D#", "fact": "..."}},
+           {{"id": "F4", "doc": "D#", "fact": "..."}},
+           {{"id": "F5", "doc": "D#", "fact": "..."}}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+      ```
+      - "used_docs" MUST include all document IDs referenced anywhere.
+
+  7) Prohibited Question Types
+     - Single-document retrieval
+     - Trivial fact lookups
+     - Hypothetical questions
+     - Questions requiring external knowledge
+     - Questions lacking a computed/ranked final answer
+
+  8) Example Questions (domain-agnostic)
+     - For the three research sites, extract their earliest and latest recorded water usage and rank them by magnitude of increase.
+     - Using the climate records, compute the temperature change for Regions X, Y, and Z, then rank the regions by greatest warming.
+     - Across the performance logs, compare the two most recent measurements for each machine and rank them by improvement.
+     - Based on the annual reports, compute the change in enrollment for Departments A–C and rank them by the size of the increase.
+     - For the species population surveys, compute each species’ change between the first and last observations and rank them accordingly.
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - Multi-document linking ✔
+     - Requires derived computation ✔
+     - Produces a ranked answer ✔
+     - JSON-only output ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

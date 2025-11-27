@@ -1,0 +1,129 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires combining explicit facts from MULTIPLE documents.
+    - The question must require:
+        • identifying the document that contains a specific factual attribute (e.g., a revenue figure, date, measurement, value),
+        • locating the first action/event performed by a specific entity within that identified document,
+        • and determining which entity produced the associated response/answer.
+    - THEN:
+        1. Extract all minimal atomic facts needed to compute the answer.
+        2. Assign each fact a unique fact ID ("F1", "F2", ...).
+        3. Provide the correct document ID for each fact.
+        4. Compute the correct final answer strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the document containing the required factual attribute.
+  2) Locate the specified entity’s first action inside that document.
+  3) Identify the entity who responded to that first action.
+  4) Extract atomic facts (assign fact IDs + document IDs).
+  5) Combine extracted facts to compute the answer.
+  6) Stop early if near the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every extracted fact MUST come directly from an explicit statement in its source document.
+     - The question MUST require multi-document linkage (cannot be answered from a single document).
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": a short unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D7")
+         • "fact": minimal single-statement fact
+     - No hallucinated or composite facts.
+     - Reasoning_trace may ONLY use these fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F2)")
+         • reference doc IDs (e.g., "(D4)")
+     - Must show:
+         • how the identifying attribute was found,
+         • how the target document was isolated,
+         • how the first action was located,
+         • and how the answer was derived strictly from facts.
+
+  4) Question
+     - Natural, precise, grounded entirely in the documents.
+     - Must require multi-document linkage and synthesis.
+     - MUST NOT be solvable using a single document.
+
+  5) Answer (MANDATORY)
+     - Compute the answer strictly from the extracted facts.
+     - Short, factual, minimal (entity, number, date, location, or short phrase).
+     - If the answer cannot be derived → return "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+     Return exactly ONE JSON object:
+
+      ```json
+       {{
+         "question": "...",
+         "answer": "...",
+         "facts_used": [
+           {{"id": "F1", "doc": "D#", "fact": "..."}},
+           {{"id": "F2", "doc": "D#", "fact": "..."}},
+           {{"id": "F3", "doc": "D#", "fact": "..."}},
+           {{"id": "F4", "doc": "D#", "fact": "..."}},
+           {{"id": "F5", "doc": "D#", "fact": "..."}}
+         ],
+         "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
+         "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+       }}
+      ```
+      - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
+
+  7) Prohibited Question Types
+     - Questions solvable from a single document.
+     - Hypothetical or speculative questions.
+     - Questions requiring external world knowledge.
+     - Questions that ask for causes, motivations, or interpretation.
+
+  8) Example Questions (varied domains)
+     - One archaeological log reports an artifact weight of 73.4 kg. Only one excavation diary records who performed the first soil analysis on that artifact. According to the documents, who conducted that analysis?
+     - One scientific study in the corpus reports a sample size of exactly 1,280. Only one lab notebook explicitly records who authored the first annotation on that study’s data. Based on the documents, who wrote that annotation?
+     - One government memo states a budget allocation of $4.2 million. Only one meeting transcript records who issued the response to the first public inquiry. According to the documents, who issued that response?
+     - One field report logs a rainfall total of 912 mm. Only one environmental transcript states who provided the first expert evaluation. Who was that evaluator?
+     - One clinical document reports a trial cohort of 57 patients. Only one transcript notes who answered the first question asked by the lead researcher. Who answered?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used each cite a document and contain atomic claims ✔
+     - Reasoning only uses facts_used ✔
+     - Correct derived answer ✔
+     - Multi-step reasoning ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

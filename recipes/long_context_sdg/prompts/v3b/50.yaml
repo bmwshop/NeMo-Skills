@@ -1,0 +1,126 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and output the JSON immediately.
+    - Never include <think> inside the JSON object.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires:
+        • extracting sets of entities from MULTIPLE documents,
+        • identifying the entities that appear in **ALL** of those documents,
+        • and sorting them **alphabetically by last name**, using **first name as a tie-breaker**.
+    - THEN:
+        1. Extract all minimal atomic facts needed to compute the intersection.
+        2. Assign each fact a unique ID ("F1", "F2", ...).
+        3. Provide the correct document ID for each fact.
+        4. Compute and list the final sorted entity list strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify entity lists across documents.  
+  2) Determine which entities appear in ALL documents.  
+  3) Extract atomic facts identifying each entity and each occurrence.  
+  4) Apply alphabetical sorting by last name (tie-breaker: first name).  
+  5) Stop early if near limit.  
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every fact MUST come directly from an explicit statement in its source document.
+     - The question MUST require true multi-document entity intersection logic.
+
+  2) Facts Used (MANDATORY)
+     - Provide a list of atomic facts under "facts_used".
+     - Each fact entry MUST include:
+         • "id": unique ID (F1, F2, …)
+         • "doc": document ID (e.g., "D5")
+         • "fact": minimal explicit fact, such as “Entity X appears in D5”.
+     - No composite, inferred, or merged facts allowed.
+     - Reasoning_trace may ONLY reference these fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered reasoning chain (3–5 steps).
+     - Each step must reference fact IDs and document IDs.
+     - Must show:
+         • extraction of entity sets,
+         • cross-document matching to find entities appearing in ALL documents,
+         • application of the alphabetical (last-name-first) sorting rule.
+
+  4) Question
+     - Natural, precise, grounded entirely in the documents.
+     - Must require:
+         • identifying entities appearing in ALL documents,
+         • applying the specified sorting rule,
+         • combining facts from multiple documents.
+     - A single-document lookup question is NOT allowed.
+
+  5) Answer (MANDATORY)
+     - A list of the sorted entity names EXACTLY as they appear in the documents.
+     - If no entity appears in all documents → "NONE".
+     - If evidence insufficient → "NOT ANSWERABLE".
+
+  6) Formatting — JSON Only
+      Return exactly ONE JSON object:
+
+      ```json
+      {{
+        "question": "...",
+        "answer": "...",
+        "facts_used": [
+          {{"id": "F1", "doc": "D#", "fact": "..."}},
+          {{"id": "F2", "doc": "D#", "fact": "..."}},
+          {{"id": "F3", "doc": "D#", "fact": "..."}},
+          {{"id": "F4", "doc": "D#", "fact": "..."}},
+          {{"id": "F5", "doc": "D#", "fact": "..."}}
+        ],
+        "reasoning_trace": "1) ... (F1,F2) 2) ... (F3) 3) ... (F4,F5)",
+        "used_docs": ["D#", "D#", "D#", "D#", "D#"]
+      }}
+      ```
+
+  7) Prohibited Question Types
+     - Questions asking for entities appearing in only one document (different archetype)
+     - Pure counting questions
+     - Single-document lookup
+     - Hypothetical or speculative questions
+     - Questions requiring outside knowledge
+
+  8) Example Questions (domain-agnostic)
+     - Which contributors are listed in every manuscript version? Sort alphabetically by surname.
+     - Which organisms are reported in all ecological survey logs? Sort alphabetically.
+     - Which speakers appear in all conference programs? Sort by last name.
+     - Which product codes appear in every inventory document? Sort alphanumerically.
+     - Which committee members are present in all meeting minutes? Sort by last name.
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - facts_used each cite one document and contain an atomic claim ✔
+     - Multi-document intersection reasoning ✔
+     - Sorting rule applied ✔
+     - JSON valid ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS
