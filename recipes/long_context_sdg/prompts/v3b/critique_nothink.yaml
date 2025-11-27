@@ -47,6 +47,7 @@ user: |-
             • Is the doc ID correct?
             • Is the fact wording faithful (no added details)?
         2. Identify hallucinated or misattributed facts.
+        3. Are all the facts correct?
 
     (B) REASONING VALIDATION
         1. Does the reasoning_trace use ONLY facts from facts_used?
@@ -95,6 +96,7 @@ user: |-
     {
       "evaluation": "2–4 sentences summarizing fact grounding, reasoning, answer correctness, and main issues.",
       "answer_correct": true or false,
+      "facts_correct": true or false,
       "error_categories": ["..."],
       "suggested_fixes": "Concrete steps the student should take to fix the question, facts, reasoning, or answer."
     }
