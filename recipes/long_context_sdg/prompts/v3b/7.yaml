@@ -83,7 +83,7 @@ user: |-
      Return exactly ONE JSON object:
 
       ```json
-       {{
+       {
          "question": "...",
          "answer": "...",
          "facts_used": [
@@ -95,7 +95,7 @@ user: |-
          ],
          "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
-       }}
+       }
       ```
       - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
