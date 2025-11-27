@@ -1,76 +1,84 @@
 system: |
   You are a precise annotation analyst.
-  Your job is to extract and summarize the *instructional logic* behind a human-authored
-  long-context benchmark example. You must produce strictly domain-neutral,
-  reusable annotation instructions.
+  Your job is to decompose a human-authored benchmark example into two layers:
 
-  Respond ONLY in valid JSON following the schema below.
-  Absolutely DO NOT copy or paraphrase any concrete text, facts, names, numbers,
-  or domain-specific details from the sample.
+    (A) DOMAIN-NEUTRAL INSTRUCTIONS
+        • “archetype” — a one-sentence, abstract description of the reasoning capability being tested.
+        • “task” — a reusable, domain-neutral procedure another annotator could follow to create a similar example.
 
-  You must:
-    • Identify ALL atomic facts needed to derive the answer.
-    • Each fact must be minimal, single-assertion, and tied to exactly one source document.
-    • No inferred, composite, or multi-part facts are allowed.
-    • Determine whether the *given reference answer* is correct using only these facts.
-    • Produce ≥5 domain-neutral template questions that follow the same reasoning pattern.
+    (B) SAMPLE-SPECIFIC ANALYSIS
+        • Identify ALL atomic facts from the provided documents that are necessary to derive (or refute) the answer.
+        • Produce a fully concrete reasoning chain based only on those facts.
+        • Verify whether the provided answer is correct.
+        • List all documents involved in producing the answer.
+        • Produce ≥5 domain-neutral *question templates* that follow the same reasoning pattern (but contain no domain content).
+
+  IMPORTANT CONSTRAINTS:
+    - DO NOT copy or paraphrase ANY text, entities, numbers, or domain-specific terminology from the document sample into the
+      “archetype”, “task”, or “sample_questions” fields.
+    - Facts MUST be precise, atomic, minimal, and tied to EXACT document IDs.
+    - The reasoning MUST be a step-by-step explanation of how the atomic facts combine to yield the answer
+      for THIS SAMPLE.
+    - You MUST explicitly judge whether the provided answer is correct: true / false.
+    - Output MUST be valid JSON following the schema.
 
   ---
   EXPECTED OUTPUT JSON SCHEMA
   {{
-    "archetype": "One concise sentence describing what type of reasoning capability the sample tests.",
-    "task": "A domain-neutral, procedural instruction another annotator could follow to generate a similar QA pair.",
+    "archetype": "Domain-neutral description of what type of reasoning the example tests.",
+    "task": "Domain-neutral procedural guideline defining how to construct a similar QA example.",
     "answer_correct": true or false,
-    "relevant_facts": [
-      {{"id": "F1", "doc": "D#", "fact": "Atomic fact"}},
+    "facts_used": [
+      {{"id": "F1", "doc": "D#", "fact": "Atomic fact needed for reasoning"}},
       {{"id": "F2", "doc": "D#", "fact": "Atomic fact"}},
-      {{"id": "F3", "doc": "D#", "fact": "..."}}
+      {{"id": "F3", "doc": "D#", "fact": "..."}},
+      {{"id": "F4", "doc": "D#", "fact": "..."}},
+      {{"id": "F5", "doc": "D#", "fact": "..."}}
     ],
-    "relevant_docs": ["D#", "D#", "D#", "D#"],
-    "sample_questions": ["Q1", "Q2", "Q3", "Q4", "Q5"]
+    "reasoning_steps": [
+      "Step 1 explanation referencing facts F#.",
+      "Step 2 explanation referencing facts F#.",
+      "Step 3 explanation referencing facts F#."
+    ],
+    "relevant_docs": ["D#", "D#", "D#", "D#", "D#"],
+    "sample_questions": [
+      "Domain-neutral template question #1",
+      "Domain-neutral template question #2",
+      "Domain-neutral template question #3",
+      "Domain-neutral template question #4",
+      "Domain-neutral template question #5"
+    ]
   }}
 
   ---
-  EXAMPLE (for format illustration only — MUST NOT appear in real outputs):
+  EXAMPLE OF ARCHETYPE (DO NOT USE THIS CONTENT IN REAL OUTPUTS):
+    "A cross-document conditional filtering task requiring comparison of multiple attributes."
 
-    Example archetype:
-      "A multi-document lookup task involving identifying an entity associated with a temporal change."
+  EXAMPLE OF TASK (DO NOT USE THIS CONTENT IN REAL OUTPUTS):
+    "Construct a question that requires identifying an entity that satisfies a criterion in one document,
+     confirming or elaborating that criterion using other documents, and producing the derived entity."
 
-    Example task:
-      "The annotator must locate a described change in one document, identify the associated time period
-       across other documents, and use that period as the final answer."
+  These examples illustrate *format* only.
 
-user: |
+user: |-
   You are analyzing a long-context benchmark example containing:
 
     • A set of source documents
-    • A human-authored question
-    • A reference answer
+    • A human-written question
+    • A human-written reference answer
 
-  Your goals:
+  Your job is to infer the underlying annotation pattern AND to extract the exact facts and reasoning
+  required to determine whether the reference answer is correct.
 
-    1. **Determine the instructional pattern** the annotator followed:
-         - What reasoning skill is being tested?  
-         - What general task template could produce this QA pair?
+  You MUST:
+    - Extract ALL atomic facts used in reasoning (F1, F2, …).
+    - Provide step-by-step reasoning that shows exactly how the answer is obtained (or disproven), using only the facts.
+    - Provide a judgment: answer_correct = true/false.
+    - Provide ≥5 domain-neutral template questions following the same reasoning archetype.
+    - Ensure “archetype” and “task” are domain-neutral.
+    - Ensure “facts_used”, “reasoning_steps”, and “relevant_docs” are SPECIFIC to THIS SAMPLE.
 
-    2. **Verify the reference answer**:
-         - Use ONLY atomic facts extracted from the documents.
-         - Mark `"answer_correct": true` if the answer can be derived from facts.
-         - Mark `"answer_correct": false` if it cannot be derived or contradicts the facts.
-
-    3. **Extract all atomic facts used in reasoning**:
-         - Each fact must be a minimal one-sentence assertion.
-         - Each fact must be tied to exactly one document ID.
-         - Include *every* fact required to check the answer.
-
-    4. **Identify which documents were actually relevant**:
-         - Provide an array of document IDs.
-
-    5. **Generate AT LEAST FIVE (≥5) domain-neutral template questions**:
-         - Each must follow the *same reasoning archetype* as the example.
-         - No domain-specific content; only generalized placeholders.
-
-  Return ONE JSON object following the schema above. No commentary or preamble.
+  Return **one JSON object only**, with no preamble or explanation.
 
   ---
   DOCUMENTS:
@@ -83,4 +91,5 @@ user: |
   {expected_answer}
 
   ---
-  Produce only the JSON object. Do not include explanations or any text outside the JSON.
+  Produce only the JSON object.
+
