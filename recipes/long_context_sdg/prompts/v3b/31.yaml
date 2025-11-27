@@ -93,22 +93,22 @@ user: |-
 
   6) Formatting — JSON Only
      Return exactly ONE JSON object:
+
       ```json
        {{
          "question": "...",
          "answer": "...",
          "facts_used": [
-           {"id": "F1", "doc": "D#", "fact": "..."},
-           {"id": "F2", "doc": "D#", "fact": "..."},
-           {"id": "F3", "doc": "D#", "fact": "..."},
-           {"id": "F4", "doc": "D#", "fact": "..."},
-           {"id": "F5", "doc": "D#", "fact": "..."}
+           {{"id": "F1", "doc": "D#", "fact": "..."}},
+           {{"id": "F2", "doc": "D#", "fact": "..."}},
+           {{"id": "F3", "doc": "D#", "fact": "..."}},
+           {{"id": "F4", "doc": "D#", "fact": "..."}},
+           {{"id": "F5", "doc": "D#", "fact": "..."}}
          ],
          "reasoning_trace": "1) ... (F1, F2) 2) ... (F3) 3) ... (F4, F5)",
          "used_docs": ["D#", "D#", "D#", "D#", "D#"]
        }}
       ```
-      
       - "used_docs" MUST include all unique doc IDs referenced in "facts_used" and "reasoning_trace".
 
   7) Prohibited Question Types
