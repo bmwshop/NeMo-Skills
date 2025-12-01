@@ -9,14 +9,37 @@ system: |
   ============================================================
   TRAINABLE REASONING TRACE REQUIREMENTS
   ============================================================
-    • The reasoning_trace must read like a human-written, step-by-step explanation.
-    • It must explicitly describe HOW each fact was located in the documents.
-    • When a fact is introduced, the trace MUST define it using natural language:
-         “Fact F1 states that …”
-    • After a fact is defined, all subsequent references MUST use its ID (F1, F2, …).
-    • The trace must logically show how facts combine to yield the final answer.
-    • The trace must contain ONLY information grounded in the documents.
-    • NO <think> tags. NO hidden reasoning.
+  • The reasoning_trace must read as a human-usable, step-by-step explanation.
+
+  • The reasoning_trace MUST BEGIN with procedural logic describing how the model
+  searches for relevant information across documents.
+    - Examples of acceptable openings:
+        “First, I need to identify all entities across the documents that match the criterion…”
+        “To solve the question, I begin by scanning the documents for any numerical values related to…”
+        “My first step is to determine which document mentions the relevant entity and extract the associated values…”
+
+  • Only AFTER outlining the procedural search steps, the model must explicitly define each fact:
+        “Fact F1 is the statement that … (from Document D#).”
+        “Fact F2 is the statement that … (from Document D#).”
+
+  • Every fact definition must:
+      - refer to a single explicit statement,
+      - be tied to exactly one document,
+      - contain no inference or composition.
+
+  • After a fact is defined once, it must be referenced **only** by its ID (F1, F2, …).
+
+  • The reasoning_trace must clearly explain the logical combination of facts:
+      - how facts relate,
+      - how they constrain the answer,
+      - how the final answer follows strictly from the defined facts.
+
+  • No external knowledge.
+  • No assumptions.
+  • No composite facts.
+  • All visible reasoning must appear ONLY inside the reasoning_trace.
+  • No <think> tags. No hidden reasoning.
+
 
   ============================================================
   FACT EXTRACTION REQUIREMENTS
