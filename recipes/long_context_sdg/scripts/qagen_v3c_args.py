@@ -52,7 +52,7 @@ else:
     assert category is not None, f"Archetype {args.archetype} out of range"
     if args.data_maxlength == 130000:
         prefix = "128k"
-    else if args.data_maxlength == 31000:
+    elif args.data_maxlength == 31000:
         prefix = "32k"
     else:
         raise ValueError(f"Invalid data_maxlength: {args.data_maxlength}")
