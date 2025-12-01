@@ -93,11 +93,11 @@ user: |-
     Return exactly ONE JSON object:
 
     ```json
-    {
+    {{
       "evaluation": "2–4 sentences summarizing fact grounding, reasoning, answer correctness, and main issues.",
       "answer_correct": true or false,
       "facts_correct": true or false,
       "error_categories": ["..."],
       "suggested_fixes": "Concrete steps the student should take to fix the question, facts, reasoning, or answer."
-    }
+    }}
     ```
