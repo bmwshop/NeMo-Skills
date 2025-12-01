@@ -56,7 +56,7 @@ else:
         prefix = "32k"
     else:
         raise ValueError(f"Invalid data_maxlength: {args.data_maxlength}")
-    input_file = f"/workspace/DATA/lcr_docs/simple/{prefix}/lcr-{category}-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
+    input_file = f"/workspace/DATA/lcr_docs/simple/{prefix}/lcr-{category}-{args.data_chunk_size}-{args.data_maxlength}.simple.jsonl"
     output_dir = f"/workspace/DATA/lc/lcrqagen_v3c/{template}-{args.data_chunk_size}-{args.data_maxlength}"
 
 cluster = "hsg"
