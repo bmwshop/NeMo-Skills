@@ -1,0 +1,130 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Your task is to produce a high-quality, factual, multi-document question; extract atomic facts;
+  generate a fully trainable natural-language reasoning trace; and compute the final answer.
+
+  ALL reasoning must rely ONLY on explicit statements in the supplied documents.
+  NO external knowledge. NO assumptions. NO composite or inferred facts.
+
+  ============================================================
+  TRAINABLE REASONING TRACE REQUIREMENTS
+  ============================================================
+    • The reasoning_trace must read like a human-written, step-by-step explanation.
+    • It must explicitly describe HOW each fact was located in the documents.
+    • When a fact is introduced, the trace MUST define it using natural language:
+         “Fact F1 states that …”
+    • After a fact is defined, all subsequent references MUST use its ID (F1, F2, …).
+    • The trace must logically show how facts combine to yield the final answer.
+    • The trace must contain ONLY information grounded in the documents.
+    • NO <think> tags. NO hidden reasoning.
+
+  ============================================================
+  FACT EXTRACTION REQUIREMENTS
+  ============================================================
+    • Extract ALL atomic facts needed for the answer.
+    • Each fact must be:
+        - minimal,
+        - single-statement,
+        - tied to exactly one document.
+    • The answer must be derivable solely from these facts.
+    • Extract ≥5 atomic facts.
+
+  You MUST produce:
+    • ONE question
+    • ONE answer
+    • facts_used: list of atomic facts (F1, F2, …)
+    • reasoning_trace: fully trainable, human-readable, step-by-step explanation
+    • docs_used: list of all document IDs used
+
+
+user: |-
+
+  ###############################################################
+  # 1. QUESTION ARCHETYPE (meta-template variable)
+  ###############################################################
+  ARCHETYPE:
+  A quantitative analysis task requiring extraction of specific statistical data from a research study and performing percentage calculations to determine an exact numerical value
+
+  ###############################################################
+  # 2. DETAILED TASK INSTRUCTIONS (meta-template variable)
+  ###############################################################
+  DETAILED_TASK_INSTRUCTIONS:
+  Construct a question that requires identifying a specific numerical value from a research study by calculating percentages based on provided data points, where the calculation involves multiple steps of percentage application
+
+  ###############################################################
+  # 3. SAMPLE QUESTIONS (meta-template variable)
+  ###############################################################
+  SAMPLE_QUESTIONS:
+  Based on a study of 200 cases from 2000-2010, where 60% resulted in unfavorable outcomes for plaintiffs, and 25% of those unfavorable outcomes were due to valid claims not being enforced, how many cases had valid claims that were not enforced?
+  - If a research study examined 300 legal decisions between 2010-2020, with 45% of cases resulting in unsuccessful enforcement attempts, and 40% of those unsuccessful cases involved valid agreements that were not enforced, what is the total number of valid agreements that were not enforced?
+  - According to a study of 500 court rulings from 1995-2005, 35% of cases resulted in enforcement failures. If 60% of these failures were due to invalid agreements while the remainder involved valid agreements that were not enforced, how many valid agreements were not enforced?
+  - A legal analysis reviewed 250 cases from 2005-2015. The study found that 55% of cases resulted in unsuccessful enforcement attempts. Of these, 70% involved invalid agreements while 30% involved valid agreements that were not enforced. How many cases involved valid agreements that were not enforced?
+  - Based on a study of 400 legal decisions between 2000-2020, 40% of cases resulted in enforcement failures. If 20% of these failures were due to valid agreements not being enforced, what is the total number of valid agreements that were not enforced?
+  - A research study examined 600 court cases from 1990-2010. It found that 50% of cases resulted in unsuccessful enforcement attempts. Of these unsuccessful cases, 25% involved valid agreements that were not enforced. How many cases involved valid agreements that were not enforced?
+
+  ###############################################################
+  # 4. DOCUMENTS
+  ###############################################################
+  DOCUMENTS:
+  {docs}
+
+  ###############################################################
+  # 5. TASK FOR THIS MODEL
+  ###############################################################
+  Using the ARCHETYPE, DETAILED_TASK_INSTRUCTIONS, and SAMPLE_QUESTIONS:
+
+    • Create exactly ONE domain-grounded question.
+    • Extract ALL atomic facts needed for answering the question.
+    • Assign fact IDs F1, F2, F3, … in the order they are introduced in reasoning.
+    • Write a TRAINABLE reasoning trace that:
+
+        1. Explains how each fact was located in the documents.
+        2. Defines each fact explicitly once (“Fact F1 states that …”).
+        3. Uses ONLY fact IDs (F1, F2, …) after definitions.
+        4. Shows the logical process by which the final answer follows from the facts.
+        5. Contains NO text not grounded directly in the documents.
+        6. Contains NO <think> tags.
+
+    • Compute the final answer strictly from the extracted facts.
+    • Provide a complete list of all used document IDs in "docs_used".
+
+
+  ###############################################################
+  # 6. OUTPUT FORMAT (MANDATORY)
+  ###############################################################
+  Return exactly ONE JSON object with the following structure:
+
+    {{
+      "question": "...",
+      "answer": "...",
+      "facts_used": [
+        {{"id": "F1", "doc": "D#", "fact": "..."}},
+        {{"id": "F2", "doc": "D#", "fact": "..."}},
+        {{"id": "F3", "doc": "D#", "fact": "..."}},
+        {{"id": "F4", "doc": "D#", "fact": "..."}},
+        {{"id": "F5", "doc": "D#", "fact": "..."}}
+      ],
+      "reasoning_trace": "A step-by-step natural-language explanation referencing F# only.",
+      "docs_used": ["D#", "D#", "D#", "D#", "D#"]
+    }}
+
+  REQUIREMENTS:
+    • ≥5 distinct documents MUST be used.
+    • ≥5 atomic facts MUST be extracted.
+    • Question MUST require multi-document linkage.
+    • All facts MUST come directly from explicit document content.
+    • Answer MUST come solely from facts_used.
+    • NO text may appear outside the JSON object.
+
+  ###############################################################
+  # 7. PROHIBITED QUESTION TYPES
+  ###############################################################
+    - Single-document lookups
+    - Hypothetical or speculative questions
+    - External taxonomies or world knowledge
+    - Pure summaries or definitional lookups
+    - Questions solvable without multi-document reasoning
+
+  ###############################################################
+  # 8. END OF TEMPLATE
+  ###############################################################

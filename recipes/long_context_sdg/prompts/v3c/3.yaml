@@ -1,0 +1,130 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Your task is to produce a high-quality, factual, multi-document question; extract atomic facts;
+  generate a fully trainable natural-language reasoning trace; and compute the final answer.
+
+  ALL reasoning must rely ONLY on explicit statements in the supplied documents.
+  NO external knowledge. NO assumptions. NO composite or inferred facts.
+
+  ============================================================
+  TRAINABLE REASONING TRACE REQUIREMENTS
+  ============================================================
+    • The reasoning_trace must read like a human-written, step-by-step explanation.
+    • It must explicitly describe HOW each fact was located in the documents.
+    • When a fact is introduced, the trace MUST define it using natural language:
+         “Fact F1 states that …”
+    • After a fact is defined, all subsequent references MUST use its ID (F1, F2, …).
+    • The trace must logically show how facts combine to yield the final answer.
+    • The trace must contain ONLY information grounded in the documents.
+    • NO <think> tags. NO hidden reasoning.
+
+  ============================================================
+  FACT EXTRACTION REQUIREMENTS
+  ============================================================
+    • Extract ALL atomic facts needed for the answer.
+    • Each fact must be:
+        - minimal,
+        - single-statement,
+        - tied to exactly one document.
+    • The answer must be derivable solely from these facts.
+    • Extract ≥5 atomic facts.
+
+  You MUST produce:
+    • ONE question
+    • ONE answer
+    • facts_used: list of atomic facts (F1, F2, …)
+    • reasoning_trace: fully trainable, human-readable, step-by-step explanation
+    • docs_used: list of all document IDs used
+
+
+user: |-
+
+  ###############################################################
+  # 1. QUESTION ARCHETYPE (meta-template variable)
+  ###############################################################
+  ARCHETYPE:
+  A classification task requiring identification of entity type based on matching described attributes to documented characteristics across multiple sources.
+
+  ###############################################################
+  # 2. DETAILED TASK INSTRUCTIONS (meta-template variable)
+  ###############################################################
+  DETAILED_TASK_INSTRUCTIONS:
+  Construct a question that requires identifying an entity classification by matching a description of stable operations with active opportunity exploitation to specific documented characteristics across multiple sources.
+
+  ###############################################################
+  # 3. SAMPLE QUESTIONS (meta-template variable)
+  ###############################################################
+  SAMPLE_QUESTIONS:
+  If an organization maintains stable operations while continuing to implement improvements based on external knowledge, what classification of organization is it most likely to be?
+  - When an entity demonstrates high engagement with innovation activities but shows minimal growth in scale, what size category does it most likely belong to?
+  - An entity that frequently adopts new approaches from others but rarely increases its operational scale would most likely be classified as what type of organization?
+  - If an organization actively pursues new opportunities yet remains at a consistent size over time, what category of organization does it most likely represent?
+  - An entity that has the highest rate of implementing external innovations but experiences little growth in size would most likely be classified as what type of organization?
+  - When an organization demonstrates strong capacity to utilize external knowledge but shows minimal expansion, what size classification does it most likely fit?
+
+  ###############################################################
+  # 4. DOCUMENTS
+  ###############################################################
+  DOCUMENTS:
+  {docs}
+
+  ###############################################################
+  # 5. TASK FOR THIS MODEL
+  ###############################################################
+  Using the ARCHETYPE, DETAILED_TASK_INSTRUCTIONS, and SAMPLE_QUESTIONS:
+
+    • Create exactly ONE domain-grounded question.
+    • Extract ALL atomic facts needed for answering the question.
+    • Assign fact IDs F1, F2, F3, … in the order they are introduced in reasoning.
+    • Write a TRAINABLE reasoning trace that:
+
+        1. Explains how each fact was located in the documents.
+        2. Defines each fact explicitly once (“Fact F1 states that …”).
+        3. Uses ONLY fact IDs (F1, F2, …) after definitions.
+        4. Shows the logical process by which the final answer follows from the facts.
+        5. Contains NO text not grounded directly in the documents.
+        6. Contains NO <think> tags.
+
+    • Compute the final answer strictly from the extracted facts.
+    • Provide a complete list of all used document IDs in "docs_used".
+
+
+  ###############################################################
+  # 6. OUTPUT FORMAT (MANDATORY)
+  ###############################################################
+  Return exactly ONE JSON object with the following structure:
+
+    {{
+      "question": "...",
+      "answer": "...",
+      "facts_used": [
+        {{"id": "F1", "doc": "D#", "fact": "..."}},
+        {{"id": "F2", "doc": "D#", "fact": "..."}},
+        {{"id": "F3", "doc": "D#", "fact": "..."}},
+        {{"id": "F4", "doc": "D#", "fact": "..."}},
+        {{"id": "F5", "doc": "D#", "fact": "..."}}
+      ],
+      "reasoning_trace": "A step-by-step natural-language explanation referencing F# only.",
+      "docs_used": ["D#", "D#", "D#", "D#", "D#"]
+    }}
+
+  REQUIREMENTS:
+    • ≥5 distinct documents MUST be used.
+    • ≥5 atomic facts MUST be extracted.
+    • Question MUST require multi-document linkage.
+    • All facts MUST come directly from explicit document content.
+    • Answer MUST come solely from facts_used.
+    • NO text may appear outside the JSON object.
+
+  ###############################################################
+  # 7. PROHIBITED QUESTION TYPES
+  ###############################################################
+    - Single-document lookups
+    - Hypothetical or speculative questions
+    - External taxonomies or world knowledge
+    - Pure summaries or definitional lookups
+    - Questions solvable without multi-document reasoning
+
+  ###############################################################
+  # 8. END OF TEMPLATE
+  ###############################################################

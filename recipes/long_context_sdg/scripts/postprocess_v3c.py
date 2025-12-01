@@ -3,7 +3,7 @@ import argparse
 import re
 # import ast
 
-REQUIRED = ["question", "answer", "reasoning_trace", "facts_used", "used_docs"]
+REQUIRED = ["question", "answer", "reasoning_trace", "facts_used", "docs_used"]
 
 
 def parse_json_after_think(s: str):

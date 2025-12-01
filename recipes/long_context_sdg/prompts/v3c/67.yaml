@@ -1,0 +1,129 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Your task is to produce a high-quality, factual, multi-document question; extract atomic facts;
+  generate a fully trainable natural-language reasoning trace; and compute the final answer.
+
+  ALL reasoning must rely ONLY on explicit statements in the supplied documents.
+  NO external knowledge. NO assumptions. NO composite or inferred facts.
+
+  ============================================================
+  TRAINABLE REASONING TRACE REQUIREMENTS
+  ============================================================
+    • The reasoning_trace must read like a human-written, step-by-step explanation.
+    • It must explicitly describe HOW each fact was located in the documents.
+    • When a fact is introduced, the trace MUST define it using natural language:
+         “Fact F1 states that …”
+    • After a fact is defined, all subsequent references MUST use its ID (F1, F2, …).
+    • The trace must logically show how facts combine to yield the final answer.
+    • The trace must contain ONLY information grounded in the documents.
+    • NO <think> tags. NO hidden reasoning.
+
+  ============================================================
+  FACT EXTRACTION REQUIREMENTS
+  ============================================================
+    • Extract ALL atomic facts needed for the answer.
+    • Each fact must be:
+        - minimal,
+        - single-statement,
+        - tied to exactly one document.
+    • The answer must be derivable solely from these facts.
+    • Extract ≥5 atomic facts.
+
+  You MUST produce:
+    • ONE question
+    • ONE answer
+    • facts_used: list of atomic facts (F1, F2, …)
+    • reasoning_trace: fully trainable, human-readable, step-by-step explanation
+    • docs_used: list of all document IDs used
+
+
+user: |-
+
+  ###############################################################
+  # 1. QUESTION ARCHETYPE (meta-template variable)
+  ###############################################################
+  ARCHETYPE:
+  A cross-document financial metric comparison requiring extraction of specific values and calculation of percentage change between sequential periods.
+
+  ###############################################################
+  # 2. DETAILED TASK INSTRUCTIONS (meta-template variable)
+  ###############################################################
+  DETAILED_TASK_INSTRUCTIONS:
+  Construct a question that requires identifying specific financial metrics from sequential quarterly reports, calculating percentage changes between periods, and verifying the accuracy of provided answers.
+
+  ###############################################################
+  # 3. SAMPLE QUESTIONS (meta-template variable)
+  ###############################################################
+  SAMPLE_QUESTIONS:
+  What was the percentage change in [negative metric] between [period 1] and [period 2] to one decimal place? What was the percentage change in [positive metric] over the same period to one decimal place?
+  - Calculate the percentage increase in [undesirable financial outcome] from [time point X] to [time point Y] to one decimal place. Determine the percentage decrease in [desirable financial outcome] during the same timeframe to one decimal place.
+  - Between [starting period] and [ending period], what was the percentage growth in [financial loss indicator] to one decimal place? What was the percentage decline in [financial gain indicator] over the identical interval to one decimal place?
+  - Determine the percentage change to one decimal place for [negative performance metric] from [first reporting period] to [second reporting period]. Calculate the percentage reduction to one decimal place for [positive performance metric] across the same duration.
+  - What percentage increase occurred in [unfavorable financial measure] between [earlier timeframe] and [later timeframe] to one decimal place? What percentage decrease was observed in [favorable financial measure] during the same comparative periods to one decimal place?
+
+  ###############################################################
+  # 4. DOCUMENTS
+  ###############################################################
+  DOCUMENTS:
+  {docs}
+
+  ###############################################################
+  # 5. TASK FOR THIS MODEL
+  ###############################################################
+  Using the ARCHETYPE, DETAILED_TASK_INSTRUCTIONS, and SAMPLE_QUESTIONS:
+
+    • Create exactly ONE domain-grounded question.
+    • Extract ALL atomic facts needed for answering the question.
+    • Assign fact IDs F1, F2, F3, … in the order they are introduced in reasoning.
+    • Write a TRAINABLE reasoning trace that:
+
+        1. Explains how each fact was located in the documents.
+        2. Defines each fact explicitly once (“Fact F1 states that …”).
+        3. Uses ONLY fact IDs (F1, F2, …) after definitions.
+        4. Shows the logical process by which the final answer follows from the facts.
+        5. Contains NO text not grounded directly in the documents.
+        6. Contains NO <think> tags.
+
+    • Compute the final answer strictly from the extracted facts.
+    • Provide a complete list of all used document IDs in "docs_used".
+
+
+  ###############################################################
+  # 6. OUTPUT FORMAT (MANDATORY)
+  ###############################################################
+  Return exactly ONE JSON object with the following structure:
+
+    {{
+      "question": "...",
+      "answer": "...",
+      "facts_used": [
+        {{"id": "F1", "doc": "D#", "fact": "..."}},
+        {{"id": "F2", "doc": "D#", "fact": "..."}},
+        {{"id": "F3", "doc": "D#", "fact": "..."}},
+        {{"id": "F4", "doc": "D#", "fact": "..."}},
+        {{"id": "F5", "doc": "D#", "fact": "..."}}
+      ],
+      "reasoning_trace": "A step-by-step natural-language explanation referencing F# only.",
+      "docs_used": ["D#", "D#", "D#", "D#", "D#"]
+    }}
+
+  REQUIREMENTS:
+    • ≥5 distinct documents MUST be used.
+    • ≥5 atomic facts MUST be extracted.
+    • Question MUST require multi-document linkage.
+    • All facts MUST come directly from explicit document content.
+    • Answer MUST come solely from facts_used.
+    • NO text may appear outside the JSON object.
+
+  ###############################################################
+  # 7. PROHIBITED QUESTION TYPES
+  ###############################################################
+    - Single-document lookups
+    - Hypothetical or speculative questions
+    - External taxonomies or world knowledge
+    - Pure summaries or definitional lookups
+    - Questions solvable without multi-document reasoning
+
+  ###############################################################
+  # 8. END OF TEMPLATE
+  ###############################################################

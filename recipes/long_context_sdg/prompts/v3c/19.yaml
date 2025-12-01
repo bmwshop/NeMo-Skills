@@ -1,0 +1,129 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Your task is to produce a high-quality, factual, multi-document question; extract atomic facts;
+  generate a fully trainable natural-language reasoning trace; and compute the final answer.
+
+  ALL reasoning must rely ONLY on explicit statements in the supplied documents.
+  NO external knowledge. NO assumptions. NO composite or inferred facts.
+
+  ============================================================
+  TRAINABLE REASONING TRACE REQUIREMENTS
+  ============================================================
+    • The reasoning_trace must read like a human-written, step-by-step explanation.
+    • It must explicitly describe HOW each fact was located in the documents.
+    • When a fact is introduced, the trace MUST define it using natural language:
+         “Fact F1 states that …”
+    • After a fact is defined, all subsequent references MUST use its ID (F1, F2, …).
+    • The trace must logically show how facts combine to yield the final answer.
+    • The trace must contain ONLY information grounded in the documents.
+    • NO <think> tags. NO hidden reasoning.
+
+  ============================================================
+  FACT EXTRACTION REQUIREMENTS
+  ============================================================
+    • Extract ALL atomic facts needed for the answer.
+    • Each fact must be:
+        - minimal,
+        - single-statement,
+        - tied to exactly one document.
+    • The answer must be derivable solely from these facts.
+    • Extract ≥5 atomic facts.
+
+  You MUST produce:
+    • ONE question
+    • ONE answer
+    • facts_used: list of atomic facts (F1, F2, …)
+    • reasoning_trace: fully trainable, human-readable, step-by-step explanation
+    • docs_used: list of all document IDs used
+
+
+user: |-
+
+  ###############################################################
+  # 1. QUESTION ARCHETYPE (meta-template variable)
+  ###############################################################
+  ARCHETYPE:
+  A cross-temporal financial guidance comparison task requiring identification of changes in expenditure forecasts and calculation of percentage differences.
+
+  ###############################################################
+  # 2. DETAILED TASK INSTRUCTIONS (meta-template variable)
+  ###############################################################
+  DETAILED_TASK_INSTRUCTIONS:
+  Construct a question that requires identifying changes in financial expenditure guidance between reporting periods, calculating the percentage change for both bounds of a range, and expressing the results as whole number percentages.
+
+  ###############################################################
+  # 3. SAMPLE QUESTIONS (meta-template variable)
+  ###############################################################
+  SAMPLE_QUESTIONS:
+  For Company X, has the guidance on capital expenditure for full year changed? If no return 0%,0% otherwise calculate and then return the differences in the guidance for the lower and upper bounds as a percentage of their earliest reported guidance respectively, rounded to the nearest whole number.
+  - Compare the initial and latest financial guidance for operational expenditure over annual period and express the change in both bounds as percentages of the initial guidance, rounded to whole numbers.
+  - Determine if there was a revision to the projected range for research expenditure for fiscal year, and if so, calculate the percentage change for both the minimum and maximum values relative to the original projection.
+  - Analyze whether the forecasted range for development costs has been adjusted between reporting periods, and quantify the changes to both bounds as percentages of the original forecast.
+  - Has the estimated range for infrastructure investment been modified since the initial guidance? If unchanged, return 0%,0%. If changed, compute the percentage differences for lower and upper bounds relative to the initial estimate.
+
+  ###############################################################
+  # 4. DOCUMENTS
+  ###############################################################
+  DOCUMENTS:
+  {docs}
+
+  ###############################################################
+  # 5. TASK FOR THIS MODEL
+  ###############################################################
+  Using the ARCHETYPE, DETAILED_TASK_INSTRUCTIONS, and SAMPLE_QUESTIONS:
+
+    • Create exactly ONE domain-grounded question.
+    • Extract ALL atomic facts needed for answering the question.
+    • Assign fact IDs F1, F2, F3, … in the order they are introduced in reasoning.
+    • Write a TRAINABLE reasoning trace that:
+
+        1. Explains how each fact was located in the documents.
+        2. Defines each fact explicitly once (“Fact F1 states that …”).
+        3. Uses ONLY fact IDs (F1, F2, …) after definitions.
+        4. Shows the logical process by which the final answer follows from the facts.
+        5. Contains NO text not grounded directly in the documents.
+        6. Contains NO <think> tags.
+
+    • Compute the final answer strictly from the extracted facts.
+    • Provide a complete list of all used document IDs in "docs_used".
+
+
+  ###############################################################
+  # 6. OUTPUT FORMAT (MANDATORY)
+  ###############################################################
+  Return exactly ONE JSON object with the following structure:
+
+    {{
+      "question": "...",
+      "answer": "...",
+      "facts_used": [
+        {{"id": "F1", "doc": "D#", "fact": "..."}},
+        {{"id": "F2", "doc": "D#", "fact": "..."}},
+        {{"id": "F3", "doc": "D#", "fact": "..."}},
+        {{"id": "F4", "doc": "D#", "fact": "..."}},
+        {{"id": "F5", "doc": "D#", "fact": "..."}}
+      ],
+      "reasoning_trace": "A step-by-step natural-language explanation referencing F# only.",
+      "docs_used": ["D#", "D#", "D#", "D#", "D#"]
+    }}
+
+  REQUIREMENTS:
+    • ≥5 distinct documents MUST be used.
+    • ≥5 atomic facts MUST be extracted.
+    • Question MUST require multi-document linkage.
+    • All facts MUST come directly from explicit document content.
+    • Answer MUST come solely from facts_used.
+    • NO text may appear outside the JSON object.
+
+  ###############################################################
+  # 7. PROHIBITED QUESTION TYPES
+  ###############################################################
+    - Single-document lookups
+    - Hypothetical or speculative questions
+    - External taxonomies or world knowledge
+    - Pure summaries or definitional lookups
+    - Questions solvable without multi-document reasoning
+
+  ###############################################################
+  # 8. END OF TEMPLATE
+  ###############################################################
