@@ -58,6 +58,7 @@ user: |-
          • "doc": the document ID (e.g., "D7")
          • "fact": the minimal factual claim
      - Reasoning_trace may ONLY reference these facts.
+     - The facts must be UNIQUE.
 
   3) Reasoning Trace
      - Provide a concise, numbered chain (3–5 steps).
@@ -124,6 +125,7 @@ user: |-
      - Reasoning only uses FACTS_USED
      - Computes numeric count
      - No external knowledge
+     - All facts are unique
 
   ---
   END INSTRUCTIONS

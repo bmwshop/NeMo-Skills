@@ -54,6 +54,8 @@ user: |-
          F# (D#): <minimal explicit fact>
      - No inferred or composite facts.
      - REASONING_TRACE must reference ONLY these fact IDs.
+     - The facts must be UNIQUE.
+
 
   3) Reasoning Trace
      - Provide a concise, numbered chain (3–5 steps).
@@ -120,6 +122,7 @@ user: |-
      - Intersection correctly computed
      - Sorting rule correctly applied
      - No external knowledge
+     - All facts are unique
 
   ---
   END INSTRUCTIONS

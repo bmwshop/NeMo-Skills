@@ -55,7 +55,8 @@ user: |-
      - Provide all extracted facts in the **FACTS_USED** section of the final output.
      - Format: F# (D#): <minimal explicit fact>
      - No inferred, composite, or speculative facts allowed.
-
+     - The facts must be UNIQUE.
+     
   3) Reasoning Trace
      - Provide 3–5 concise steps under **REASONING_TRACE**.
      - Each step must:
@@ -115,6 +116,7 @@ user: |-
      - ≥5 atomic facts extracted ✔
      - Conflicting interpretations resolved strictly from evidence ✔
      - No external knowledge ✔
+     - All facts are unique ✔
 
   ---
   END INSTRUCTIONS

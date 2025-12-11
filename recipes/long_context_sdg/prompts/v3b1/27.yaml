@@ -56,6 +56,7 @@ user: |-
      - Format each as:
          F# (D#): <minimal explicit fact>
      - No composite or inferred facts.
+     - The facts must be UNIQUE.
 
   3) Reasoning Trace
      - Provide a concise 3–5 step reasoning chain under **REASONING_TRACE:**.
@@ -114,6 +115,7 @@ user: |-
      - Filtering + extraction + computation required ✔
      - Answer derivable strictly from facts_used ✔
      - No external knowledge ✔
+     - All facts are unique ✔
 
   ---
   END INSTRUCTIONS

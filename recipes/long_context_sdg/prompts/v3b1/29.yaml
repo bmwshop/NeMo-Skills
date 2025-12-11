@@ -59,6 +59,7 @@ user: |-
          F# (D#): <minimal explicit fact>
      - No composite or inferred facts.
      - REASONING_TRACE may ONLY reference fact IDs.
+     - The facts must be UNIQUE.
 
   3) Reasoning Trace
      - Provide a concise, numbered 3–5 step reasoning chain.

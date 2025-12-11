@@ -57,6 +57,7 @@ user: |-
          F# (D#): <minimal atomic fact>
      - No inferred or composite facts.
      - Reasoning_TRACE may ONLY reference F# identifiers.
+     - The facts must be UNIQUE.
 
   3) Reasoning Trace
      - Provide a concise, numbered 3–5 step chain.
@@ -121,6 +122,7 @@ user: |-
      - All facts tied to specific documents
      - Ranking derived solely from FACTS_USED
      - No external knowledge
+     - All facts are unique
 
   ---
   END INSTRUCTIONS

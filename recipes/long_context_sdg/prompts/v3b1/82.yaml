@@ -54,7 +54,8 @@ user: |-
      - Format: F# (D#): <minimal explicit fact>
      - No inferred or multi-sentence statements.
      - Reasoning_trace may ONLY use these fact IDs.
-
+     - The facts must be UNIQUE.
+     
   3) Reasoning Trace
      - Provide 3–5 concise steps under **REASONING_TRACE**.
      - Steps must reference fact IDs (F#) and doc IDs (D#).
@@ -117,6 +118,7 @@ user: |-
      - All facts explicitly from documents ✔
      - Multi-step set difference reasoning ✔
      - No external knowledge ✔
+     - All facts are unique ✔
 
   ---
   END INSTRUCTIONS

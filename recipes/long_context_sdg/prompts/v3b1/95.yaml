@@ -53,7 +53,8 @@ user: |-
      - Final output must include a **FACTS_USED** section.
      - Each entry must appear as:
          F# (D#): <atomic fact>
-
+     - The facts must be UNIQUE.
+     
   3) Reasoning Trace
      - Provide 3–5 numbered steps under **REASONING_TRACE**.
      - Each step must reference fact IDs and doc IDs.
@@ -114,6 +115,7 @@ user: |-
      - Reasoning uses ONLY extracted facts ✔
      - Correct final answer derivable ✔
      - No external knowledge ✔
+     - All facts are unique ✔
 
   ---
   END INSTRUCTIONS

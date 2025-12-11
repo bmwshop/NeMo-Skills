@@ -54,6 +54,7 @@ user: |-
      - Provide atomic facts under **FACTS_USED:** in the final output.
      - Format: F# (D#): <minimal explicit fact>
      - No inferred or composite facts allowed.
+     - The facts must be UNIQUE.
 
   3) Reasoning Trace
      - Provide 3–5 concise steps under **REASONING_TRACE:**.
@@ -114,6 +115,7 @@ user: |-
      - Extracts ≥5 atomic facts ✔
      - Multi-document time period derivation ✔
      - No external knowledge ✔
+     - All facts are unique
 
   ---
   END INSTRUCTIONS

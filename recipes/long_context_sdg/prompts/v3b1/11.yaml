@@ -58,6 +58,7 @@ user: |-
      - Each fact MUST use the format:
          F# (D#): <minimal explicit fact>
      - No inferred or composite facts allowed.
+     - The facts must be UNIQUE.
 
   3) Reasoning Trace
      - Provide a concise 3–5 step chain under **REASONING_TRACE:**.
@@ -123,6 +124,7 @@ user: |-
      - All facts explicitly stated ✔
      - Final answer derivable strictly from facts_used ✔
      - No external knowledge ✔
+     - All facts are unique ✔
 
   ---
   END INSTRUCTIONS

@@ -53,6 +53,7 @@ user: |-
      - Format strictly: F# (D#): <minimal explicit fact>.
      - No inference, no composite sentences.
      - REASONING_TRACE may ONLY reference these fact IDs.
+     - The facts must be UNIQUE.
 
   3) Reasoning Trace
      - Provide 3–5 concise steps under **REASONING_TRACE**.
@@ -114,6 +115,7 @@ user: |-
      - ≥5 atomic facts extracted ✔
      - Multi-hop linkage required ✔
      - No external knowledge ✔
+     - All facts are unique ✔
 
   ---
   END INSTRUCTIONS

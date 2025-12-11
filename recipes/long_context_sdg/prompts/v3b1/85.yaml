@@ -54,6 +54,7 @@ user: |-
      - Format: F# (D#): <minimal explicit fact>
      - No inferred or composite facts allowed.
      - Reasoning_trace may ONLY reference fact IDs.
+     - The facts must be UNIQUE.
 
   3) Reasoning Trace
      - Provide a 3–5 step explanation under **REASONING_TRACE**.
@@ -115,6 +116,7 @@ user: |-
      - Requires viewpoint vs. contrary viewpoint synthesis ✔
      - Multi-step reasoning ✔
      - No external knowledge ✔
+     - All facts are unique ✔
 
   ---
   END INSTRUCTIONS
