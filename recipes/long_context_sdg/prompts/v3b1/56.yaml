@@ -1,0 +1,129 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and proceed to the final answer.
+    - Never include <think> inside the final output block.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires combining explicit facts from MULTIPLE documents.
+    - The question must require:
+        • locating a set of named entities explicitly mentioned in one or more documents,
+        • applying a criterion (e.g., time period, status, event, attribute) stated in a different document,
+        • identifying ONLY the entities that satisfy that criterion,
+        • and COUNTING how many such entities exist.
+    - THEN:
+        1. Extract all minimal atomic facts needed to compute the count.
+        2. Assign each fact a unique fact ID ("F1", "F2", ...).
+        3. Provide the correct document ID for each fact.
+        4. Compute the correct final answer strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the documents that define the filtering criterion.
+  2) Identify which documents enumerate entities satisfying (or related to) the criterion.
+  3) Extract atomic facts (assign fact IDs + document IDs).
+  4) Count the qualifying entities strictly from the extracted facts.
+  5) Stop early if near the limit.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every extracted fact MUST come from an explicit statement in its source document.
+     - The question MUST require multi-document linkage.
+
+  2) Facts Used (MANDATORY)
+     - Provide all atomic facts under "FACTS_USED:".
+     - Each fact entry MUST include:
+         • "id": F1, F2, F3, …
+         • "doc": the document ID (e.g., "D7")
+         • "fact": the minimal factual claim
+     - Reasoning_trace may ONLY reference these facts.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered chain (3–5 steps).
+     - Each step must:
+         • reference fact IDs (e.g., "(F2)")
+         • reference document IDs (e.g., "(D4)")
+     - Must demonstrate:
+         • how the criterion was located,
+         • how relevant entities were identified,
+         • how the count was derived strictly from facts.
+
+  4) Question
+     - Natural, precise, grounded entirely in the documents.
+     - Must explicitly ask for a COUNT of entities that meet a condition.
+     - Must involve multi-document reasoning.
+
+  5) Answer
+     - Short, factual, numeric.
+     - If the count cannot be computed → "NOT ANSWERABLE".
+
+  6) Formatting
+     Return exactly the following fields, in this order:
+
+     QUESTION:
+     <question text>
+
+     ANSWER:
+     <answer text>
+
+     FACTS_USED:
+     F1 (D#): <minimal atomic fact>
+     F2 (D#): <minimal atomic fact>
+     F3 (D#): <minimal atomic fact>
+     ...
+
+     REASONING_TRACE:
+     1) ...
+     2) ...
+     3) ...
+
+     USED_DOCS:
+     D#, D#, D#, D#, D#
+     (Include every unique doc ID referenced in FACTS_USED or REASONING_TRACE.)
+
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external domain knowledge
+     - Questions whose answer is not a count of entities
+
+  8) Example Questions (domain-agnostic)
+     - One expedition report lists newly identified archaeological sites. Another specifies
+       which belong to the Late Bronze Age horizon. How many Late Bronze Age sites are named?
+     - One biodiversity survey lists observed plants. Another marks which are invasive.
+       How many invasive species are mentioned across the documents?
+     - Multiple audits list registered organizations. A policy document defines which qualify
+       as “Tier-1 Suppliers.” How many Tier-1 Suppliers appear across the documents?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents
+     - Extracts ≥5 atomic facts
+     - FACTS_USED each cite a document and contain atomic claims
+     - Reasoning only uses FACTS_USED
+     - Computes numeric count
+     - No external knowledge
+
+  ---
+  END INSTRUCTIONS

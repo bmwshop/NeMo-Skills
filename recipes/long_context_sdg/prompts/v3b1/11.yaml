@@ -1,0 +1,128 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question requiring multi-document, multi-step numerical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The answer must be computed strictly from these documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens in <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step ≤ 1–2 sentences.
+    - Do NOT restate long passages.
+    - If close to limit, stop thinking and produce the final output.
+    - Never include <think> inside the final output.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    Create exactly ONE question requiring:
+      1. Identifying a specific numerical value explicitly stated in one or more documents.
+      2. Determining which entity, time period, or event this value corresponds to.
+      3. Performing a second computation (difference, percent change, margin, comparison, etc.)
+         using values from OTHER documents.
+
+    The question MUST require **two sequential reasoning stages**:
+      (1) numeric lookup + entity/period identification,
+      (2) derived computation using additional evidence.
+
+    THEN:
+      - Extract all minimal atomic facts needed.
+      - Assign fact IDs in order (F1, F2, F3, ...).
+      - Compute the final answer strictly from those facts.
+
+  <think limit=1500>
+  1) Identify the numeric value and its linked entity/period/event.
+  2) Extract all atomic facts and assign fact IDs + doc IDs.
+  3) Perform the second computation using only these facts.
+  4) Derive the final answer.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - MUST use ≥5 distinct documents.
+     - The primary numerical value MUST appear explicitly.
+     - The same metric (or logically necessary companion metric) must appear elsewhere across documents.
+     - Must require multi-document lookup + multi-document computation.
+     - All facts must be explicitly stated.
+
+  2) Facts Used
+     - Provide atomic facts under **FACTS_USED:** in the final output.
+     - Each fact MUST use the format:
+         F# (D#): <minimal explicit fact>
+     - No inferred or composite facts allowed.
+
+  3) Reasoning Trace
+     - Provide a concise 3–5 step chain under **REASONING_TRACE:**.
+     - Steps must reference fact IDs and document IDs only.
+     - Must show:
+         • how the target value was located,
+         • how its entity/period/event was identified,
+         • how the derived computation was performed to reach the final answer.
+
+  4) Question
+     - Must be clearly numerical, multi-document, and multi-step.
+     - Must require:
+         • a lookup of a stated number,
+         • identification of what that number corresponds to,
+         • a further computation using numbers from other documents.
+     - Must not be answerable from one document.
+
+  5) Answer
+     - Provide the final computed numeric result (and any required entity/period names).
+     - If not derivable → “NOT ANSWERABLE”.
+
+  6) Formatting — FINAL OUTPUT MUST FOLLOW EXACTLY:
+
+     QUESTION:
+     <question text>
+
+     ANSWER:
+     <numeric answer>
+
+     FACTS_USED:
+     F1 (D#): <atomic fact>
+     F2 (D#): <atomic fact>
+     F3 (D#): <atomic fact>
+     F4 (D#): <atomic fact>
+     F5 (D#): <atomic fact>
+
+     REASONING_TRACE:
+     1) ...
+     2) ...
+     3) ...
+
+     USED_DOCS:
+     D#, D#, D#, D#, D#
+     (All doc IDs referenced in FACTS_USED or REASONING_TRACE.)
+
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring non-document knowledge
+
+  8) Example Question Types (domain-agnostic)
+     - Identify the month when a metric equals X; compute % change from the previous month.
+     - Identify the product reporting value Y; compute the difference relative to another model.
+     - Identify the survey entry that reports V; compute the delta vs. a prior period.
+     - Identify which region hits a threshold; compute its margin versus another region.
+     - In which reporting quarter did emissions equal 7.4 tons, and by how much did this differ from the prior quarter?
+
+  ---
+  VALIDATION CHECK
+     - ≥5 documents used ✔
+     - ≥5 atomic facts extracted ✔
+     - Multi-step lookup + computation required ✔
+     - All facts explicitly stated ✔
+     - Final answer derivable strictly from facts_used ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

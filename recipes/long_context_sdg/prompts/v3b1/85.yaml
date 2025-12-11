@@ -1,0 +1,120 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and produce the output.
+    - Never include <think> inside the final answer block.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    Create exactly ONE question whose answer requires:
+      • identifying a stated viewpoint, claim, or normative position in the documents,
+      • locating an entity that expresses a clear disagreement or contrary stance,
+      • ensuring that disagreement is grounded in explicit textual context across MULTIPLE documents,
+      • integrating these facts into a multi-hop comparison.
+
+    THEN:
+      1. Extract every minimal atomic fact needed to answer.
+      2. Assign fact IDs in order (F1, F2, …).
+      3. Provide the correct document ID for each fact.
+      4. Derive the final answer strictly from these extracted facts.
+
+  <think limit=1500>
+  1) Identify the viewpoint/claim.
+  2) Locate entities expressing positions about the same issue.
+  3) Extract atomic facts capturing the viewpoint and the contradictory stance.
+  4) Determine which entity explicitly disagrees.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract ≥5 atomic facts.
+     - Each fact MUST be explicit and tied to exactly one document.
+     - The question MUST require multi-document reasoning.
+
+  2) Facts Used
+     - Provide all atomic facts in the **FACTS_USED** section of the final output.
+     - Format: F# (D#): <minimal explicit fact>
+     - No inferred or composite facts allowed.
+     - Reasoning_trace may ONLY reference fact IDs.
+
+  3) Reasoning Trace
+     - Provide a 3–5 step explanation under **REASONING_TRACE**.
+     - Each step must:
+         • reference fact IDs (F#),
+         • reference document IDs (D#),
+         • show how the disagreeing entity is identified using only the facts.
+
+  4) Question
+     - Must explicitly ask: **which entity disagrees** with a stated viewpoint.
+     - Must require multi-document linkage (not solvable from a single document).
+     - Must be natural and grounded entirely in the provided documents.
+
+  5) Answer
+     - A short entity name (1–10 tokens).
+     - If not derivable strictly from the documents → “NOT ANSWERABLE”.
+
+  6) FORMATTING — FINAL OUTPUT MUST FOLLOW EXACTLY THIS STRUCTURE:
+
+     QUESTION:
+     <question text>
+
+     ANSWER:
+     <entity name or NOT ANSWERABLE>
+
+     FACTS_USED:
+     F1 (D#): <atomic fact>
+     F2 (D#): <atomic fact>
+     F3 (D#): <atomic fact>
+     F4 (D#): <atomic fact>
+     F5 (D#): <atomic fact>
+
+     REASONING_TRACE:
+     1) ...
+     2) ...
+     3) ...
+
+     USED_DOCS:
+     D#, D#, D#, D#, D#
+     (ALL doc IDs referenced above.)
+
+  7) Prohibited Question Types
+     - Single-document retrieval
+     - Hypothetical or speculative viewpoints
+     - External-world normative reasoning
+     - Questions without viewpoint comparison
+
+  8) Example Question Archetypes (Domain-Agnostic)
+     - One scientist claims a compound is safe; which researcher disagrees?
+     - One agency states a site meets environmental standards; which stakeholder disputes this?
+     - One policy draft asserts a requirement applies; who challenges this?
+     - One analyst argues a trend is rising; which source claims the opposite?
+     - One committee says a method is effective; who argues it is not?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - Requires viewpoint vs. contrary viewpoint synthesis ✔
+     - Multi-step reasoning ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

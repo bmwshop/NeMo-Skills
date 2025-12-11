@@ -1,0 +1,119 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and produce the final output.
+    - Never include <think> inside the final output block.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    Create exactly ONE question whose answer requires:
+      • locating two or more explicit numerical estimates (percentages, rates, counts, scores, etc.)
+        that refer to the SAME underlying metric/topic across MULTIPLE documents,
+      • comparing these values (e.g., identifying which is higher/lower),
+      • deriving the correct comparative answer strictly from explicit multi-document evidence.
+
+    THEN:
+      1. Extract minimal atomic facts with doc IDs.
+      2. Assign fact IDs "F1", "F2", ...
+      3. Use only these facts to compute the final answer.
+
+  <think limit=1500>
+  1) Identify the shared metric/topic across documents.  
+  2) Extract numerical estimates describing this shared metric.  
+  3) Create atomic facts with fact IDs + doc IDs.  
+  4) Compare the values to determine the correct answer.  
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract ≥5 atomic facts.
+     - All facts must be explicitly stated.
+     - Compared values must refer to the SAME conceptual measurement.
+     - Question must require multi-document reasoning.
+
+  2) Facts Used
+     - Final output must include a **FACTS_USED** section.
+     - Each entry must appear as:
+         F# (D#): <atomic fact>
+
+  3) Reasoning Trace
+     - Provide 3–5 numbered steps under **REASONING_TRACE**.
+     - Each step must reference fact IDs and doc IDs.
+
+  4) Question
+     - Must explicitly ask for a numerical comparison (e.g., “Which estimate is higher?”).
+     - Must require values from MULTIPLE documents.
+     - Must NOT be solvable from a single document.
+
+  5) Answer
+     - MUST provide the **actual numerical value(s)** used in the comparison  
+       (not just “Document A is higher,” but e.g. **“Document A: 37%, Document B: 29% — 37% is higher.”**).
+     - If not derivable → “NOT ANSWERABLE”.
+
+  6) FINAL OUTPUT FORMAT — MUST MATCH EXACTLY:
+
+     QUESTION:
+     <question>
+
+     ANSWER:
+     <answer>
+
+     FACTS_USED:
+     F1 (D#): <atomic fact>
+     F2 (D#): <atomic fact>
+     F3 (D#): <atomic fact>
+     F4 (D#): <atomic fact>
+     F5 (D#): <atomic fact>
+
+     REASONING_TRACE:
+     1) ...
+     2) ...
+     3) ...
+
+     USED_DOCS:
+     D#, D#, D#, D#, D#
+
+     (Include *every* document ID referenced anywhere in the facts or reasoning.)
+
+  7) Prohibited Question Types
+     - Single-document numerical lookup.
+     - Hypothetical comparisons (“assume…”, “estimate…”).
+     - Questions requiring external world knowledge.
+     - Vague or non-comparable metrics.
+
+  8) Example Questions (varied domains — **answers MUST contain actual numerical values**)
+     - Two documents report different failure percentages for the same component. Which percentage is lower, and what are the exact values, rounded to the nearest whole number? 
+     - Two studies give different growth-rate estimates for the same species. Which growth rate is larger, and what are the numbers, rounded to one decimal place?
+     - Two market reports predict adoption rates for the same technology. Which forecast is higher, and by how much? Provide the actual rates, rounded to two decimal places.
+     - Two weather stations record humidity on the same day. Which station reports the higher humidity, and what are the humidity percentages, rounded to three decimal places?
+     - Two financial reports list revenue growth for the same quarter. Which growth figure is greater? Include both numerical values, in percentage points, rounded to one decimal place.
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - Facts each cite a document and contain atomic claims ✔
+     - Reasoning uses ONLY extracted facts ✔
+     - Correct final answer derivable ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

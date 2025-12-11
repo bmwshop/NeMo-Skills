@@ -1,0 +1,123 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests multi-document
+  analytical reasoning involving extraction, classification, and aggregation
+  of additions and subtractions.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  Ground everything strictly in the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and proceed to the final output.
+    - Never include <think> inside the final output block.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly one question whose answer requires:
+        • identifying multiple instances of additions (e.g., acquisitions, gains, increases),
+        • identifying multiple instances of subtractions (e.g., disposals, losses, decreases),
+        • ensuring these events occur within a specified time window or conditional scope,
+        • and computing a NET TOTAL = (sum of additions) − (sum of subtractions).
+    - THEN:
+        1) Extract all minimal atomic facts needed to compute this net total.
+        2) Assign each fact a unique ID ("F1", "F2", ...).
+        3) Provide the correct document ID for each fact.
+        4) Compute the correct net total strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify the additions and subtractions within the defined scope.
+  2) Extract minimal atomic facts for each event.
+  3) Sum additions and subtractions to compute the net total.
+  4) Ensure every step is grounded in the extracted facts.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Include at least:
+         • 2 additive events AND 2 subtractive events, OR
+         • 2 additive events AND 2 subtractive events.
+     - Events MUST fall within an explicitly stated scope (e.g., time range, region, category).
+     - The question MUST NOT be answerable from a single document.
+
+  2) Facts Used (MANDATORY)
+     - Provide all atomic facts under "FACTS_USED:".
+     - Format each fact as:
+         F# (D#): <minimal explicit fact>
+     - No composite or inferred facts.
+     - REASONING_TRACE may ONLY reference fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered 3–5 step reasoning chain.
+     - Each step must reference fact IDs (F#) and document IDs (D#).
+     - Must show:
+         • how additions and subtractions were identified,
+         • how the net total was computed strictly from the extracted facts.
+
+  4) Question
+     - Must explicitly ask for a **net total** derived from additions and subtractions.
+     - Must specify the time window / condition / scope.
+     - Must require multi-document aggregation of events.
+
+  5) Answer
+     - A single numeric net total, or a minimal numeric pair if required.
+     - If the computation cannot be performed → “NOT ANSWERABLE”.
+
+  6) OUTPUT FORMAT (MANDATORY)
+     Return exactly the following fields, in this order:
+
+     QUESTION:
+     <question text>
+
+     ANSWER:
+     <numeric net total>
+
+     FACTS_USED:
+     F1 (D#): <minimal atomic fact>
+     F2 (D#): <minimal atomic fact>
+     F3 (D#): <minimal atomic fact>
+     ...
+
+     REASONING_TRACE:
+     1) ...
+     2) ...
+     3) ...
+
+     USED_DOCS:
+     D#, D#, D#, ...
+     (List every document referenced in FACTS_USED or REASONING_TRACE.)
+
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
+
+  8) Example Question Types (domain-agnostic)
+     - Across all reports from 2020–2023, what is the net number of housing units added (new units built − units demolished)?
+     - Across university budget documents from FY21–FY24, what is the net change in tenure-track faculty (hires − departures)?
+     - Across conservation surveys, what is the net wildlife population change (births + migrations in − deaths − migrations out)?
+     - Across excavation reports from 2018–2022, what is the net number of artifacts added after accounting for losses?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥3 atomic facts (additions/subtractions) ✔
+     - Requires cross-document aggregation ✔
+     - Computes a net total strictly from FACTS_USED ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

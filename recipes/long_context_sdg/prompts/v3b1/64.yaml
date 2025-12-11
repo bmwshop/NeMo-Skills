@@ -1,0 +1,119 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do not restate long document passages.
+    - If near the limit, stop thinking and produce the output.
+    - Never include <think> inside the final output.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    Create exactly ONE question whose answer requires:
+      • locating a notable change, increase, decrease, milestone, or inflection point described in one document,
+      • identifying the specific time period (quarter, year, season, epoch, etc.) associated with that change,
+      • confirming or cross-referencing that time period using additional documents,
+      • and providing that time period as the final answer.
+
+    THEN:
+      1. Extract all minimal atomic facts needed to identify the change.
+      2. Extract all minimal atomic facts identifying the associated time period.
+      3. Assign each fact a unique ID (F1, F2, …).
+      4. Provide the correct document ID for each fact.
+      5. Compute the final answer strictly from these facts.
+
+  <think limit=1500>
+  1) Identify the change or milestone.
+  2) Identify the document(s) providing the corresponding time period.
+  3) Extract atomic facts with fact IDs and doc IDs.
+  4) Derive the final time period using only these facts.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every fact must come directly from explicit statements.
+     - Must require multi-document linkage.
+
+  2) Facts Used
+     - Provide atomic facts under **FACTS_USED:** in the final output.
+     - Format: F# (D#): <minimal explicit fact>
+     - No inferred or composite facts allowed.
+
+  3) Reasoning Trace
+     - Provide 3–5 concise steps under **REASONING_TRACE:**.
+     - Each step must reference fact IDs and doc IDs.
+     - Must show:
+         • where the change was identified,
+         • where its associated time period was identified,
+         • how the final answer followed strictly from facts.
+
+  4) Question
+     - Natural, precise, grounded entirely in the documents.
+     - Must explicitly ask for the **time period** in which the change occurred.
+     - Must require multi-document reasoning.
+
+  5) Answer
+     - A short time-period label (e.g., "Q4 FY2024").
+     - If not derivable → “NOT ANSWERABLE”.
+
+  6) FORMATTING — FINAL OUTPUT MUST FOLLOW THIS EXACT STRUCTURE:
+
+     QUESTION:
+     <question text>
+
+     ANSWER:
+     <answer text>
+
+     FACTS_USED:
+     F1 (D#): <atomic fact>
+     F2 (D#): <atomic fact>
+     F3 (D#): <atomic fact>
+     F4 (D#): <atomic fact>
+     F5 (D#): <atomic fact>
+
+     REASONING_TRACE:
+     1) ...
+     2) ...
+     3) ...
+
+     USED_DOCS:
+     D#, D#, D#, D#, D#
+     (Include all unique doc IDs referenced in FACTS_USED and REASONING_TRACE.)
+
+  7) Prohibited Question Types
+     • Single-document fact lookups  
+     • “Why” or causal explanations  
+     • Numerical ranking or counting questions  
+     • External knowledge questions  
+
+  8) Example Questions (domain-agnostic)
+     - In which season did a sudden rise in artifact density occur?
+     - During which recorded year did Region A show its steepest temperature increase?
+     - In which sampling period did amphibian sightings spike dramatically?
+     - During which epoch did volcanic activity undergo a major acceleration?
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents ✔
+     - Extracts ≥5 atomic facts ✔
+     - Multi-document time period derivation ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

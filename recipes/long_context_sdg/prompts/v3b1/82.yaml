@@ -1,0 +1,122 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and produce the final answer.
+    - Never include <think> inside the final answer block.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    Create exactly ONE question whose answer requires:
+      • locating a list of entities in an EARLIER document,
+      • locating a comparable list in a LATER document,
+      • identifying which entities appear ONLY in the later list (i.e., newly added),
+      • integrating these facts across documents.
+
+    THEN:
+      1. Extract all minimal atomic facts needed.
+      2. Assign fact IDs (F1, F2, …).
+      3. Provide the correct document ID for each fact.
+      4. Compute the final answer strictly from these facts.
+
+  <think limit=1500>
+  1) Identify the two documents containing comparable lists.
+  2) Extract the earlier list and the later list.
+  3) Extract atomic facts describing list membership and document timing.
+  4) Determine which entities appear only in the later list.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use ≥5 distinct documents.
+     - Extract ≥5 atomic facts.
+     - All facts MUST come from explicit textual statements.
+     - The question MUST require multi-document linkage.
+
+  2) Facts Used
+     - Provide atomic facts under **FACTS_USED** in the final output.
+     - Format: F# (D#): <minimal explicit fact>
+     - No inferred or multi-sentence statements.
+     - Reasoning_trace may ONLY use these fact IDs.
+
+  3) Reasoning Trace
+     - Provide 3–5 concise steps under **REASONING_TRACE**.
+     - Steps must reference fact IDs (F#) and doc IDs (D#).
+     - Must show:
+         • how the earlier list was located,
+         • how the later list was located,
+         • how newly added entities were determined.
+
+  4) Question
+     - Must clearly require comparing earlier vs. later lists.
+     - Must ask explicitly for **entities newly added in the later list**.
+     - Must require multi-document reasoning (cannot be single-document).
+
+  5) Answer
+     - Provide the list of newly added entities as they appear in the documents.
+     - If no entities were added → return "NONE".
+     - If cannot be derived strictly from the documents → “NOT ANSWERABLE”.
+
+  6) FORMATTING — FINAL OUTPUT MUST FOLLOW THIS EXACT STRUCTURE:
+
+     QUESTION:
+     <question text>
+
+     ANSWER:
+     <entity name(s) or NOT ANSWERABLE>
+
+     FACTS_USED:
+     F1 (D#): <atomic fact>
+     F2 (D#): <atomic fact>
+     F3 (D#): <atomic fact>
+     F4 (D#): <atomic fact>
+     F5 (D#): <atomic fact>
+
+     REASONING_TRACE:
+     1) ...
+     2) ...
+     3) ...
+
+     USED_DOCS:
+     D#, D#, D#, D#, D#
+     (Include ALL doc IDs referenced above.)
+
+  7) Prohibited Question Types
+     - Single-document questions
+     - Hypothetical or speculative additions
+     - Questions requiring outside knowledge
+     - Lists that are not clearly comparable
+
+  8) Example Question Archetypes (Domain-Agnostic)
+     - Between the January and April membership reports, which new organizations were added?
+     - Comparing vendor approval lists from Phase 1 vs. Phase 2, which vendor appears only in Phase 2?
+     - Between two annual donor lists, which donor appears only in the later year?
+     - Across two project team rosters, which specialist is newly added in the second version?
+     - Which accreditation body appears only in the later audit summary?
+
+  ---
+  VALIDATION CHECK
+     - ≥5 documents ✔
+     - ≥5 atomic facts ✔
+     - All facts explicitly from documents ✔
+     - Multi-step set difference reasoning ✔
+     - No external knowledge ✔
+
+  ---
+  END INSTRUCTIONS

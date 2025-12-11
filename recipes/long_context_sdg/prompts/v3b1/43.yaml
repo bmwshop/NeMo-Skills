@@ -1,0 +1,125 @@
+system: |
+  You are an expert question-generation and reasoning model.
+  Produce one high-quality, factual question that tests conditional, multi-document analytical reasoning.
+  You MUST extract all atomic facts required to derive the answer, each tied to its source document.
+  The final answer must be computed strictly from the supplied documents—no outside knowledge.
+
+  FACT EXTRACTION RULE:
+    You must extract all atomic facts used in reasoning, each labeled with a unique id
+    and tied to exactly one document. The final answer must be derivable solely from these facts.
+
+  VISIBLE THINKING CONSTRAINTS:
+    - The content inside <think>...</think> is visible and counts toward token limits.
+    - HARD LIMIT: ~1500 tokens total inside <think>.
+    - Use exactly 3–5 concise reasoning steps.
+    - Each step may contain at most 1–2 sentences.
+    - Do NOT restate long document passages.
+    - If close to the limit, stop thinking and proceed to the final output.
+    - Never include <think> inside the final output block.
+
+user: |-
+  DOCUMENTS:
+  {docs}
+
+  ---
+  TASK
+    - Create exactly ONE question whose answer requires:
+        • extracting sets of entities from MULTIPLE documents,
+        • determining which entities appear in ONLY ONE document (i.e., appear in no others),
+        • and sorting these entities ALPHABETICALLY.
+    - THEN:
+        1. Extract all minimal atomic facts needed to compute the result.
+        2. Assign each fact a unique ID ("F1", "F2", ...).
+        3. Provide the correct document ID for each fact.
+        4. Produce the final sorted list strictly from these extracted facts.
+
+  <think limit=1500>
+  Keep visible thinking extremely concise.
+  1) Identify entity lists across documents.
+  2) Determine which entities appear in exactly one document.
+  3) Extract atomic facts showing each entity’s presence in its associated document.
+  4) Apply alphabetical sorting.
+  </think>
+
+  REQUIREMENTS
+  1) Evidence & Scope
+     - Use AT LEAST FIVE (≥5) distinct documents.
+     - Extract AT LEAST FIVE (≥5) atomic facts.
+     - Every fact MUST be explicitly present in its document.
+     - The question MUST require multi-document comparison.
+
+  2) Facts Used (MANDATORY)
+     - Provide all atomic facts under "FACTS_USED:".
+     - Format for each entry:
+         F# (D#): <minimal explicit fact>
+     - No inferred or composite facts.
+     - REASONING_TRACE must reference ONLY these fact IDs.
+
+  3) Reasoning Trace
+     - Provide a concise, numbered chain (3–5 steps).
+     - Each step must reference fact IDs (F#) and document IDs (D#).
+     - Must demonstrate:
+         • how entity sets were identified,
+         • how “only one document” membership was determined,
+         • how alphabetical (last-name-first) sorting was applied.
+
+  4) Question
+     - Natural, precise, grounded entirely in the documents.
+     - Must explicitly require:
+         • identifying entities appearing in ONLY ONE of the documents,
+         • sorting them alphabetically.
+
+  5) Answer
+     - A list of sorted entity names exactly as written in the documents.
+     - If no such entities exist → “NONE”.
+     - If insufficient evidence → “NOT ANSWERABLE”.
+
+  6) OUTPUT FORMAT (MANDATORY)
+     Return exactly the following fields, in this order:
+
+     QUESTION:
+     <question text>
+
+     ANSWER:
+     <answer text>
+
+     FACTS_USED:
+     F1 (D#): <minimal atomic fact>
+     F2 (D#): <minimal atomic fact>
+     F3 (D#): <minimal atomic fact>
+     ...
+
+     REASONING_TRACE:
+     1) ...
+     2) ...
+     3) ...
+
+     USED_DOCS:
+     D#, D#, D#, ...
+     (Include every document referenced in FACTS_USED or REASONING_TRACE.)
+
+  7) Prohibited Question Types
+     - Single-document lookups
+     - Pure counting questions
+     - Hypothetical or speculative questions
+     - Questions requiring external world knowledge
+     - Questions asking for entities appearing in ALL documents (different archetype)
+
+  8) Example Questions (domain-agnostic)
+     - Across the field reports, which species appears in exactly one region? Sort alphabetically.
+     - Among conference programs, which presenters appear in only one schedule? Sort by surname.
+     - Across archival lists, which artifacts are unique to a single catalog? Sort alphabetically.
+     - In lab notebooks, which compounds occur in exactly one experiment? Sort by name.
+     - Across manuscript versions, which co-authors appear only once? Sort alphabetically, using first name as tie-breaker.
+
+  ---
+  VALIDATION CHECK
+     - Uses ≥5 documents
+     - Extracts ≥5 atomic facts
+     - All atomic facts tied to specific documents
+     - Multi-document “exclusive appearance” logic applied
+     - Sorting rule applied correctly
+     - No external knowledge
+
+  ---
+  END INSTRUCTIONS
