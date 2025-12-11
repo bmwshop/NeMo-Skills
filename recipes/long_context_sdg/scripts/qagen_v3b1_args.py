@@ -22,11 +22,11 @@ category = args.category
 
 if category == "sec":
     # input_file = f"/workspace/DATA/lc/lcrqagen_v4/sec-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
-    input_file = f"/workspace/DATA/lcr_docs/simple/sec/sec-{args.data_chunk_size}-{args.data_maxlength}.simple.jsonl"
+    input_file = f"/workspace/DATA/lcr_docs/simple/sec/sec-{args.data_chunk_size}-{args.data_maxlength}.simple.v3b1.jsonl"
     output_dir = f"/workspace/DATA/lc/lcrqagen_v3b1/sec/{template}-{args.data_chunk_size}-{args.data_maxlength}"
 else:
     # input_file = f"/workspace/DATA/lcr_docs/acgilms-{args.data_chunk_size}-{args.data_maxlength}.jsonl"
-    input_file = f"/workspace/DATA/lcr_docs/simple/acgilms-{args.data_chunk_size}-{args.data_maxlength}_sh.jsonl"
+    input_file = f"/workspace/DATA/lcr_docs/simple/acgilms-{args.data_chunk_size}-{args.data_maxlength}_sh_v3b1.jsonl"
     output_dir = f"/workspace/DATA/lc/lcrqagen_v3b1/{template}-{args.data_chunk_size}-{args.data_maxlength}"
 
 cluster = "hsg"
