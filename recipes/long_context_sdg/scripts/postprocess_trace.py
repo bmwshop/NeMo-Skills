@@ -15,6 +15,13 @@ def parse_json_after_think(s: str):
     obj = {} # the new reasoning trace and answer
     obj["reasoning_trace"] = before
     obj["answer"] = after
+
+    if "Final answer is:" in obj["answer"]:
+        obj["answer"] = obj["answer"].split("Final answer is:")[-1].strip()
+        
+    if "NOT ANSWERABLE" in obj["answer"].upper():
+        print(f"Warning: NOT ANSWERABLE in the generation: {obj['answer']}")
+        return None
     return obj
 
 def extract_generation_fields(input_file, output_file):
