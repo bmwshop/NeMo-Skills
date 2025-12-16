@@ -8,7 +8,7 @@ prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/annotate_aalcr_
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
-num_servers = 10
+num_servers = 20
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
 
@@ -19,7 +19,7 @@ generate(
         f"++inference.tokens_to_generate=131072 "
         f"++inference.endpoint_type=text "
         f"++max_concurrent_requests=16 "
-        f"++inference.temperature=0.3 "
+        f"++inference.temperature=0.6 "
         f"++inference.top_p=0.9 "
     ),
     cluster=cluster,
