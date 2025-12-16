@@ -3,7 +3,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Generate QA pairs with specified template')
 parser.add_argument('--experiment_suffix', type=str, help='Experiment suffix', default="")
-parser.add_argument('--num_servers', type=int, help='Number of servers', default=10)
+parser.add_argument('--servers', type=int, help='Number of servers', default=10)
 args = parser.parse_args()
 
 cluster = "hsg"
@@ -14,7 +14,7 @@ prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/annotate_aalcr_
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
-num_servers = args.num_servers
+num_servers = args.servers
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
 
