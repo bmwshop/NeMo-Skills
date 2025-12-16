@@ -1,14 +1,20 @@
 from nemo_skills.pipeline.cli import generate, wrap_arguments
+import argparse
+
+parser = argparse.ArgumentParser(description='Generate QA pairs with specified template')
+parser.add_argument('--experiment_suffix', type=str, help='Experiment suffix', default="")
+parser.add_argument('--num_servers', type=int, help='Number of servers', default=10)
+args = parser.parse_args()
 
 cluster = "hsg"
 # input_file = "/nemo_run/code/recipes/long_context_sdg/src/test.jsonl"
 input_file = "/workspace/DATA/lc/lcrdocq_topic_annotation/lcrdocq.jsonl"
-output_dir = "/workspace/DATA/lc/aalcr_v2"
+output_dir = f"/workspace/DATA/lc/aalcr_v2_{args.experiment_suffix}"
 prompt_config = "/nemo_run/code/recipes/long_context_sdg/prompts/annotate_aalcr_v2.yaml"
 # teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Instruct-2507"
 teacher_model = "/hf_models/Qwen_Qwen3-235B-A22B-Thinking-2507"
 
-num_servers = 20
+num_servers = args.num_servers
 #  f"++max_concurrent_requests=512 "
 #  server_type="vllm",
 
