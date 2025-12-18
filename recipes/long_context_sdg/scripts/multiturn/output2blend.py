@@ -31,7 +31,7 @@ def remove_special_prefix(text):
 def convert_string_to_training_data(s):
     # Splits the string into turns by matching "User:" or "Assistant:" prefixes.
     pattern = r'(User|Assistant): (.*?)(?=(?:User|Assistant):|$)'
-    matches = re.findall(pattern, s, flags=re.DOTALL)
+    matches = re.findall(pattern, s, flags=re.DOTALL | re.IGNORECASE)
     conversations = []
     for speaker, text in matches:
         conversations.append({
@@ -49,9 +49,9 @@ def convert_line_to_jsonl(line):
     original_conversation = convert_string_to_training_data(data["prompt"])
     generation = data["generation"]
     if "</think>" not in generation:
-        print("Warning: No </think> found in the generation.")
+        logging.warning("No </think> found in the generation.")
         return None
-        
+
     post_think = generation.split("</think>", 1)[-1]
     raw_segments = post_think.split("~~~~~~~~~~")
     segments = []
@@ -61,6 +61,7 @@ def convert_line_to_jsonl(line):
             segments.append(cleaned)
     # Skip line if number of segments (turns) is not even.
     if len(segments) % 2 != 0:
+        logging.warning("Number of segments is not even.")
         return None
     referencing_turns = []
     # Assume the first (non-empty) segment is User, then Assistant, and so on.
@@ -81,6 +82,7 @@ def convert_line_to_jsonl(line):
 
 def process_file(input_filename, output_filename, max_lines=None):
     line_count = 0
+    written_count = 0
     with open(input_filename, 'r', encoding='utf-8') as infile, \
          open(output_filename, 'w', encoding='utf-8') as outfile:
         for line in infile:
@@ -99,6 +101,7 @@ def process_file(input_filename, output_filename, max_lines=None):
                     logging.error("Output line is not valid JSON (line %d): %s", line_count, out_str)
                     continue
                 outfile.write(out_str + "\n")
+                written_count += 1
             except Exception as e:
                 logging.error("Error processing line %d: %s", line_count, str(e))
                 logging.error("Line content: %s", line)
@@ -107,6 +110,8 @@ def process_file(input_filename, output_filename, max_lines=None):
             if max_lines is not None and line_count >= max_lines:
                 logging.info("Reached maximum lines to process: %d", max_lines)
                 break
+
+    logging.info(f"Wrote {written_count} lines out of {line_count} inputs to {output_filename}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert output to blend format.')
