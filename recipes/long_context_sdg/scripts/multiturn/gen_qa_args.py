@@ -6,6 +6,7 @@ MAX_SEQ_LEN = 524288
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Generate QA pairs with specified template')
 
+parser.add_argument('--input_split', type=int, help='Split number of the input file to process', required=True)
 parser.add_argument('--servers', type=int, help='Number of servers', default=1)
 parser.add_argument('--jobs', type=int, help='Number of jobs', default=3)
 parser.add_argument('--concurrent_requests', type=int, help='Number of concurrent requests', default=16)
@@ -13,10 +14,12 @@ parser.add_argument('--tokens_to_generate', type=int, help='Number of tokens to 
 
 args = parser.parse_args()
 
+split_number = args.input_split
 
+# input_file = f"/workspace/DATA/lc/multiturn/nickel-capybara_noncommercial.shuf.prompts.jsonl"
 
-input_file = f"/workspace/DATA/lc/multiturn/nickel-capybara_noncommercial.shuf.prompts.jsonl"
-output_dir = f"/workspace/DATA/lc/multiturn/with_synth_turns"
+input_file = f"/workspace/DATA/lc/multiturn/nc_{split_number}_prompt.jsonl"
+output_dir = f"/workspace/DATA/lc/multiturn/synth_turns_{split_number}"
 
 
 
