@@ -1,0 +1,43 @@
+system: |
+  Your response will be a sequence of User and Assistant turns. Every single turn is separated 
+  from the others by a separator \"~~~~~~~~~~\". The turns should not start with \"User:\" or \"Assistant:\" 
+  and should not be enclosed in quotation marks"
+
+user: |-
+  Conversation:
+  {prompt}
+
+  Above are several turns that are part of a longer conversation between User and Assistant. 
+  We are trying to create training data for a language model to improve its long context capabilities. 
+  For this, we will be creating additional turns that will go much later in this conversation and will 
+  reference these earlier turns. Note that when writing new User and Assistant turns, you can assume that 
+  they will be present in the same conversation as the above turns. So, for example, when the User references 
+  something the Assistant said, the User can say "what *you* said earlier", not "what the assistant said earlier".
+
+  First, please produce ONLY a single user-message that asks for a summary of these earlier turns.
+  The user message should refer to these turns by what they're about, as this will be part of a much larger text. 
+  (E.g. 'Summarize the conversation about the weather in England.' or 'What did we discuss about the weather?')
+  Then, use the separator "~~~~~~~~~~".
+
+  Afterwards, write an assistant response to that user question. Do not include "User:" or "Assistant" in either 
+  of the messages. Then put the same separator again.
+
+  After that, we will create several question and answer pairs in the same format. Similarly, they will 
+  serve as a reading and recall tests. Ideally, the questions should ask about specific details present in 
+  these turns, rather than something requiring general knowledge, because the User is trying to test how well 
+  the Assistant recalls this part of the conversation. For example, you may ask about specific variable names 
+  or values, interesting constraints given by User in these turns, quirks of the way the question was phrased, etc. 
+  Be creative, but make sure there is a clear and unambiguos answer. Also, include at least 1 question where you, 
+  as the User, should mention a detail incorrectly or ask about something that wasn't stated. State the incorrect 
+  detail firmly as fact, in the same way that you ask questions that are accurate. (DO NOT make it sound different 
+  by saying something like "fix this false statement" or "do I remember this right?". Ask normally and have the 
+  Assistant figure out that there is an issue instead). When writing the response to that as the Assistant, 
+  note any inaccuracies to show that you are paying attention.
+  Each qa pair will act independently of each other, not as part of one test, so each time the User turn needs 
+  to reference the conversation/earlier turns again by the topic or some element, instead of assuming the Assistant 
+  already knows what they are asking about. If you just ask "what was the value of X" this will not make sense. 
+  You always need to re-specify the context of your question. Use different styles, manners of speaking and tones when 
+  generating the User turns. EACH QUESTION NEEDS TO SEPARATELY REFENCE THE ORIGINAL CONVERSATION 
+  (e.g. "When we were discussing weather, what was the exact temperature?", "When I mentioned weather in some country, 
+  what was the country?"). Also try to make both User and Assistant turns long, at least a couple paragraphs each. Do not 
+  include anything like User: or Assistant: at the start of any turn.
