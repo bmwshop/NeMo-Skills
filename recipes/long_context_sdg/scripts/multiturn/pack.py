@@ -8,8 +8,15 @@ import threading
 import queue
 import argparse
 from tqdm import tqdm
-import sentencepiece as spm
 
+try:
+    from tokenizer.tiktokenizer import TiktokenTokenizer
+except ImportError:
+    print('tiktoken tokenizer not available')
+try:
+    from transformers import AutoTokenizer
+except ImportError:
+    print('transformers library not available for HuggingFace tokenizers')
 
 # adapted from /lustre/fsw/portfolios/llmservice/users/skriman/lgen/scripts/create_extended_dataset7.py
 logging.basicConfig(
@@ -26,6 +33,43 @@ conv1_fhs = None
 conv2_fhs = None
 metadata = None
 output_folder = None
+
+def setup_tokenizer(tokenizer_path):
+    """Setup the tokenizer based on the provided path or HuggingFace URL"""
+
+    # Check if it's a HuggingFace URL (contains '/' and doesn't exist as local file)
+    # if '/' in tokenizer_path and not os.path.exists(tokenizer_path):
+    if not tokenizer_path.endswith('.json'):
+        try:
+            print(f"Loading HuggingFace tokenizer: {tokenizer_path}")
+            tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+        except Exception as e:
+            raise RuntimeError(f"Failed to load HuggingFace tokenizer '{tokenizer_path}': {e}")
+    else:
+        # Treat as tiktoken tokenizer
+        if not os.path.exists(tokenizer_path):
+            raise FileNotFoundError(f"Tokenizer file not found: {tokenizer_path}")
+        try:
+            from tokenizer.tiktokenizer import TiktokenTokenizer
+            print(f"Loading local tiktoken tokenizer: {tokenizer_path}")
+            tokenizer = TiktokenTokenizer(vocab_file=tokenizer_path)
+        except Exception as e:
+            raise RuntimeError(f"Failed to load local tokenizer '{tokenizer_path}': {e}")
+    return tokenizer
+
+def tokenize_text(text, tokenizer):
+    if tokenizer is None:
+        raise RuntimeError("Tokenizer not initialized. Call setup_tokenizer first.")
+
+    # Handle different tokenizer types
+    if hasattr(tokenizer, 'text_to_tokens'):
+        # TiktokenTokenizer
+        return tokenizer.text_to_tokens(text)
+    else:
+        # HuggingFace AutoTokenizer
+        tokens = tokenizer.encode(text, add_special_tokens=False)
+        return tokens
+
 
 # ---------- helpers for metadata loading/estimation ----------
 def _try_load_metadata(folder):
@@ -168,6 +212,21 @@ def sanitize_conversation(conv):
         out.append(new_t)
     return out
 
+def sanitize_conversation_oai(conv):
+    out = []
+    for turn in conv:
+        new_t = dict(turn)
+        val = new_t.get("content", "")
+        if "reasoning_content" in new_t:
+            new_t.pop("reasoning_content")
+
+        if not isinstance(val, str):
+            try:
+                new_t["content"] = json.dumps(val, ensure_ascii=False)
+            except Exception:
+                new_t["content"] = str(val)
+        out.append(new_t)
+    return out
 
 def count_tokens(conv, sp):
     txts = []
@@ -179,7 +238,17 @@ def count_tokens(conv, sp):
             except Exception:
                 val = str(val)
         txts.append(val)
-    return len(sp.encode(" ".join(txts)))
+    return len(tokenize_text(" ".join(txts), sp))
+
+def count_turn_list_tokens_oai(turns, sp):
+    txts = []
+    for t in turns:
+        val = t.get("content", "")
+        if t.get("role") == "system":
+            continue
+        txts.append(val)
+    # return len(sp.encode(" ".join(txts)))
+    return len(tokenize_text(" ".join(txts), sp))
 
 
 def count_turn_list_tokens(turns, sp):
@@ -192,7 +261,18 @@ def count_turn_list_tokens(turns, sp):
             except Exception:
                 val = str(val)
         txts.append(val)
-    return len(sp.encode(" ".join(txts)))
+    # return len(sp.encode(" ".join(txts)))
+    return len(tokenize_text(" ".join(txts), sp))
+
+def count_turn_list_tokens_oai(turns, sp):
+    txts = []
+    for t in turns:
+        val = t.get("content", "")
+        if t.get("role") == "system":
+            continue
+        txts.append(val)
+    # return len(sp.encode(" ".join(txts)))
+    return len(tokenize_text(" ".join(txts), sp))
 
 
 def merge_conversations(conv1, conv2):
@@ -204,12 +284,35 @@ def merge_conversations(conv1, conv2):
         return conv1 + [dummy] + conv2
     return conv1 + conv2
 
+def merge_conversations_oai(conv1, conv2):
+    if conv1 and conv2 and conv1[-1]["role"] == conv2[0]["role"]:
+        dummy = {
+            "role": "assistant" if conv1[-1]["role"] == "user" else "user",
+            "content": "",
+        }
+        return conv1 + [dummy] + conv2
+    return conv1 + conv2
 
 def insert_block(conv, block, boundary):
     if not isinstance(block, list):
         block = [block]
     nb = boundary
     while nb > 0 and nb <= len(conv) and conv[nb - 1].get("from") != "Assistant":
+        nb += 1
+    if nb > len(conv):
+        nb = len(conv)
+    return conv[:nb] + block + conv[nb:]
+
+def insert_block_hybrid(conv, block, boundary):
+    # the conv is in the new format: messages
+    # the block is in the old format
+    if not isinstance(block, list):
+        block = [block]
+    # convert the block to the new format
+    block = [{"role": t.get("from").lower(), "content": t.get("value")} for t in block]
+
+    nb = boundary
+    while nb > 0 and nb <= len(conv) and conv[nb - 1].get("role").lower() != "assistant":
         nb += 1
     if nb > len(conv):
         nb = len(conv)
@@ -330,6 +433,7 @@ def get_dep_line_dep2():
 
 # ---------------- dependency insertion helpers (unchanged) ----------------
 def insert_dependency_dep1_partial(sample, sample_token_count, sp, T_final, dep_obj, num_ref_turns):
+    # the dep_obj is still in the old format. 
     block_orig = dep_obj.get("original_conversation", {}).get("conversations", [])
     if "user_rewrite" in dep_obj and block_orig:
         rw = dep_obj["user_rewrite"]
@@ -349,7 +453,7 @@ def insert_dependency_dep1_partial(sample, sample_token_count, sp, T_final, dep_
     offset = 0
     needed_blk = count_turn_list_tokens(block_orig, sp) if block_orig else 0
     if block_orig and sample_token_count + needed_blk <= T_final:
-        sample = insert_block(sample, block_orig, earliest + offset)
+        sample = insert_block_hybrid(sample, block_orig, earliest + offset)
         sample_token_count += needed_blk
         offset += len(block_orig)
     else:
@@ -364,7 +468,7 @@ def insert_dependency_dep1_partial(sample, sample_token_count, sp, T_final, dep_
         needed_ref = count_turn_list_tokens(referencing[i], sp)
         if sample_token_count + needed_ref <= T_final:
             bpos = remain[i]
-            sample = insert_block(sample, referencing[i], bpos + offset)
+            sample = insert_block_hybrid(sample, referencing[i], bpos + offset)
             sample_token_count += needed_ref
             offset += len(referencing[i])
         else:
@@ -457,13 +561,13 @@ def main():
     )
     parser.add_argument("--main_files", required=True)
     parser.add_argument("--conv1_files", required=True)
-    parser.add_argument("--conv2_files", required=True)
+    parser.add_argument("--conv2_files", required=False, default=None)
     parser.add_argument("--output_folder", required=True)
     parser.add_argument("--tokenizer_model", required=True)
     parser.add_argument("--T_final", type=int, required=True)
     parser.add_argument("--T_main", type=int, required=True)
     parser.add_argument("--add_long_dep_1", type=int, required=True)
-    parser.add_argument("--add_long_dep_2", type=int, required=True)
+    parser.add_argument("--add_long_dep_2", type=int, required=False, default=0)
     parser.add_argument("--samples_per_file", type=int, required=True)
     parser.add_argument("--max_main_lines", type=int, required=True)
     parser.add_argument("--mode", choices=["discard", "allow_overflow"], required=True)
@@ -476,7 +580,7 @@ def main():
 
     main_paths = args.main_files.split(",")
     conv1_paths = args.conv1_files.split(",")
-    conv2_paths = args.conv2_files.split(",")
+    conv2_paths = args.conv2_files.split(",") if args.conv2_files else []
     global output_folder, metadata
     output_folder = args.output_folder
     os.makedirs(output_folder, exist_ok=True)
@@ -513,12 +617,11 @@ def main():
     # ---- log metadata at startup ----
     logging.info("Metadata at startup:\n%s", json.dumps(metadata, indent=2, ensure_ascii=False))
 
-    sp = spm.SentencePieceProcessor()
-    sp.load(args.tokenizer_model)
+    sp = setup_tokenizer(args.tokenizer_model)
 
     global conv1_fhs, conv2_fhs
     conv1_fhs = [open(p, "r", encoding="utf-8") for p in conv1_paths]
-    conv2_fhs = [open(p, "r", encoding="utf-8") for p in conv2_paths]
+    conv2_fhs = [open(p, "r", encoding="utf-8") for p in conv2_paths] if conv2_paths else []
 
     # proportions
     if args.main_files_proportions is None:
@@ -606,18 +709,26 @@ def main():
                     data = json.loads(line)
                 except Exception:
                     continue
-                new_turns = data.get("conversations", [])
-                needed = count_turn_list_tokens(new_turns, sp)
+                # new_turns = data.get("conversations", [])
+                # the incoming data is in oai format, so we need to use the messages field
+                new_turns = data.get("messages", [])
+                if not new_turns[0].get("role") == "system": # the first turn is a system turn.
+                    continue
+                new_turns = new_turns[1:] # remove the system turn
+                
+                needed = count_turn_list_tokens_oai(new_turns, sp)
                 pot = tok_count + needed
                 if pot <= args.T_main:
-                    conversation = merge_conversations(conversation, new_turns)
+                    # conversation = merge_conversations(conversation, new_turns)
+                    conversation = merge_conversations_oai(conversation, new_turns)
                     tok_count = pot
                     if needed:
                         bar.update(needed)
                     lines_used += 1
                 else:
                     if args.mode == "allow_overflow":
-                        conversation = merge_conversations(conversation, new_turns)
+                        # conversation = merge_conversations(conversation, new_turns)
+                        conversation = merge_conversations_oai(conversation, new_turns)
                         bar.update(needed)
                         tok_count += needed
                         lines_used += 1
@@ -655,12 +766,18 @@ def main():
                 dep1c = d1s
                 dep2c = d2s
 
+            # final_conv = {
+            #     "system": system_prompt,
+            #     "mask": "User",
+            #     "conversations": sanitize_conversation(sample),
+            # }
+            messages = sanitize_conversation_oai(sample)
+            first_message = {"role": "system", "content": system_prompt}
+            messages = [first_message] + messages
             final_conv = {
-                "system": system_prompt,
-                "mask": "User",
-                "conversations": sanitize_conversation(sample),
+                "messages": messages,
             }
-            ctk = count_tokens(final_conv["conversations"], sp)
+            ctk = count_turn_list_tokens_oai(final_conv["messages"], sp)
             with meta_lock:
                 update_stats(metadata, ctk, args.T_final)
                 k = f"dep1:{dep1c}_dep2:{dep2c}"
